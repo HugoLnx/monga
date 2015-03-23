@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include "../build/src/lex.yy.h"
+#include "../build/lex.yy.h"
 #include "../src/y.tab.h"
 
 int main()
 {
 	int token;
 	while(token = yylex()) {
-		printf("=>%d (%d|%s)", token, yylval.ival, yylval.text);
+		printf("=>%d (%d)\n", token, yylval.ival);
 	}
   return 0;
 }
