@@ -1,0 +1,6 @@
+Estrutura de diretórios
+
+src/ - Contém os arquivos fonte que nós estamos desenvolvendo.
+build/ - Ficam todos os arquivos temporários que são criados automaticamente.
+build/dist - Arquivos necessários para distribuição (no nosso caso só o executável).
+tests/ - Onde ficarão os testes automatizados.
