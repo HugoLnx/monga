@@ -73,20 +73,33 @@ end
 
 def execute_case(test_path)
   test_output = execute test_path
-  expected = File.read test_path.gsub(/\.in$/, ".expected")
+  expected_path = test_path.gsub(/\.in$/, ".expected")
+  expected = File.exist?(expected_path) ? File.read(expected_path) : nil
   failing_msg(test_output, expected)
 end
 
 def failing_msg(output, expected)
-  expected = expected.lines
-  output.lines.each_with_index do |line, i|
-    if line != expected[i]
-      return %Q{
+  if expected
+    expected = expected.lines
+    output.lines.each_with_index do |line, i|
+      if line != expected[i]
+        return %Q{
 Difference on line #{i+1}:
   Expected: #{expected[i].strip}
   Output:   #{line.strip}
-      }.strip
+        }.strip
+      end
+    end
+    return nil 
+  else
+    matching = output.match /^INVALID,(.*)\Z/
+    if matching.nil?
+      return %Q[
+Expected to reject but the output was:
+#{output}
+      ].strip
+    else
+      return nil
     end
   end
-  nil
 end
