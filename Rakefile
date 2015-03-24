@@ -47,7 +47,7 @@ task(:test_all => [:test_compile]) do
     if error_msg
       puts "Failing test: '#{test_name}'"
       puts error_msg
-      exit
+      puts
     end
   end
   puts "#{test_cases.size} test cases passed."
