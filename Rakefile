@@ -28,9 +28,14 @@ task :compile => [:clear] do
   ])
 end
 
-desc "rake test[<test-name>] - Run with one test"
-task(:test, %w{test_name} => [:test_compile]) do |_, args|
-  error_msg = execute_case args[:test_name]
+desc "rake run <input-name> - Run with one input"
+task(:run => [:test_compile]) do |_, args|
+  puts execute ARGV[1]
+end
+
+desc "rake test <test-path> - Run with one test"
+task(:test => [:test_compile]) do
+  error_msg = execute_case ARGV[1]
   if error_msg.nil?
     puts "The test case passed."
   else
@@ -41,10 +46,10 @@ end
 desc "rake test_all - Run all tests"
 task(:test_all => [:test_compile]) do
   test_cases = Dir["./tests/*.in"]
-  test_cases.each do |filename|
-    test_name = File.basename filename, ".in"
-    error_msg = execute_case test_name
+  test_cases.each do |filepath|
+    error_msg = execute_case filepath
     if error_msg
+      test_name = File.basename filepath, ".in"
       puts "Failing test: '#{test_name}'"
       puts error_msg
       puts
@@ -62,9 +67,13 @@ task :test_compile => [:compile] do
   ])
 end
 
-def execute_case(test_name)
-  test_output = %x[#{File.join(TEST_DIST,"main")} < #{File.join(TESTS, test_name)}.in]
-  expected = File.read(File.join(TESTS, test_name) + ".expected")
+def execute(input_path)
+  %x[#{File.join(TEST_DIST,"main")} < #{input_path}]
+end
+
+def execute_case(test_path)
+  test_output = execute test_path
+  expected = File.read test_path.gsub(/\.in$/, ".expected")
   failing_msg(test_output, expected)
 end
 
