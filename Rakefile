@@ -46,6 +46,7 @@ end
 desc "rake test_all - Run all tests"
 task(:test_all => [:test_compile]) do
   test_cases = Dir["./tests/*.in"]
+  fails = 0
   test_cases.each do |filepath|
     error_msg = execute_case filepath
     if error_msg
@@ -53,9 +54,11 @@ task(:test_all => [:test_compile]) do
       puts "Failing test: '#{test_name}'"
       puts error_msg
       puts
+      fails += 1
     end
   end
-  puts "#{test_cases.size} test cases passed."
+  passing_tests = test_cases.size - fails
+  puts "Result: #{passing_tests} of #{test_cases.size} test cases passed."
 end
 
 # PRIVATE
