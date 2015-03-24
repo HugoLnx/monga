@@ -1,10 +1,12 @@
-Estrutura de diretórios
+Directory Structure
 
-src/ - Contém os arquivos fonte que nós estamos desenvolvendo.
-build/ - Ficam todos os arquivos temporários que são criados automaticamente.
-build/dist - Arquivos necessários para distribuição (no nosso caso só o executável).
-tests/ - Onde ficarão os testes automatizados.
+src/ - Source files that we are developing.
+build/ - Temporary files that are automatically created.
+build/dist - Distributions files. (The executable in our case)
+build/test - Simulated distributions files for testing. (The executable in our case)
+tests/ - Where the tests are.
 
 
-Tarefas
-As tarefas estão escritas em ruby, para lista-las basta executar: rake -T
+Tasks
+The tasks were writen in ruby, to list then execute:
+  rake -T
