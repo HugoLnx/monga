@@ -125,7 +125,7 @@ def failing_msg(output, expected)
       if line != expected[i]
         return %Q{
 Difference on line #{i+1}:
-  Expected: #{expected[i].strip}
+  Expected: #{expected[i] && expected[i].strip || "<no-line>"}
   Output:   #{line.strip}
         }.strip
       end
