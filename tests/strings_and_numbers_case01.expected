@@ -1,6 +1,7 @@
 NUMBER,99
-NUMBER,30
-NUMBER,123
+NUMBER,0
 TEXT,"hugo roque 938z"
-NUMBER,90
-TEXT,"hey"
+NUMBER,-50
+TEXT,"hey\n\t\"\^\~\-\+"
+TEXT,""
+TEXT,"\" very evil sample \""
