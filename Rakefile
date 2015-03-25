@@ -9,7 +9,7 @@ TEST_DIST = File.join(BUILD, "test")
 SRC = File.join(ROOT, "src")
 TESTS = File.join(ROOT, "tests")
 
-REJECT_CASE_TEMPLATE = %Q{92 ::test-case:: 29}
+REJECT_CASE_TEMPLATE = %Q{"92" ::test-case:: "29"}
 
 desc "rake clear - Clear build files"
 task :clear do
