@@ -9,6 +9,8 @@ TEST_DIST = File.join(BUILD, "test")
 SRC = File.join(ROOT, "src")
 TESTS = File.join(ROOT, "tests")
 
+REJECT_CASE_TEMPLATE = %Q{92 ::test-case:: 29}
+
 desc "rake clear - Clear build files"
 task :clear do
   system(%Q[
@@ -45,7 +47,7 @@ end
 
 desc "rake test_all - Run all tests"
 task(:test_all => [:test_compile]) do
-  test_cases = Dir["./tests/*.in"]
+  test_cases = Dir["./tests/*.{in,rejected}"]
   fails = 0
   test_cases.each do |filepath|
     error_msg = execute_case filepath
@@ -74,11 +76,46 @@ def execute(input_path)
   %x[#{File.join(TEST_DIST,"main")} < #{input_path}]
 end
 
+def execute_content(content)
+  %x[#{File.join(TEST_DIST,"main")} <<EOF
+#{content}
+EOF]
+end
+
 def execute_case(test_path)
+  if File.extname(test_path) == ".in"
+    execute_normal_test test_path
+  else
+    execute_reject_test test_path
+  end
+end
+
+def execute_normal_test(test_path)
   test_output = execute test_path
   expected_path = test_path.gsub(/\.in$/, ".expected")
   expected = File.exist?(expected_path) ? File.read(expected_path) : nil
   failing_msg(test_output, expected)
+end
+
+def execute_reject_test(test_path)
+  msgs = []
+  reject_cases = File.readlines test_path
+  reject_cases.each do |rcase|
+    rcase.gsub!(/\n$/, "")
+    content = REJECT_CASE_TEMPLATE.gsub("::test-case::", rcase)
+    test_output = execute_content content
+    if !rejected?(test_output)
+      msgs << %Q[
+#{content} should be rejected but the output was:
+#{test_output}
+      ].strip
+    end
+  end
+  if msgs.empty?
+    return nil
+  else
+    msgs.join "\n"
+  end
 end
 
 def failing_msg(output, expected)
@@ -95,14 +132,18 @@ Difference on line #{i+1}:
     end
     return nil 
   else
-    matching = output.match /^INVALID,(.*)\Z/
-    if matching.nil?
+    if rejected?(output)
+      return nil
+    else
       return %Q[
 Expected to reject but the output was:
 #{output}
       ].strip
-    else
-      return nil
     end
   end
+end
+
+def rejected?(output)
+  matching = output.match /^INVALID,(.*)\Z/
+  !matching.nil?
 end
