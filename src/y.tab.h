@@ -2,6 +2,7 @@
 	TOKEN(END) \
   TOKEN(INVALID) \
   TOKEN(NUMBER) \
+  TOKEN(HEXADECIMAL) \
   TOKEN(TEXT) \
 
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -16,6 +17,6 @@ static const char *TOKEN_STR[] = {
 };
 
 union {
-	int ival;
+	long long int ival;
 	char *text;
 } yylval;

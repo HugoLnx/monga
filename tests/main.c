@@ -8,7 +8,8 @@ int main()
 	while(token = yylex()) {
 		printf("%s,", TOKEN_STR[token]);
 		switch(token) {
-			case NUMBER: printf("%d\n", yylval.ival); break;
+			case NUMBER:
+			case HEXADECIMAL: printf("%d\n", yylval.ival); break;
 			default: printf("%s\n", yylval.text);
 		}
     if(token == INVALID) break;
