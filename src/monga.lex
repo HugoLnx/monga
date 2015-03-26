@@ -10,7 +10,6 @@ STR_CHAR ([^\"\n]|\\\\|\\\"|\\n|\\t)
 STR_NON_ESCAPED_CHAR ([^\"\n\\]|\\\\|\\\"|\\n|\\t)
 HEX_CHAR [0-9a-fA-F]
 COMMENT ([^*]|\*+[^/*])*
-TYPE (int|char|float)
 
 %%
 \/\*{COMMENT}\*+\/ yylval.text = yytext; return COMMENT; // comments
@@ -34,7 +33,15 @@ TYPE (int|char|float)
 -?[0-9]+ yylval.ival = atoi(yytext); return NUMBER;
 -?[0-9]+{ID_CHAR}+ yylval.text = yytext; return INVALID;
 
-{TYPE} yylval.text = yytext; return TYPE;
+int yylval.text = "";    return TK_INT;
+char yylval.text = "";   return TK_CHAR;
+float yylval.text = "";  return TK_FLOAT;
+void yylval.text = "";   return TK_VOID;
+if yylval.text = "";     return TK_IF;
+else yylval.text = "";   return TK_ELSE;
+while yylval.text = "";  return TK_WHILE;
+new yylval.text = "";    return TK_NEW;
+return yylval.text = ""; return TK_RETURN;
 [a-zA-Z_][a-zA-Z_0-9]* yylval.text = yytext; return TK_ID;
 
 [ \t\n]+ // ignore white space
