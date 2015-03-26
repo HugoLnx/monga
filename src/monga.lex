@@ -18,12 +18,12 @@ COMMENT ([^*]|\*+[^/*])*
 
 \"{STR_NON_ESCAPED_CHAR}*\\[a-zA-Z0-9]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
 \"{STR_CHAR}*\" yylval.text = yytext; return TEXT;
-\"{STR_CHAR}*$ yylval.text = yytext; return INVALID;
+\" yylval.text = yytext; return INVALID;
 
 '{CHAR_CHAR}?' yylval.text = yytext; return CHAR;  // chars
 '\\[a-zA-Z0-9]' yylval.text = yytext; return INVALID;
 '{CHAR_CHAR}+' yylval.text = yytext; return INVALID;
-'{CHAR_CHAR}?[^'] yylval.text = yytext; return INVALID;
+' yylval.text = yytext; return INVALID;
 
 -0x0* yylval.text = yytext; return INVALID; // hexadecimals
 -?0x{HEX_CHAR}+ yylval.ival = strtol(yytext, NULL, 16); return HEXADECIMAL;

@@ -4,6 +4,7 @@ TEXT,"hugo roque 938z"
 NUMBER,-50
 TEXT,"hey\n\t\"\^\~\-\+"
 TEXT,""
+TEXT,"\\"
 TEXT,"\" very evil sample \""
 HEXADECIMAL,1
 HEXADECIMAL,0
