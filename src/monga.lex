@@ -13,8 +13,7 @@ COMMENT ([^*]|\*+[^/*])*
 
 %%
 \/\*{COMMENT}\*+\/ yylval.text = yytext; return COMMENT; // comments
-\/\*{COMMENT}$ yylval.text = yytext; return INVALID;
-\*\/ yylval.text = yytext; return INVALID;
+(\/\*|\*\/) yylval.text = yytext; return INVALID;
 
 \"{STR_NON_ESCAPED_CHAR}*\\[a-zA-Z0-9]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
 \"{STR_CHAR}*\" yylval.text = yytext; return TEXT;
