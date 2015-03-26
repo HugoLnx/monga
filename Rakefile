@@ -144,6 +144,6 @@ Expected to reject but the output was:
 end
 
 def rejected?(output)
-  matching = output.match /^INVALID,(.*)\Z/
+  matching = output.match /INVALID,(.*)\Z/
   !matching.nil?
 end
