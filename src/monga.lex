@@ -12,7 +12,7 @@ HEX_CHAR [0-9a-fA-F]
 COMMENT ([^*]|\*+[^/*])*
 
 %%
-\/\*{COMMENT}\*+\/ yylval.text = yytext; return COMMENT;
+\/\*{COMMENT}\*+\/ yylval.text = yytext; return COMMENT; // comments
 \/\*{COMMENT}$ yylval.text = yytext; return INVALID;
 \*\/ yylval.text = yytext; return INVALID;
 
