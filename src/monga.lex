@@ -6,11 +6,16 @@
 /* macros */
 ID_CHAR [a-zA-Z_]
 CHAR_CHAR ([^'\n]|\\'|\\n|\\t|\\\\)
-STR_CHAR ([^\"\n]|\\\")
-STR_NON_ESCAPED_CHAR ([^\"\n\\]|\\\")
+STR_CHAR ([^\"\n]|\\\\|\\\"|\\n|\\t)
+STR_NON_ESCAPED_CHAR ([^\"\n\\]|\\\\|\\\"|\\n|\\t)
 HEX_CHAR [0-9a-fA-F]
+COMMENT ([^*]|\*+[^/*])*
 
 %%
+\/\*{COMMENT}\*+\/ yylval.text = yytext; return COMMENT;
+\/\*{COMMENT}$ yylval.text = yytext; return INVALID;
+\*\/ yylval.text = yytext; return INVALID;
+
 \"{STR_NON_ESCAPED_CHAR}*\\[a-zA-Z0-9]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
 \"{STR_CHAR}*\" yylval.text = yytext; return TEXT;
 \"{STR_CHAR}*$ yylval.text = yytext; return INVALID;

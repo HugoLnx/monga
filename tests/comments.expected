@@ -1,0 +1,24 @@
+COMMENT,/* test */
+TEXT,"before1"
+COMMENT,/* "test" */
+TEXT,"after1"
+TEXT,"before2"
+COMMENT,/* "test */
+TEXT,"after2"
+TEXT,"before3"
+COMMENT,/*"test*/
+TEXT,"after3"
+COMMENT,/**/
+COMMENT,/***/
+COMMENT,/****/
+COMMENT,/* */
+TEXT,"before4"
+COMMENT,/*"*/
+TEXT,"after4"
+COMMENT,/** abc **/
+COMMENT,/** abc */
+COMMENT,/* abc **/
+COMMENT,/* a*bc */
+COMMENT,/* a**bc */
+COMMENT,/* line1
+line2*/

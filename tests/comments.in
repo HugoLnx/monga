@@ -1,0 +1,8 @@
+/* test */
+"before1"/* "test" */"after1"
+"before2" /* "test */ "after2"
+"before3" /*"test*/ "after3"
+/**//***//****//* */
+"before4"/*"*/"after4"
+/** abc **/ /** abc */ /* abc **/ /* a*bc */ /* a**bc */ /* line1
+line2*/
