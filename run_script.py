@@ -89,16 +89,15 @@ def execute_content(content):
 
 def execute_case(test_path):
   if ".in" in test_path:
-    execute_normal_test(test_path)
+    return execute_normal_test(test_path)
   else:
-    execute_reject_test(test_path)
+    return execute_reject_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
   expected_path = test_path[:-3] + ".expected"
   expected = (open(expected_path, 'r') if os.path.exists(expected_path) else None)
-  failing_msg(test_output, expected)
-  return
+  return failing_msg(test_output, expected)
 
 def execute_reject_test(test_path):
   msgs = []
