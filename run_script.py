@@ -128,7 +128,7 @@ def failing_msg(output, expected):
       return "Expected to reject but the output was: " + output + "".strip()
 
 def is_rejected(output):
-  matching = re.match('/^INVALID,(.*)\Z/', output)
+  matching = re.match('INVALID,(.*)$', output)
   return matching
 
 
