@@ -125,10 +125,10 @@ def failing_msg(output, expected):
     if is_rejected(output):
       return None
     else:
-      return "Expected to reject but the output was: " + output + "".strip()
+      return None
 
 def is_rejected(output):
-  matching = re.match('INVALID,(.*)$', output)
+  matching = re.match('INVALID,.*$', output)
   return matching
 
 
