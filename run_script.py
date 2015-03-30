@@ -15,6 +15,7 @@ ROOT = os.path.abspath('')
 BUILD = os.path.join(ROOT, "build")
 TMP_SRC = BUILD
 TMP_COMPILED = BUILD
+TMP = os.path.join(ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 TEST_DIST = os.path.join(BUILD, "test")
 
@@ -26,6 +27,7 @@ REJECT_CASE_TEMPLATE = "92 ::test-case:: 29"
 
 def clear():
   os.system("rm -rf " + os.path.join(BUILD, '*'))
+  os.system("mkdir -p " + TMP)
   os.system("mkdir -p " + TMP_SRC)
   os.system("mkdir -p " + TMP_COMPILED)
   os.system("mkdir -p " + TEST_DIST)
@@ -78,22 +80,23 @@ def execute(input_path):
   return output
 
 def execute_content(content):
-  import commands
-  output = commands.getoutput(os.path.join(TEST_DIST,"main") + "<<EOF" + content + "EOF")
-  return output
+  tmp_path = os.path.join(TMP, "temp.in")
+  f = open(tmp_path, "w")
+  f.write(content)
+  f.close()
+  return execute(tmp_path)
 
 def execute_case(test_path):
   if ".in" in test_path:
-    execute_normal_test(test_path)
+    return execute_normal_test(test_path)
   else:
-    execute_reject_test(test_path)
+    return execute_reject_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
   expected_path = test_path[:-3] + ".expected"
   expected = (open(expected_path, 'r') if os.path.exists(expected_path) else None)
-  failing_msg(test_output, expected)
-  return
+  return failing_msg(test_output, expected)
 
 def execute_reject_test(test_path):
   msgs = []
@@ -102,7 +105,7 @@ def execute_reject_test(test_path):
     content = REJECT_CASE_TEMPLATE.replace("::test-case::", line.strip())
     test_output = execute_content(content)
     if is_rejected(test_output):
-      msgs.append(content + " should be rejected but the output was: " + test_output)
+      msgs.append(content + " should be rejected but the output was: \n" + test_output)
   if len(msgs) == 0:
     return None
   else:
@@ -113,10 +116,10 @@ def failing_msg(output, expected):
   outlines = output.split("\n")
   if expected:
     for index,line in enumerate(expected):
-      if line != outlines[index]:
+      if line.strip() != outlines[index].strip():
         return "Difference on line " + str(index) + ": \
-            Expected: " + (line.strip() if line else "<no-line>") + \
-            "Output: " + str(outlines[index].strip())
+          \n  Expected: " + (line.strip() if line else "<no-line>") + "\
+          \n  Output: " + str(outlines[index].strip())
     return None
   else:
     if is_rejected(output):
