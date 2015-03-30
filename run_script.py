@@ -106,7 +106,7 @@ def execute_reject_test(test_path):
     content = REJECT_CASE_TEMPLATE.replace("::test-case::", line.strip())
     test_output = execute_content(content)
     if is_rejected(test_output):
-      msgs.append(content + " should be rejected but the output was: " + test_output)
+      msgs.append(content + " should be rejected but the output was: \n" + test_output)
   if len(msgs) == 0:
     return None
   else:
@@ -117,10 +117,10 @@ def failing_msg(output, expected):
   outlines = output.split("\n")
   if expected:
     for index,line in enumerate(expected):
-      if line != outlines[index]:
+      if line.strip() != outlines[index].strip():
         return "Difference on line " + str(index) + ": \
-            Expected: " + (line.strip() if line else "<no-line>") + \
-            "Output: " + str(outlines[index].strip())
+          \n  Expected: " + (line.strip() if line else "<no-line>") + "\
+          \n  Output: " + str(outlines[index].strip())
     return None
   else:
     if is_rejected(output):
