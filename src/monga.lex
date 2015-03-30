@@ -1,14 +1,6 @@
 %{
 #include <stdio.h>
 #include "../src/y.tab.h"
-  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE][-+]f?
-  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n]+|[+-][^0-9\n]+|[+-]?[0-9]+[^f])
-  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([^f]|f.*)
-  // [+-]?\.[^0-9]
-
-
-  /* descartadas */
-  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n]+|[+-]|[+-][^0-9\n]+|[+-]?[0-9]+[^f])
 %}
 
 /* macros */
@@ -24,7 +16,7 @@ COMMENT ([^*]|\*+[^/*])*
 (\/\*|\*\/) yylval.text = yytext; return INVALID;
 
 \"\\\" yylval.text = yytext; return INVALID;
-\"{STR_NON_ESCAPED_CHAR}*\\[a-zA-Z0-9]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
+\"{STR_NON_ESCAPED_CHAR}*\\[^nt\\\"]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
 \"{STR_CHAR}*\" yylval.text = yytext; return TEXT;
 
 '\\' yylval.text = yytext; return INVALID;
@@ -47,28 +39,28 @@ COMMENT ([^*]|\*+[^/*])*
 [-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([^f \n]|f[^ \n]*) yylval.text = yytext; return INVALID;
 [-+]?\.[^0-9] yylval.text = yytext; return INVALID;
 
-\[ yylval.text = yytext; return TK_SQUARE_BRACKET_OPEN;
-\] yylval.text = yytext; return TK_SQUARE_BRACKET_CLOSE;
-\( yylval.text = yytext; return TK_PARENTHESES_OPEN;
-\) yylval.text = yytext; return TK_PARENTHESES_CLOSE;
-\; yylval.text = yytext; return TK_SEMICOLON;
-\+ yylval.text = yytext; return TK_PLUS;
-\- yylval.text = yytext; return TK_MINUS;
-\* yylval.text = yytext; return TK_ASTERISK;
-\/ yylval.text = yytext; return TK_SLASH;
-[{] yylval.text = yytext; return TK_CURLY_BRACE_OPEN;
-[}] yylval.text = yytext; return TK_CURLY_BRACE_CLOSE;
-[!] yylval.text = yytext; return TK_EXCLAMATION_MARK;
-== yylval.text = yytext; return TK_DOUBLE_EQUAL;
-!= yylval.text = yytext; return TK_BANG_EQUAL;
-= yylval.text = yytext; return TK_ONE_EQUAL;
-(<=) yylval.text = yytext; return TK_LESS_EQUAL;
-(>=) yylval.text = yytext; return TK_GREATER_EQUAL;
-[<] yylval.text = yytext; return TK_LESS;
-[>] yylval.text = yytext; return TK_GREATER;
-\|\| yylval.text = yytext; return TK_OR;
-(&&) yylval.text = yytext; return TK_AND;
-[,] yylval.text = yytext; return TK_COMMA;
+\[   yylval.text = ""; return TK_SQUARE_BRACKET_OPEN;
+\]   yylval.text = ""; return TK_SQUARE_BRACKET_CLOSE;
+\(   yylval.text = ""; return TK_PARENTHESES_OPEN;
+\)   yylval.text = ""; return TK_PARENTHESES_CLOSE;
+\;   yylval.text = ""; return TK_SEMICOLON;
+\+   yylval.text = ""; return TK_PLUS;
+\-   yylval.text = ""; return TK_MINUS;
+\*   yylval.text = ""; return TK_ASTERISK;
+\/   yylval.text = ""; return TK_SLASH;
+[{]  yylval.text = ""; return TK_CURLY_BRACE_OPEN;
+[}]  yylval.text = ""; return TK_CURLY_BRACE_CLOSE;
+[!]  yylval.text = ""; return TK_EXCLAMATION_MARK;
+==   yylval.text = ""; return TK_DOUBLE_EQUAL;
+!=   yylval.text = ""; return TK_BANG_EQUAL;
+=    yylval.text = ""; return TK_ONE_EQUAL;
+(<=) yylval.text = ""; return TK_LESS_EQUAL;
+(>=) yylval.text = ""; return TK_GREATER_EQUAL;
+[<]  yylval.text = ""; return TK_LESS;
+[>]  yylval.text = ""; return TK_GREATER;
+\|\| yylval.text = ""; return TK_OR;
+(&&) yylval.text = ""; return TK_AND;
+[,]  yylval.text = ""; return TK_COMMA;
 
 int yylval.text = ""; 	 return TK_INT;
 char yylval.text = "";   return TK_CHAR;

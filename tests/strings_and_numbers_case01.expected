@@ -19,3 +19,4 @@ CHAR,'\''
 CHAR,'"'
 CHAR,'\t'
 CHAR,'\\'
+TEXT,"teste \n"
