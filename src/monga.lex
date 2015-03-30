@@ -48,6 +48,16 @@ COMMENT ([^*]|\*+[^/*])*
 \/ yylval.text = yytext; return TK_SLASH;
 [{] yylval.text = yytext; return TK_CURLY_BRACE_OPEN;
 [}] yylval.text = yytext; return TK_CURLY_BRACE_CLOSE;
+[!] yylval.text = yytext; return TK_EXCLAMATION_MARK;
+== yylval.text = yytext; return TK_DOUBLE_EQUAL;
+[=] yylval.text = yytext; return TK_ONE_EQUAL;
+(<=) yylval.text = yytext; return TK_LESS_EQUAL;
+(>=) yylval.text = yytext; return TK_GREATER_EQUAL;
+[<] yylval.text = yytext; return TK_LESS;
+[>] yylval.text = yytext; return TK_GREATER;
+\|\| yylval.text = yytext; return TK_OR;
+(&&) yylval.text = yytext; return TK_AND;
+[,] yylval.text = yytext; return TK_COMMA;
 
 int yylval.text = ""; 	 return TK_INT;
 char yylval.text = "";   return TK_CHAR;
@@ -60,6 +70,7 @@ new yylval.text = "";    return TK_NEW;
 return yylval.text = ""; return TK_RETURN;
 
 [a-zA-Z_][a-zA-Z_0-9]* yylval.text = yytext; return TK_ID;
+[:?_$#%&] yylval.text = yytext; return INVALID;
 
 [ \t\n]+ // ignore white space
 %%
