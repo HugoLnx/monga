@@ -1,5 +1,8 @@
-Directory Structure
+Students
+ * Hugo Roque  - 1311162
+ * Rômulo Dusi - 1213094
 
+Directory Structure
  * src/ - Source files that we are developing.
  * build/ - Temporary files that are automatically created.
  * build/dist - Distributions files. (The executable in our case)
