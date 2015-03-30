@@ -100,11 +100,11 @@ def execute_normal_test(test_path):
 
 def execute_reject_test(test_path):
   msgs = []
-  file_test_path = open(test_path, 'r')
-  for line in file_test_path:
+  file_test = open(test_path, 'r')
+  for line in file_test:
     content = REJECT_CASE_TEMPLATE.replace("::test-case::", line.strip())
     test_output = execute_content(content)
-    if is_rejected(test_output):
+    if not is_rejected(test_output):
       msgs.append(content + " should be rejected but the output was: \n" + test_output)
   if len(msgs) == 0:
     return None
@@ -128,7 +128,7 @@ def failing_msg(output, expected):
       return "Expected to reject but the output was: " + output + "".strip()
 
 def is_rejected(output):
-  matching = re.match('INVALID,(.*)$', output)
+  matching = re.search('INVALID,.*$', output)
   return matching
 
 
