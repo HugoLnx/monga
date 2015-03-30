@@ -1,6 +1,14 @@
 %{
 #include <stdio.h>
 #include "../src/y.tab.h"
+  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE][-+]f?
+  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n]+|[+-][^0-9\n]+|[+-]?[0-9]+[^f])
+  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([^f]|f.*)
+  // [+-]?\.[^0-9]
+
+
+  /* descartadas */
+  // [+-]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n]+|[+-]|[+-][^0-9\n]+|[+-]?[0-9]+[^f])
 %}
 
 /* macros */
@@ -17,12 +25,10 @@ COMMENT ([^*]|\*+[^/*])*
 
 \"{STR_NON_ESCAPED_CHAR}*\\[a-zA-Z0-9]{STR_NON_ESCAPED_CHAR}*\" yylval.text = yytext; return INVALID;  // strings
 \"{STR_CHAR}*\" yylval.text = yytext; return TEXT;
-\" yylval.text = yytext; return INVALID;
 
 '{CHAR_CHAR}?' yylval.text = yytext; return CHAR;  // chars
 '\\[a-zA-Z0-9]' yylval.text = yytext; return INVALID;
 '{CHAR_CHAR}+' yylval.text = yytext; return INVALID;
-' yylval.text = yytext; return INVALID;
 
 -0x0* yylval.text = yytext; return INVALID; // hexadecimals
 -?0x{HEX_CHAR}+ yylval.ival = strtol(yytext, NULL, 16); return HEXADECIMAL;
@@ -33,9 +39,11 @@ COMMENT ([^*]|\*+[^/*])*
 -?[0-9]+ yylval.ival = atoi(yytext); return NUMBER;
 -?[0-9]+{ID_CHAR}+ yylval.text = yytext; return INVALID;
 
--?[0-9]*\.[0-9]*[e]+([a-zA-Z])+ yylval.text = yytext; return INVALID; // floats
--?[0-9]*\.[0-9]*(ID_CHAR)+[^0-9]+ yylval.text = yytext; return INVALID;
--?[0-9]*\.[0-9]+([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT;
+[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT; // floats
+[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE][-+]f? yylval.text = yytext; return INVALID;
+[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n ]+|[+-][^0-9\n ]+|[+-]?[0-9]+[^f \n]) yylval.text = yytext; return INVALID;
+[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([^f \n]|f[^ \n]*) yylval.text = yytext; return INVALID;
+[-+]?\.[^0-9] yylval.text = yytext; return INVALID;
 
 \[ yylval.text = yytext; return TK_SQUARE_BRACKET_OPEN;
 \] yylval.text = yytext; return TK_SQUARE_BRACKET_CLOSE;
@@ -70,9 +78,10 @@ new yylval.text = "";    return TK_NEW;
 return yylval.text = ""; return TK_RETURN;
 
 [a-zA-Z_][a-zA-Z_0-9]* yylval.text = yytext; return TK_ID;
-[:?_$#%&] yylval.text = yytext; return INVALID;
 
 [ \t\n]+ // ignore white space
+
+. yylval.text = yytext; return INVALID;
 %%
 yywrap()
 {

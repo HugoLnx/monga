@@ -11,7 +11,7 @@ int main()
 		switch(token) {
 			case NUMBER:
 			case HEXADECIMAL: printf("%d\n", yylval.ival); break;
-			case FLOAT: printf("%f\n", yylval.fval); break;
+			case FLOAT: printf("%.5f\n", yylval.fval); break;
 			default: printf("%s\n", yylval.text);
 		}
     	if(token == INVALID) break;
