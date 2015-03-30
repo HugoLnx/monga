@@ -74,7 +74,6 @@ def test_compile():
 
 def execute(input_path):
   import commands
-
   output = commands.getoutput(os.path.join(TEST_DIST,"main") + " < " + input_path)
   return output
 
