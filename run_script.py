@@ -73,7 +73,16 @@ def test_compile():
 	return
 
 def execute(input_path):
-	os.system(os.path.join(TEST_DIST,"main") + " < " + input_path+ "> /dev/null")
+	import commands
+
+	stat, output = commands.getstatusoutput( os.path.join(TEST_DIST,"main") + " < " + input_path+ "> /dev/null" )
+	
+	if stat == 0:
+		print "Command succeeded, here is the output: %s" % output
+	else:
+		print "Command failed, here is the output: %s" % output
+
+	# os.system(os.path.join(TEST_DIST,"main") + " < " + input_path+ "> /dev/null")
 	return
 
 def execute_content(content):

@@ -33,7 +33,23 @@ COMMENT ([^*]|\*+[^/*])*
 -?[0-9]+ yylval.ival = atoi(yytext); return NUMBER;
 -?[0-9]+{ID_CHAR}+ yylval.text = yytext; return INVALID;
 
-int yylval.text = "";    return TK_INT;
+-?[0-9]*\.[0-9]*[e]+([a-zA-Z])+ yylval.text = yytext; return INVALID; // floats
+-?[0-9]*\.[0-9]*(ID_CHAR)+[^0-9]+ yylval.text = yytext; return INVALID;
+-?[0-9]*\.[0-9]+([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT;
+
+\[ yylval.text = yytext; return TK_SQUARE_BRACKET_OPEN;
+\] yylval.text = yytext; return TK_SQUARE_BRACKET_CLOSE;
+\( yylval.text = yytext; return TK_PARENTHESES_OPEN;
+\) yylval.text = yytext; return TK_PARENTHESES_CLOSE;
+\; yylval.text = yytext; return TK_SEMICOLON;
+\+ yylval.text = yytext; return TK_PLUS;
+\- yylval.text = yytext; return TK_MINUS;
+\* yylval.text = yytext; return TK_ASTERISK;
+\/ yylval.text = yytext; return TK_SLASH;
+[{] yylval.text = yytext; return TK_CURLY_BRACE_OPEN;
+[}] yylval.text = yytext; return TK_CURLY_BRACE_CLOSE;
+
+int yylval.text = ""; 	 return TK_INT;
 char yylval.text = "";   return TK_CHAR;
 float yylval.text = "";  return TK_FLOAT;
 void yylval.text = "";   return TK_VOID;
@@ -42,6 +58,7 @@ else yylval.text = "";   return TK_ELSE;
 while yylval.text = "";  return TK_WHILE;
 new yylval.text = "";    return TK_NEW;
 return yylval.text = ""; return TK_RETURN;
+
 [a-zA-Z_][a-zA-Z_0-9]* yylval.text = yytext; return TK_ID;
 
 [ \t\n]+ // ignore white space
