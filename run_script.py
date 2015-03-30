@@ -13,11 +13,8 @@ cmdargs = sys.argv
 ROOT = os.path.abspath('')
 
 BUILD = os.path.join(ROOT, "build")
-TMP_SRC = BUILD
-TMP_COMPILED = BUILD
 TMP = os.path.join(ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
-TEST_DIST = os.path.join(BUILD, "test")
 
 SRC = os.path.join(ROOT, "src")
 TESTS = os.path.join(ROOT, "tests")
@@ -28,16 +25,13 @@ REJECT_CASE_TEMPLATE = "92 ::test-case:: 29"
 def clear():
   os.system("rm -rf " + os.path.join(BUILD, '*'))
   os.system("mkdir -p " + TMP)
-  os.system("mkdir -p " + TMP_SRC)
-  os.system("mkdir -p " + TMP_COMPILED)
-  os.system("mkdir -p " + TEST_DIST)
   os.system("mkdir -p " + DIST)
   return
 
 def compile():
   clear()
-  os.system("lex --header-file=" + os.path.join(TMP_SRC, 'lex.yy.h') + " -o " + os.path.join(TMP_SRC, "lex.yy.c") + " " + os.path.join(SRC, "monga.lex"))
-  os.system("gcc -ll " + os.path.join(TMP_SRC,"lex.yy.c") + " -o " + os.path.join(TMP_COMPILED,"lex.yy.o") + " -c")
+  os.system("lex --header-file=" + os.path.join(BUILD, 'lex.yy.h') + " -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(SRC, "monga.lex"))
+  os.system("gcc -ll " + os.path.join(BUILD,"lex.yy.c") + " -o " + os.path.join(BUILD,"lex.yy.o") + " -c")
   return
 
 def run(input_name):
@@ -70,13 +64,13 @@ def test_all():
 def test_compile():
   compile()
   
-  os.system("gcc " + os.path.join(TESTS, "main.c") + " -o " + os.path.join(TMP_COMPILED,"main.o") + " -c")
-  os.system("gcc " + os.path.join(TMP_COMPILED,"main.o") + " " + os.path.join(TMP_COMPILED,"lex.yy.o") + " -o " + os.path.join(TEST_DIST,"main"))
+  os.system("gcc " + os.path.join(SRC, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
+  os.system("gcc " + os.path.join(BUILD,"main.o") + " " + os.path.join(BUILD,"lex.yy.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):
   import commands
-  output = commands.getoutput(os.path.join(TEST_DIST,"main") + " < " + input_path)
+  output = commands.getoutput(os.path.join(DIST,"main") + " < " + input_path)
   return output
 
 def execute_content(content):
