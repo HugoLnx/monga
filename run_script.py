@@ -15,6 +15,7 @@ ROOT = os.path.abspath('')
 BUILD = os.path.join(ROOT, "build")
 TMP_SRC = BUILD
 TMP_COMPILED = BUILD
+TMP = os.path.join(ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 TEST_DIST = os.path.join(BUILD, "test")
 
@@ -26,6 +27,7 @@ REJECT_CASE_TEMPLATE = "92 ::test-case:: 29"
 
 def clear():
   os.system("rm -rf " + os.path.join(BUILD, '*'))
+  os.system("mkdir -p " + TMP)
   os.system("mkdir -p " + TMP_SRC)
   os.system("mkdir -p " + TMP_COMPILED)
   os.system("mkdir -p " + TEST_DIST)
@@ -79,9 +81,11 @@ def execute(input_path):
   return output
 
 def execute_content(content):
-  import commands
-  output = commands.getoutput(os.path.join(TEST_DIST,"main") + "<<EOF" + content + "EOF")
-  return output
+  tmp_path = os.path.join(TMP, "temp.in")
+  f = open(tmp_path, "w")
+  f.write(content)
+  f.close()
+  return execute(tmp_path)
 
 def execute_case(test_path):
   if ".in" in test_path:
