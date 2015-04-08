@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "lex.yy.h"
-#include "y.tab.h"
+#include "main.h"
 
 int main()
 {
