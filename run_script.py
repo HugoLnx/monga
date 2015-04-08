@@ -11,35 +11,35 @@ total = len(sys.argv)
 cmdargs = sys.argv
 
 ROOT = os.path.abspath('')
-
-BUILD = os.path.join(ROOT, "build")
-TMP = os.path.join(ROOT, "tmp")
-DIST = os.path.join(BUILD, "dist")
-
 SRC = os.path.join(ROOT, "src")
-TESTS = os.path.join(ROOT, "tests")
+
+LEX_ROOT = os.path.join(ROOT, "lexical")
+
+LEX_BUILD = os.path.join(LEX_ROOT, "build")
+LEX_TMP = os.path.join(LEX_ROOT, "tmp")
+LEX_DIST = os.path.join(LEX_ROOT, "dist")
+
+LEX_SRC = os.path.join(LEX_ROOT, "src")
+LEX_TESTS = os.path.join(LEX_ROOT, "tests")
 
 REJECT_CASE_TEMPLATE = "92 ::test-case:: 29"
 
 
 def clear():
-  os.system("rm -rf " + os.path.join(BUILD, '*'))
-  os.system("mkdir -p " + TMP)
-  os.system("mkdir -p " + DIST)
-  return
-
-def compile():
-  clear()
-  os.system("lex --header-file=" + os.path.join(BUILD, 'lex.yy.h') + " -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(SRC, "monga.lex"))
-  os.system("gcc -ll " + os.path.join(BUILD,"lex.yy.c") + " -o " + os.path.join(BUILD,"lex.yy.o") + " -c")
+  os.system("rm -rf " + LEX_BUILD)
+  os.system("rm -rf " + LEX_TMP)
+  os.system("rm -rf " + LEX_DIST)
+  os.system("mkdir -p " + LEX_BUILD)
+  os.system("mkdir -p " + LEX_TMP)
+  os.system("mkdir -p " + LEX_DIST)
   return
 
 def run(input_name):
-  test_compile()
+  lex_test_compile()
   return execute(input_name)
 
 def test(type_test):
-  test_compile()
+  lex_test_compile()
   error_msg = execute_case(type_test)
   if error_msg:
     print error_msg
@@ -47,13 +47,13 @@ def test(type_test):
     print "The test case passed."
 
 def test_all():
-  test_compile()
+  lex_test_compile()
   list_files = []
   fails = 0
-  for file in os.listdir("./tests"):
+  for file in os.listdir(LEX_TESTS):
     if file.endswith(".in") or file.endswith(".rejected"):
       list_files.append(file)
-      error_msg = execute_case(os.path.join(TESTS,file))
+      error_msg = execute_case(os.path.join(LEX_TESTS,file))
       if error_msg:
         print "Failing test: " + file.split("/")[-1]
         print error_msg
@@ -61,20 +61,25 @@ def test_all():
         fails += 1
   print "Result: " + str(len(list_files) - fails) + " of " + str(len(list_files)) + " test cases passed."
 
-def test_compile():
-  compile()
+def lex_test_compile():
+  clear()
+  os.system("cp " + os.path.join(SRC, "monga.lex") + " " + LEX_BUILD)
+  os.system("cp " + os.path.join(LEX_SRC, "main.c") + " " + LEX_BUILD)
+  os.system("cp " + os.path.join(LEX_SRC, "y.tab.h") + " " + LEX_BUILD)
+  os.system("lex --header-file=" + os.path.join(LEX_BUILD, 'lex.yy.h') + " -o " + os.path.join(LEX_BUILD, "lex.yy.c") + " " + os.path.join(LEX_BUILD, "monga.lex"))
+  os.system("gcc -ll " + os.path.join(LEX_BUILD,"lex.yy.c") + " -o " + os.path.join(LEX_BUILD,"lex.yy.o") + " -c")
   
-  os.system("gcc " + os.path.join(SRC, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  os.system("gcc " + os.path.join(BUILD,"main.o") + " " + os.path.join(BUILD,"lex.yy.o") + " -o " + os.path.join(DIST,"main"))
+  os.system("gcc " + os.path.join(LEX_BUILD, "main.c") + " -o " + os.path.join(LEX_BUILD,"main.o") + " -c")
+  os.system("gcc " + os.path.join(LEX_BUILD,"main.o") + " " + os.path.join(LEX_BUILD,"lex.yy.o") + " -o " + os.path.join(LEX_DIST,"main"))
   return
 
 def execute(input_path):
   import commands
-  output = commands.getoutput(os.path.join(DIST,"main") + " < " + input_path)
+  output = commands.getoutput(os.path.join(LEX_DIST,"main") + " < " + input_path)
   return output
 
 def execute_content(content):
-  tmp_path = os.path.join(TMP, "temp.in")
+  tmp_path = os.path.join(LEX_TMP, "temp.in")
   f = open(tmp_path, "w")
   f.write(content)
   f.close()

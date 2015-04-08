@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "../build/lex.yy.h"
-#include "../src/y.tab.h"
+#include "lex.yy.h"
+#include "y.tab.h"
 
 int main()
 {

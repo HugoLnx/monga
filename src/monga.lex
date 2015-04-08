@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "../src/y.tab.h"
+#include "y.tab.h"
 %}
 
 /* macros */
