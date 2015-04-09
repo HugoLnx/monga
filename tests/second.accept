@@ -1,1 +1,1 @@
-void xpto(int hey, char xpto)
+int[] xpto()
