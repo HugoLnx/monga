@@ -70,7 +70,7 @@ def compile():
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   os.chdir("build")
-  critical_sys("yacc -d -i -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
+  critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir("..")
   
   critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
