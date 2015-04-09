@@ -56,6 +56,11 @@ def test_all():
         fails += 1
   print "Result: " + str(len(list_files) - fails) + " of " + str(len(list_files)) + " test cases passed."
 
+def critical_sys(cmd):
+  outcode = os.system(cmd)
+  if outcode != 0:
+    exit()
+
 def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
@@ -63,13 +68,13 @@ def compile():
   os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
-  os.system("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
+  critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   os.chdir("build")
-  os.system("yacc -d -i -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
+  critical_sys("yacc -d -i -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir("..")
   
-  os.system("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  os.system("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):
