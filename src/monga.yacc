@@ -18,8 +18,13 @@
   TK_OR TK_AND
 %%
 programa : declaracao;
-declaracao : dec_variavel;
+declaracao : dec_variavel | dec_function;
 dec_variavel : tipo lista_nomes TK_SEMICOLON;
 lista_nomes : TK_ID | TK_ID TK_COMMA lista_nomes;
 tipo : tipo_base | tipo TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE;
 tipo_base : TK_INT | TK_CHAR | TK_FLOAT;
+
+dec_function : return_type TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE;
+return_type : tipo | TK_VOID;
+parameters : parameter | parameter TK_COMMA parameters;
+parameter : tipo TK_ID;
