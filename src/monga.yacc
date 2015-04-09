@@ -26,6 +26,5 @@ base_type : TK_INT | TK_CHAR | TK_FLOAT;
 
 dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE
 						|  TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE;
-return_type : type | TK_VOID;
 parameters : parameter | parameter TK_COMMA parameters;
 parameter : type TK_ID;
