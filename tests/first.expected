@@ -1,0 +1,7 @@
+TK_INT
+base_type
+TK_ID
+TK_ID TK_COMMA names_list
+names_list TK_SEMICOLON
+dec_variable
+type declaration

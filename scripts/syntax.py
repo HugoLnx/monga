@@ -68,6 +68,7 @@ def compile():
   os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
+  adapt_yacc_file_to_debug(os.path.join(BUILD, "monga.yacc"))
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   os.chdir("build")
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
@@ -92,8 +93,10 @@ def execute_content(content):
 def execute_case(test_path):
   if ".in" in test_path:
     return execute_normal_test(test_path)
-  else:
+  elif ".rejected" in test_path:
     return execute_reject_test(test_path)
+  elif ".accepted" in test_path:
+    return execute_accepted_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
@@ -104,11 +107,13 @@ def execute_normal_test(test_path):
 def execute_reject_test(test_path):
   msgs = []
   file_test = open(test_path, 'r')
-  for line in file_test:
-    content = REJECT_CASE_TEMPLATE.replace("::test-case::", line.strip())
+  file_content = file_test.read()
+  file_test.close()
+  for content in file_content.split("-----"):
+    content = content.strip()
     test_output = execute_content(content)
     if not is_rejected(test_output):
-      msgs.append(content + " should be rejected but the output was: \n" + test_output)
+      msgs.append(">>>\n" + content + "\nshould be rejected but the output was: \n" + test_output + "\n<<<\n")
   if len(msgs) == 0:
     return None
   else:
@@ -131,8 +136,17 @@ def failing_msg(output, expected):
       return "Expected to reject but the output was: " + output + "".strip()
 
 def is_rejected(output):
-  matching = re.search('INVALID,.*$', output)
+  matching = re.search('^error: syntax error', output)
   return matching
+
+def adapt_yacc_file_to_debug(path):
+  import re
+  f = open(path, "r+")
+  content = f.read()
+  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n]+)', r'\1\2 { printf("\2\\n"); }', content)
+  f.seek(0)
+  f.write(new_content)
+  f.close()
 
 
 if (len(cmdargs) > 1):

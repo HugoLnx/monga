@@ -1,1 +1,3 @@
-int[] xpto()
+int[] xpto() {
+  int xpto;
+}
