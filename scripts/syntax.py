@@ -91,7 +91,6 @@ def execute_content(content):
   return execute(tmp_path)
 
 def execute_case(test_path):
-  import re
   if re.match(r'.in$', test_path):
     return execute_normal_test(test_path)
   elif re.match(r'.rejected$', test_path):
@@ -150,7 +149,6 @@ def is_not_rejected(output):
   return not is_rejected(output)
 
 def adapt_yacc_file_to_debug(path):
-  import re
   f = open(path, "r+")
   content = f.read()
   new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n]+)', r'\1\2 { printf("\2\\n"); }', content)
