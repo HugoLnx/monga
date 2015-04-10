@@ -46,7 +46,7 @@ def test_all():
   list_files = []
   fails = 0
   for file in os.listdir(TESTS):
-    if file.endswith(".in") or file.endswith(".rejected"):
+    if file.endswith(".in") or file.endswith(".rejected") or file.endswith(".accepted"):
       list_files.append(file)
       error_msg = execute_case(os.path.join(TESTS,file))
       if error_msg:
@@ -105,6 +105,12 @@ def execute_normal_test(test_path):
   return failing_msg(test_output, expected)
 
 def execute_reject_test(test_path):
+  return execute_multiline_case(test_path, is_not_rejected, "should be rejected but the output was")
+
+def execute_accepted_test(test_path):
+  return execute_multiline_case(test_path, is_rejected, "should be accepted but the output was")
+
+def execute_multiline_case(test_path, rejection_condition, middle_msg):
   msgs = []
   file_test = open(test_path, 'r')
   file_content = file_test.read()
@@ -112,8 +118,8 @@ def execute_reject_test(test_path):
   for content in file_content.split("-----"):
     content = content.strip()
     test_output = execute_content(content)
-    if not is_rejected(test_output):
-      msgs.append(">>>\n" + content + "\nshould be rejected but the output was: \n" + test_output + "\n<<<\n")
+    if rejection_condition(test_output):
+      msgs.append(">>>\n" + content + "\n" + middle_msg + "\n" + test_output + "\n<<<\n")
   if len(msgs) == 0:
     return None
   else:
@@ -136,8 +142,11 @@ def failing_msg(output, expected):
       return "Expected to reject but the output was: " + output + "".strip()
 
 def is_rejected(output):
-  matching = re.search('^error: syntax error', output)
+  matching = re.search(r'^error: syntax error', output)
   return matching
+
+def is_not_rejected(output):
+  return not is_rejected(output)
 
 def adapt_yacc_file_to_debug(path):
   import re

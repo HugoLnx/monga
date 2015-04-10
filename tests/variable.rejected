@@ -1,0 +1,9 @@
+void xpto;
+-----
+void[] xpto, hey2x;
+-----
+int void;
+-----
+int xpto, void;
+-----
+int xpto, int;

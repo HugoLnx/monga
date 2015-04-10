@@ -1,0 +1,15 @@
+int xpto(char[] lol, char heyhey) {
+  int hey;
+}
+-----
+int xpto() {
+  int hey;
+}
+-----
+void xpto(char[] lol, char heyhey) {
+  int hey;
+}
+-----
+void xpto() {
+  int hey;
+}

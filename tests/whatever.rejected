@@ -1,8 +1,0 @@
-int*() {
-}
------
-int xpto;
------
-void xpto2() {
-  int hey;
-}

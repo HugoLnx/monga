@@ -1,0 +1,24 @@
+int 2xpto(char[] lol, char heyhey) {
+  int hey;
+}
+-----
+int* xpto() {
+  int hey;
+}
+-----
+void xpto(char[] lol, void heyhey) {
+  int hey;
+}
+-----
+void xpto(void) {
+  int hey;
+}
+-----
+int*() {
+}
+-----
+int 2xpto;
+-----
+void 2xpto2() {
+  int hey;
+}
