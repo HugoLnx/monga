@@ -1,0 +1,19 @@
+int main() {
+  nome = ;meuNome;
+}
+-----
+int main() {
+  nome = (2;)
+}
+-----
+int main() {
+  nome = (x = y);
+}
+-----
+int main() {
+  a = new void[10];
+}
+-----
+int main() {
+  a = char new[index];
+}

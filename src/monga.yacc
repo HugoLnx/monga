@@ -48,6 +48,7 @@ parameter : type TK_ID
 block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE
       | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE
       | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE
+      | TK_CURLY_BRACE_OPEN TK_CURLY_BRACE_CLOSE
       ;
 
 var_declarations : type dec_variable 
@@ -68,11 +69,16 @@ return_call : TK_RETURN
 
 attribution : var TK_ONE_EQUAL exp
             ;
+
 var : TK_ID
+    | exp TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE
     ;
 
 exp : NUMBER
     | TEXT
+    | var
+    | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
+    | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE
     ;
 
 exp_list : exp

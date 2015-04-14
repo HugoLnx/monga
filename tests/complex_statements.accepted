@@ -1,0 +1,46 @@
+int main() {
+  nome = meuNome;
+}
+-----
+int main() {
+  nome = (2);
+}
+-----
+int main() {
+  nome = (outro_nome);
+}
+-----
+int main() {
+  a = new char[10];
+}
+-----
+int main() {
+  a = new char[index];
+}
+-----
+int main() {
+  a = (new char
+  [][][][(
+    new int[size]
+  )]);
+}
+-----
+int main() {
+  numbers[1] = 10;
+}
+-----
+int main() {
+  numbers[a] = 10;
+}
+-----
+int main() {
+  numbers["300"] = 10;
+}
+-----
+int main() {
+  numbers[new int[10]] = 10;
+}
+-----
+int main() {
+  numbers[(40)] = 10;
+}
