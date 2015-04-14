@@ -91,11 +91,11 @@ def execute_content(content):
   return execute(tmp_path)
 
 def execute_case(test_path):
-  if re.match(r'.in$', test_path):
+  if re.search(r'.in$', test_path):
     return execute_normal_test(test_path)
-  elif re.match(r'.rejected$', test_path):
+  elif re.search(r'.rejected$', test_path):
     return execute_reject_test(test_path)
-  elif re.match(r'.accepted$', test_path):
+  elif re.search(r'.accepted$', test_path):
     return execute_accepted_test(test_path)
 
 def execute_normal_test(test_path):
