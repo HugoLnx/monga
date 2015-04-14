@@ -1,0 +1,51 @@
+int main() {
+	funcao("hey xp");
+  char[] nome;
+}
+-----
+int main() {
+  funcao() = "romulo";
+}
+-----
+int main() {
+  20 = xpto;
+}
+-----
+int main() {
+  "hey" = hey;
+}
+-----
+int main() {
+  nome = "romulo"
+}
+-----
+int main() {
+	funcao("hey xp")
+}
+-----
+int main() {
+  nome = "romulo"
+	funcao("hey xp")
+}
+-----
+int main() {
+  nome = "romulo"
+	funcao("hey xp");
+}
+-----
+int main() {
+  10;
+}
+-----
+int main() {
+  int xpto() {
+  }
+}
+-----
+int main() {
+  int xpto();
+}
+-----
+int main() {
+  int;
+}

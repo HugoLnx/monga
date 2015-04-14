@@ -1,0 +1,32 @@
+int main() {
+	nome = "Hugo";
+}
+-----
+int main() {
+	idade = 22;
+}
+-----
+int main() {
+	funcao();
+}
+-----
+int main() {
+	funcao(10, "30");
+}
+-----
+int main() {
+  char[] nome;
+  int idade;
+  nome = "romulo";
+  idade = 21;
+	funcao();
+	funcao("hey xp");
+}
+-----
+int main() {
+	return 10;
+}
+-----
+int main() {
+	return;
+}

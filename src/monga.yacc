@@ -45,5 +45,40 @@ parameters : parameter
 parameter : type TK_ID
           ;
 
-block : TK_CURLY_BRACE_OPEN type dec_variable TK_CURLY_BRACE_CLOSE
+block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE
+      | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE
+      | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE
       ;
+
+var_declarations : type dec_variable 
+                 | type dec_variable var_declarations
+                 ;
+statement_list : statement
+               | statement statement_list
+               ;
+
+statement : attribution TK_SEMICOLON
+          | function_call TK_SEMICOLON
+          | return_call TK_SEMICOLON
+          ;
+
+return_call : TK_RETURN
+            | TK_RETURN exp
+            ;
+
+attribution : var TK_ONE_EQUAL exp
+            ;
+var : TK_ID
+    ;
+
+exp : NUMBER
+    | TEXT
+    ;
+
+exp_list : exp
+         | exp TK_COMMA exp_list
+         ;
+
+function_call : TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE 
+              | TK_ID TK_PARENTHESES_OPEN exp_list TK_PARENTHESES_CLOSE 
+              ;
