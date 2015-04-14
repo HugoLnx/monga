@@ -1,39 +1,40 @@
-programa : {declaracao}
-declaracao : dec-variavel | dec-funcao
-dec-variavel : tipo lista-nomes ';'
-lista-nomes : ID { ',' ID }
-tipo : tipo-base | tipo '[' ']'
-tipo-base : 'int' | 'char' | 'float'
-dec-funcao : tipo-retorno ID '(' parametros ')' bloco
-tipo-retorno : tipo | 'void'
-parametros : /* vazio */ | parametro { ',' parametro }
-parametro : tipo ID
-bloco : '{' { dec-variavel } { comando } '}'
-comando : 'if' '(' exp ')' comando parte-else
-        | 'while' '(' exp ')' comando
-        | var '=' exp ';'
-        | 'return' [ exp ] ';'
-        | chamada ';'
-	| bloco
-parte-else : /* vazio */ | 'else' comando
-var : ID | exp '[' exp ']'
-exp : NUMERAL | LITERAL
-	| var
-	| '(' exp ')'
-	| chamada
-	| 'new' tipo '[' exp ']'
-	| '-' exp
-	| exp '+' exp
-	| exp '-' exp
-	| exp '*' exp
-	| exp '/' exp
-	| exp '==' exp
-	| exp '<=' exp
-	| exp '>=' exp
-	| exp '<' exp
-	| exp '>' exp
-	| '!' exp
-	| exp '&&' exp
-	| exp '||' exp
-chamada : ID '(' lista-exp ')'
-lista-exp : /* vazio */ | exp { ',' exp }
+X  programa : {declaracao}
+X  declaracao : dec-variavel | dec-funcao
+X  dec-variavel : tipo lista-nomes ';'
+X  lista-nomes : ID { ',' ID }
+X  tipo : tipo-base | tipo '[' ']'
+X  tipo-base : 'int' | 'char' | 'float'
+X  dec-funcao : tipo-retorno ID '(' parametros ')' bloco
+X  tipo-retorno : tipo | 'void'
+X  parametros : /* vazio */ | parametro { ',' parametro }
+X  parametro : tipo ID
+X  bloco : '{' { dec-variavel } { comando } '}'
+   comando : 'if' '(' exp ')' comando parte-else
+    | 'while' '(' exp ')' comando
+X   | var '=' exp ';'
+X   | 'return' [ exp ] ';'
+X   | chamada ';'
+   	| bloco
+   parte-else : /* vazio */ | 'else' comando
+X  var : ID | exp '[' exp ']'
+X  exp : NUMERAL
+X   | LITERAL
+X  	| var
+X  	| '(' exp ')'
+X  	| chamada
+X  	| 'new' tipo '[' exp ']'
+   	| '-' exp
+   	| exp '+' exp
+   	| exp '-' exp
+   	| exp '*' exp
+   	| exp '/' exp
+   	| exp '==' exp
+   	| exp '<=' exp
+   	| exp '>=' exp
+   	| exp '<' exp
+   	| exp '>' exp
+   	| '!' exp
+   	| exp '&&' exp
+   	| exp '||' exp
+X  chamada : ID '(' lista-exp ')'
+X  lista-exp : /* vazio */ | exp { ',' exp }
