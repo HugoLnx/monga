@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 %}
+%left TK_BANG_EQUAL TK_DOUBLE_EQUAL TK_LESS_EQUAL TK_LESS TK_GREATER_EQUAL TK_GREATER TK_EXCLAMATION_MARK
+%left TK_SQUARE_BRACKET_OPEN
 %token
 	END INVALID
 	NUMBER HEXADECIMAL FLOAT TEXT CHAR COMMENT
@@ -20,14 +22,18 @@
 program : type declaration
         | TK_VOID dec_function
 				;
+
 declaration : dec_variable
         | dec_function
 				;
+
 dec_variable : names_list TK_SEMICOLON
              ;
+
 names_list : TK_ID
            | TK_ID TK_COMMA names_list
 					 ;
+
 type : base_type
      | type TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE
 		 ;
@@ -79,6 +85,13 @@ exp : NUMBER
     | var
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE
+    | exp TK_DOUBLE_EQUAL exp
+    | exp TK_BANG_EQUAL exp
+    | exp TK_GREATER_EQUAL exp
+    | exp TK_GREATER exp
+    | exp TK_LESS_EQUAL exp
+    | exp TK_LESS exp
+    | TK_EXCLAMATION_MARK exp
     ;
 
 exp_list : exp

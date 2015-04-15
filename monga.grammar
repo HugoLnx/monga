@@ -28,12 +28,12 @@ X  	| 'new' tipo '[' exp ']'
    	| exp '-' exp
    	| exp '*' exp
    	| exp '/' exp
-   	| exp '==' exp
-   	| exp '<=' exp
-   	| exp '>=' exp
-   	| exp '<' exp
-   	| exp '>' exp
-   	| '!' exp
+X  	| exp '==' exp
+X  	| exp '<=' exp
+X  	| exp '>=' exp
+X  	| exp '<' exp
+X  	| exp '>' exp
+X  	| '!' exp
    	| exp '&&' exp
    	| exp '||' exp
 X  chamada : ID '(' lista-exp ')'
