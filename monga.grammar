@@ -34,7 +34,7 @@ X  	| exp '>=' exp
 X  	| exp '<' exp
 X  	| exp '>' exp
 X  	| '!' exp
-   	| exp '&&' exp
-   	| exp '||' exp
+X  	| exp '&&' exp
+X  	| exp '||' exp
 X  chamada : ID '(' lista-exp ')'
 X  lista-exp : /* vazio */ | exp { ',' exp }

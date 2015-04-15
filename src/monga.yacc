@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 %}
+%left TK_AND TK_OR
 %left TK_BANG_EQUAL TK_DOUBLE_EQUAL TK_LESS_EQUAL TK_LESS TK_GREATER_EQUAL TK_GREATER TK_EXCLAMATION_MARK
-%left TK_SQUARE_BRACKET_OPEN
+%nonassoc TK_SQUARE_BRACKET_OPEN
 %token
 	END INVALID
 	NUMBER HEXADECIMAL FLOAT TEXT CHAR COMMENT
@@ -92,6 +93,8 @@ exp : NUMBER
     | exp TK_LESS_EQUAL exp
     | exp TK_LESS exp
     | TK_EXCLAMATION_MARK exp
+    | exp TK_AND exp
+    | exp TK_OR exp
     ;
 
 exp_list : exp
