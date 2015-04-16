@@ -70,6 +70,7 @@ statement_list : statement
 statement : attribution TK_SEMICOLON
           | function_call TK_SEMICOLON
           | return_call TK_SEMICOLON
+          | block
           ;
 
 return_call : TK_RETURN

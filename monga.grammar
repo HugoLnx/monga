@@ -14,7 +14,7 @@ X  bloco : '{' { dec-variavel } { comando } '}'
 X   | var '=' exp ';'
 X   | 'return' [ exp ] ';'
 X   | chamada ';'
-   	| bloco
+X  	| bloco
    parte-else : /* vazio */ | 'else' comando
 X  var : ID | exp '[' exp ']'
 X  exp : NUMERAL
