@@ -1,0 +1,16 @@
+var TK_ONE_EQUAL exp
+attribution TK_SEMICOLON
+function_call TK_SEMICOLON
+block
+TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+attribution TK_SEMICOLON
+if TK_ELSE statement
+TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE
+block
+TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+block
+TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+if 
+TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+block
+if TK_ELSE statement

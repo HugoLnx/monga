@@ -1,0 +1,21 @@
+int main() {
+  if(x > 10) {
+    a = 2;
+    
+    if(x > 10) {
+    	print("hey! ho! lets go!");
+  	}
+  	else
+  		i = 2 > 5;
+  }
+  
+  else{
+  	if(x > 10) {
+    	y = 2 / 4;
+  	}
+ 	
+ 	while(10.8){
+
+ 	}
+  }
+}

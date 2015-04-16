@@ -1,0 +1,27 @@
+int main() {
+  if(x > 10) {
+    print("hey! ho! lets go!");
+  }
+}
+-----
+int main() {
+  if(x > 10) {
+    print("hey! ho! lets go!");
+  }
+  else{
+  	printf();
+  }
+}
+-----
+int main() {
+  if(x > 10) {}
+  else{
+  	printf();
+  }
+}
+-----
+int main() {
+	if(10.8){
+
+	}
+}

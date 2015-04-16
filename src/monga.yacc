@@ -7,6 +7,8 @@
 %left TK_MINUS TK_PLUS
 %left TK_ASTERISK TK_SLASH
 %nonassoc TK_SQUARE_BRACKET_OPEN
+%nonassoc aux
+%nonassoc TK_ELSE
 %token
 	END INVALID
 	NUMBER HEXADECIMAL FLOAT TEXT CHAR COMMENT
@@ -63,6 +65,7 @@ block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE
 var_declarations : type dec_variable 
                  | type dec_variable var_declarations
                  ;
+
 statement_list : statement
                | statement statement_list
                ;
@@ -72,7 +75,15 @@ statement : attribution TK_SEMICOLON
           | return_call TK_SEMICOLON
           | block
 					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+          | if_statement
           ;
+
+if_statement : if %prec aux
+             | if TK_ELSE statement
+             ;
+
+if : TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+   ;
 
 return_call : TK_RETURN
             | TK_RETURN exp
