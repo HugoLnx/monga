@@ -125,15 +125,23 @@ def execute_multiline_case(test_path, rejection_condition, middle_msg):
   else:
     return "\n".join(msgs)
 
+def match_arrays(matching, array):
+  if (len(matching) == 0):
+    return True
+  else:
+    for i,line in enumerate(array):
+      if matching[0].strip() == line.strip():
+        return match_arrays(matching[1:], array[i+1:])
+    return False
 
 def failing_msg(output, expected):
   outlines = output.split("\n")
   if expected:
-    for index,line in enumerate(expected):
-      if line.strip() != outlines[index].strip():
-        return "Difference on line " + str(index) + ": \
-          \n  Expected: " + (line.strip() if line else "<no-line>") + "\
-          \n  Output: " + str(outlines[index].strip())
+    expected = list(expected)
+    if not match_arrays(expected, outlines):
+        return "Expected output... \
+          \n  To match: \n" + "".join(expected) + "\
+          \n  But was: \n" + output
     return None
   else:
     if is_rejected(output):

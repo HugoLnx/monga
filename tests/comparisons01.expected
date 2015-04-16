@@ -1,31 +1,8 @@
-TK_INT
-base_type
-TK_ID
-TK_ID
-var
 TK_EXCLAMATION_MARK exp
-TK_ID
-var
 exp TK_DOUBLE_EQUAL exp
-TK_ID
-var
 exp TK_BANG_EQUAL exp
-TK_ID
-var
 exp TK_GREATER exp
-TK_ID
-var
 exp TK_LESS exp
-TK_ID
-var
 exp TK_GREATER_EQUAL exp
-TK_ID
-var
 exp TK_LESS_EQUAL exp
 var TK_ONE_EQUAL exp
-attribution TK_SEMICOLON
-statement
-TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE
-TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block
-dec_function
-type declaration
