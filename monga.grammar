@@ -10,7 +10,7 @@ X  parametros : /* vazio */ | parametro { ',' parametro }
 X  parametro : tipo ID
 X  bloco : '{' { dec-variavel } { comando } '}'
    comando : 'if' '(' exp ')' comando parte-else
-    | 'while' '(' exp ')' comando
+X   | 'while' '(' exp ')' comando
 X   | var '=' exp ';'
 X   | 'return' [ exp ] ';'
 X   | chamada ';'

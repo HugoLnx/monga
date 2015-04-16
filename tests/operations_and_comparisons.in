@@ -1,0 +1,3 @@
+int main() {
+	x = k < a * -b > c * d;
+}
