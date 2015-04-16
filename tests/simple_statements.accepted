@@ -7,6 +7,18 @@ int main() {
 }
 -----
 int main() {
+	price = 1 + 22.50;
+}
+-----
+int main() {
+	code = 0x1A;
+}
+-----
+int main() {
+	letter = 'h';
+}
+-----
+int main() {
 	funcao();
 }
 -----

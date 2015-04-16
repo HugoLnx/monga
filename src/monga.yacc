@@ -71,6 +71,7 @@ statement : attribution TK_SEMICOLON
           | function_call TK_SEMICOLON
           | return_call TK_SEMICOLON
           | block
+					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
           ;
 
 return_call : TK_RETURN
@@ -85,7 +86,10 @@ var : TK_ID
     ;
 
 exp : NUMBER
+		| FLOAT
     | TEXT
+    | HEXADECIMAL
+    | CHAR
     | var
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE

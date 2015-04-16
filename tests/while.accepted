@@ -1,0 +1,25 @@
+int main() {
+  while(x > 10) {
+    print("hey! ho! lets go!");
+  }
+}
+-----
+int main() {
+  while(x > 10)
+    print("hey! ho! lets go!");
+}
+-----
+int main() {
+  {
+    while(x > 10)
+      print("hey! ho! lets go!");
+  }
+}
+-----
+int main() {
+  {
+    while(x > 1.0+1e3-2e4+1+0x5) {
+      {print("hey! ho! lets go!");}
+    }
+  }
+}
