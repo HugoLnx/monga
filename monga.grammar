@@ -23,11 +23,11 @@ X  	| var
 X  	| '(' exp ')'
 X  	| chamada
 X  	| 'new' tipo '[' exp ']'
-   	| '-' exp
-   	| exp '+' exp
-   	| exp '-' exp
-   	| exp '*' exp
-   	| exp '/' exp
+X  	| '-' exp
+X  	| exp '+' exp
+X  	| exp '-' exp
+X  	| exp '*' exp
+X  	| exp '/' exp
 X  	| exp '==' exp
 X  	| exp '<=' exp
 X  	| exp '>=' exp

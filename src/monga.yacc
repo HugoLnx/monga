@@ -4,6 +4,8 @@
 %}
 %left TK_AND TK_OR
 %left TK_BANG_EQUAL TK_DOUBLE_EQUAL TK_LESS_EQUAL TK_LESS TK_GREATER_EQUAL TK_GREATER TK_EXCLAMATION_MARK
+%left TK_MINUS TK_PLUS
+%left TK_ASTERISK TK_SLASH
 %nonassoc TK_SQUARE_BRACKET_OPEN
 %token
 	END INVALID
@@ -95,6 +97,11 @@ exp : NUMBER
     | TK_EXCLAMATION_MARK exp
     | exp TK_AND exp
     | exp TK_OR exp
+    | exp TK_PLUS exp
+    | exp TK_MINUS exp
+    | exp TK_ASTERISK exp
+    | exp TK_SLASH exp
+    | TK_MINUS exp %prec TK_ASTERISK %prec TK_SLASH
     ;
 
 exp_list : exp

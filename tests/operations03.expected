@@ -1,0 +1,3 @@
+TK_MINUS exp
+exp TK_ASTERISK exp
+var TK_ONE_EQUAL exp
