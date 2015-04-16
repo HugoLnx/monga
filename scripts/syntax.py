@@ -159,7 +159,7 @@ def is_not_rejected(output):
 def adapt_yacc_file_to_debug(path):
   f = open(path, "r+")
   content = f.read()
-  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n]+)', r'\1\2 { printf("\2\\n"); }', content)
+  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n%]+)', r'\1\2 { printf("\2\\n"); }', content)
   f.seek(0)
   f.write(new_content)
   f.close()
