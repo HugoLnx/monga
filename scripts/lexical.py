@@ -36,7 +36,7 @@ def clear():
 
 def run(input_name):
   lex_test_compile()
-  return execute(input_name)
+  print execute(input_name)
 
 def test(type_test):
   lex_test_compile()

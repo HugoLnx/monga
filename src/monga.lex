@@ -25,20 +25,17 @@ COMMENT ([^*]|\*+[^/*])*
 '\\[a-zA-Z0-9]' yylval.text = yytext; return INVALID;
 '{CHAR_CHAR}+' yylval.text = yytext; return INVALID;
 
--0x0* yylval.text = yytext; return INVALID; // hexadecimals
--?0x{HEX_CHAR}+ yylval.ival = strtol(yytext, NULL, 16); return HEXADECIMAL;
--?0x{HEX_CHAR}+{ID_CHAR}+ yylval.text = yytext; return INVALID;
+0x{HEX_CHAR}+ yylval.ival = strtol(yytext, NULL, 16); return HEXADECIMAL; // hexadecimals
+0x{HEX_CHAR}+{ID_CHAR}+ yylval.text = yytext; return INVALID;
 
--?0+[0-9]+ yylval.text = yytext; return INVALID; // numbers
--0+ yylval.text = yytext; return INVALID;
--?[0-9]+ yylval.ival = atoi(yytext); return NUMBER;
--?[0-9]+{ID_CHAR}+ yylval.text = yytext; return INVALID;
+0+[0-9]+ yylval.text = yytext; return INVALID; // numbers
+[0-9]+ yylval.ival = atoi(yytext); return NUMBER;
+[0-9]+{ID_CHAR}+ yylval.text = yytext; return INVALID;
 
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT; // floats
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE][-+]f? yylval.text = yytext; return INVALID;
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)[eE]([^-+0-9\n ]+|[+-][^0-9\n ]+|[+-]?[0-9]+[^f \n]) yylval.text = yytext; return INVALID;
-[-+]?([0-9]*\.[0-9]+|[0-9]+\.[0-9]*)([^f \n]|f[^ \n]*) yylval.text = yytext; return INVALID;
-[-+]?\.[^0-9] yylval.text = yytext; return INVALID;
+([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT; // floats
+([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE][-+]f? yylval.text = yytext; return INVALID;
+([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE]([+-][\n ]|[+-][^0-9\n ]+) yylval.text = yytext; return INVALID;
+\.[^0-9] yylval.text = yytext; return INVALID;
 
 \[   yylval.text = ""; return TK_SQUARE_BRACKET_OPEN;
 \]   yylval.text = ""; return TK_SQUARE_BRACKET_CLOSE;
