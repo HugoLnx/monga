@@ -12,13 +12,15 @@ total = len(sys.argv)
 cmdargs = sys.argv
 
 ROOT = os.path.abspath('.')
+SYNTAX_ROOT = os.path.join(ROOT, "syntax")
 
-BUILD = os.path.join(ROOT, "build")
-TMP = os.path.join(ROOT, "tmp")
+BUILD = os.path.join(SYNTAX_ROOT, "build")
+TMP = os.path.join(SYNTAX_ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 
 SRC = os.path.join(ROOT, "src")
-TESTS = os.path.join(ROOT, "tests")
+SYNTAX_SRC = os.path.join(SYNTAX_ROOT, "src")
+TESTS = os.path.join(SYNTAX_ROOT, "tests")
 
 def clear():
   os.system("rm -rf " + BUILD)
@@ -66,14 +68,14 @@ def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
+  os.system("cp " + os.path.join(SYNTAX_SRC, "main.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SYNTAX_SRC, "main.h") + " " + BUILD)
   adapt_yacc_file_to_debug(os.path.join(BUILD, "monga.yacc"))
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
-  os.chdir("build")
+  current_dir = os.getcwd()
+  os.chdir(BUILD)
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
-  os.chdir("..")
+  os.chdir(current_dir)
   
   critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
   critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))

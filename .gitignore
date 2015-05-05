@@ -1,4 +1,4 @@
-build/
-tmp/
-dist/
+**/build/
+**/tmp/
+**/dist/
 *.ignore
