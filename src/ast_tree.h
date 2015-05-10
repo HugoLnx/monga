@@ -1,3 +1,6 @@
+#ifndef AST_TREE
+#define AST_TREE
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,7 +19,7 @@ typedef struct stType {
 } tpType;
 
 typedef struct stProgramNode {
-	void *pNode;
+	tpDeclaration *pDec;
 } ndProgram;
 
 typedef struct stBlockNode {
@@ -34,6 +37,8 @@ ndBlock *createBlockNode();
 tpType *newType(int token, int depth);
 tpDeclaration *newDeclaration(void *node, enum enDeclaration decType);
 char *strDup(char *str);
+
+ndProgram *pProgram = NULL;
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -42,13 +47,14 @@ char *strDup(char *str) {
 }
 
 ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec) {
-	ndProgram *pProgram = NEW(ndProgram);
+	pProgram = NEW(ndProgram);
 	if (pDec->decType == DEC_FUNCTION) {
 		ndFunction *pFunc = (ndFunction*) pDec->pNode;
 		pFunc->pReturnType = pType;
 	}
 
-	pProgram->pNode = pDec->pNode;
+	pProgram->pDec = pDec;
+	return pProgram;
 }
 
 ndFunction *createFunctionNode(char *name, ndBlock *pBlock) {
@@ -75,3 +81,34 @@ tpDeclaration *newDeclaration(void *node, enum enDeclaration decType) {
 	pDec->pNode = node;
 	return pDec;
 }
+
+void printProgram();
+void printFunction(ndFunction* pFunc, char *ident);
+void printBlock(ndBlock *pBlock, char *ident);
+char *addIdent(char *ident);
+
+void printProgram() {
+	tpDeclaration* pDec = pProgram->pDec;
+	printf("program:\n");
+	if(pDec->decType == DEC_FUNCTION) {
+		printFunction((ndFunction*) pDec->pNode, strdup("  "));
+	}
+}
+
+void printFunction(ndFunction* pFunc, char *ident) {
+	tpType* pReturn = pFunc->pReturnType;
+	printf("%sfunction:%s,%d\n", ident, pFunc->name,pReturn->token,pReturn->depth);
+	printBlock(pFunc->pBlock, addIdent(ident));
+}
+
+void printBlock(ndBlock *pBlock, char *ident) {
+	printf("%sblock:\n", ident);
+}
+
+char *addIdent(char *ident) {
+	char *newIdent = (char*) malloc(sizeof(char)*(strlen(ident)+3));
+	memset(newIdent, ' ', strlen(ident)+2);
+	newIdent[strlen(ident)+3] = '\0';
+	return newIdent;
+}
+#endif

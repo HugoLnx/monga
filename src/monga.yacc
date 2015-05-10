@@ -1,14 +1,16 @@
 %{
 #include <stdio.h>
 #include <string.h>
-#include "./main.h"
+#include "./ast_tree.h"
 %}
+%union {
+ 	long long int ival;
+ 	char *text;
+  double fval;
+	void* pNode;
+}
 
-%type <pProgram> program
-%type <pFunction> dec_function
-%type <pBlock> block
-%type <pType> type
-%type <pDec> declaration
+%type <pNode> program dec_function block type declaration
 %type <ival> base_type
 
 %token
@@ -38,7 +40,7 @@
 %nonassoc aux
 %nonassoc TK_ELSE
 %%
-program : type declaration { $$ = createProgramNode($1, $2); }
+program : type declaration { $$ = createProgramNode((tpType*)$1, (tpDeclaration*)$2); }
         | TK_VOID dec_function { $$ = createProgramNode(NULL, NULL); }
 				;
 
@@ -54,15 +56,15 @@ names_list : TK_ID
 					 ;
 
 type : base_type { $$ = newType($1, 0); }
-     | type TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE { $$ = $1; $$->depth += 1; }
+     | type TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE { $$ = $1; ((tpType*)$$)->depth += 1; }
 		 ;
 base_type : TK_INT { $$ = TK_INT; }
           | TK_CHAR { $$ = TK_CHAR; }
 					| TK_FLOAT { $$ = TK_FLOAT; }
 					;
 
-dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE block
-						 | TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, $4); }
+dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndBlock*)$5); /* FIX */}
+						 | TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndBlock*)$4); }
 						 ;
 parameters : parameter
            | parameter TK_COMMA parameters
@@ -70,9 +72,9 @@ parameters : parameter
 parameter : type TK_ID
           ;
 
-block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE
-      | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE
-      | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE
+block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
+      | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
+      | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
       | TK_CURLY_BRACE_OPEN TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); }
       ;
 
