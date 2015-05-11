@@ -97,7 +97,7 @@ void printProgram() {
 
 void printFunction(ndFunction* pFunc, char *ident) {
 	tpType* pReturn = pFunc->pReturnType;
-	printf("%sfunction:%s,%d\n", ident, pFunc->name,pReturn->token,pReturn->depth);
+	printf("%sfunction:%s,%d,%d\n", ident, pFunc->name,pReturn->token,pReturn->depth);
 	printBlock(pFunc->pBlock, addIdent(ident));
 }
 
