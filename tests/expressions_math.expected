@@ -18,3 +18,13 @@ program:
                             exp:0,20
                         exp:0,5
                 exp:0,30
+        statement:
+          attribution:
+            var:x
+            exp:9
+             exp:0,99
+        statement:
+          attribution:
+            var:x
+            exp:8
+             exp:0,77

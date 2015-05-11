@@ -501,9 +501,18 @@ void printExp(ndExpression *pExp, char *ident) {
     case(EXP_TEXT):
       printf("%sexp:%d,\"%s\"\n", ident, pExp->expType, pExp->value.text);
 			break;
+		case(EXPND_VAR):
+      printf("%sexp:%d\n", ident, pExp->expType);
+			printVar((ndVar*) (pExp->value.pNode), addIdent(ident));
+			break;
     case(EXPND_NEW): 
       printf("%sexp:%d\n", ident, pExp->expType);
 			printNewNode((ndNew*) (pExp->value.pNode), addIdent(ident));
+			break;
+		case(EXPND_MINUS):
+		case(EXPND_EXCLAMATION): 
+      printf("%sexp:%d\n", ident, pExp->expType);
+			printExp((ndExpression*) (pExp->value.pNode), addIdent(ident));
 			break;
     case(EXPND_BIN): 
       printf("%sexp:%d\n", ident, pExp->expType);

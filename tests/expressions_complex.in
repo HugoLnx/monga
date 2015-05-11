@@ -1,4 +1,5 @@
 int main() {
+	x = y;
 	x = new int[10];
 	x = new int[(10)];
 	x = 10 == 15 == 20;
