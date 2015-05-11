@@ -24,6 +24,8 @@ typedef struct stProgramNode {
 } ndProgram;
 
 typedef struct stBlockNode {
+  ndVarDeclarations *pVarDecs;
+  ndStatements *pStats;
 } ndBlock;
 
 typedef struct stFunctionNode {
@@ -50,6 +52,20 @@ typedef struct stVariablesNode {
 typedef struct stVariableNode {
 	char *name;
 } ndVariable;
+
+typedef struct stVarDeclarationsNode {
+	tpList *pList;
+} ndVarDeclarations;
+
+typedef struct stStatementsNode {
+	tpList *pList;
+} ndStatements;
+
+typedef struct stStatementNode {
+	void *pNode;
+  enum enStatType statType;
+} ndStatement;
+
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -83,8 +99,11 @@ ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBloc
 	return pFunc;
 }
 
-ndBlock *createBlockNode() {
-	return NEW(ndBlock);
+ndBlock *createBlockNode(ndVarDeclarations *pVarDecs, ndStatements *pStats) {
+	ndBlock *pBlock = NEW(ndBlock);
+  pBlock->pVarDecs = pVarDecs;
+  pBlock->pStats = pStats;
+  return pBlock;
 }
 
 tpType *newType(int token, int depth) {
@@ -132,6 +151,36 @@ void addVariable(ndVariables *pVars, char *name) {
   addLast(pVars->pList, pVar);
 }
 
+ndVarDeclarations *createVarDeclarations(tpType *pType, ndVariables *pVars) {
+  ndVarDeclarations *pVarDecs = NEW(ndVarDeclarations);
+  pVarDecs->pList = createList();
+  addVarDeclaration(pVarDecs, pType, pVars);
+  return pVarDecs;
+}
+
+void addVarDeclaration(ndVarDeclarations *pVarDecs, tpType *pType, ndVariables *pVars) {
+  pVars->pType = pType;
+  tpList *pList = pVarDecs->pList;
+  addLast(pList, (void*)pVars);
+}
+
+ndStatements *createStatements(ndStatement *pStat) {
+  ndStatements *pStats = NEW(ndStatements);
+  pStats->pList = createList();
+  addStatement(pStats, pStat);
+  return pStats;
+}
+
+void addStatement(ndStatements *pStats, ndStatement *pStat) {
+  addLast(pStats->pList, (void*) pStat);
+}
+
+ndStatement *createStatement(void *pNode, enum enStatType statType) {
+  ndStatement *pStat = NEW(ndStatement);
+  pStat->pNode = pNode;
+  pStat->statType = statType;
+  return pStat;
+}
 
 
 
@@ -159,7 +208,6 @@ void printFunction(ndFunction* pFunc, char *ident) {
 }
 
 void printParameters(ndParameters *pParameters, char *ident) {
-  int i;
   tpList *pList;
   if(pParameters == NULL) return;
   pList = pParameters->pList;
@@ -197,6 +245,45 @@ void printVariable(ndVariable *pVar, char *ident) {
 
 void printBlock(ndBlock *pBlock, char *ident) {
 	printf("%sblock:\n", ident);
+  ident = addIdent(ident);
+  printVarDeclarations(pBlock->pVarDecs, ident);
+  printStatements(pBlock->pStats, ident);
+}
+
+void printVarDeclarations(ndVarDeclarations *pVarDecs, char *ident) {
+  tpList *pList;
+  if(pVarDecs == NULL) return;
+  pList = pVarDecs->pList;
+  printf("%svar_declarations:\n", ident);
+
+  ident = addIdent(ident);
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariables *pVars = (ndVariables*) getCurrentValue(pList);
+    printVariables(pVars, ident);
+  }
+}
+
+void printStatements(ndStatements *pStats, char *ident) {
+  tpList *pList;
+  if(pStats == NULL) return;
+  pList = pStats->pList;
+  printf("%sstatements:\n", ident);
+
+  ident = addIdent(ident);
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndStatement *pStat = (ndStatement*) getCurrentValue(pList);
+    printStatement(pStat, ident);
+  }
+}
+
+void printStatement(ndStatement *pStat, char *ident) {
+  printf("%sstatement:\n", ident);
+  ident = addIdent(ident);
+  switch(pStat->statType){
+    case(STAT_BLOCK): printBlock((ndBlock*) pStat->pNode, ident); break;
+  }
 }
 
 char *addIdent(char *ident) {

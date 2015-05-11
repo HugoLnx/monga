@@ -13,6 +13,7 @@ ndProgram *pProgram = NULL;
 
 %type <pNode> program dec_function block type declaration parameters parameter
 	dec_variable names_list
+	var_declarations statement_list statement
 %type <ival> base_type
 
 %token
@@ -74,26 +75,26 @@ parameters : parameter { $$ = createParametersNode((ndParameter*) $1); }
 parameter : type TK_ID { $$ = createParameterNode((tpType*)$1, $2); }
           ;
 
-block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
-      | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
-      | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}
-      | TK_CURLY_BRACE_OPEN TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); }
+block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE { $$ = createBlockNode((ndVarDeclarations*)$2, NULL); }
+      | TK_CURLY_BRACE_OPEN statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(NULL, (ndStatements*)$2); }
+      | TK_CURLY_BRACE_OPEN var_declarations statement_list TK_CURLY_BRACE_CLOSE { $$ = createBlockNode((ndVarDeclarations*)$2, (ndStatements*)$3); }
+      | TK_CURLY_BRACE_OPEN TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(NULL, NULL); }
       ;
 
-var_declarations : type dec_variable 
-                 | type dec_variable var_declarations
+var_declarations : type dec_variable { $$ = createVarDeclarations((tpType*)$1, (ndVariables*)$2); }
+                 | type dec_variable var_declarations { $$ = $3; addVarDeclaration((ndVarDeclarations*)$$, (tpType*)$1, (ndVariables*)$2); }
                  ;
 
-statement_list : statement
-               | statement statement_list
+statement_list : statement { $$ = createStatements((ndStatement*)$1); }
+               | statement statement_list { $$ = $2; addStatement((ndStatements*)$$, (ndStatement*)$1); }
                ;
 
-statement : attribution TK_SEMICOLON
-          | function_call TK_SEMICOLON
-          | return_call TK_SEMICOLON
-          | block
-					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
-          | if_statement
+statement : attribution TK_SEMICOLON { $$ = createStatement(NULL, STAT_ATTRIBUTION); /* INCOMPLETE */}
+          | function_call TK_SEMICOLON { $$ = createStatement(NULL, STAT_FUNCTION_CALL); /* INCOMPLETE */}
+          | return_call TK_SEMICOLON { $$ = createStatement(NULL, STAT_RETURN_CALL); /* INCOMPLETE */}
+          | block { $$ = createStatement($1, STAT_BLOCK); }
+					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createStatement(NULL, STAT_WHILE); /* INCOMPLETE */}
+          | if_statement { $$ = createStatement(NULL, STAT_IF); /* INCOMPLETE */}
           ;
 
 if_statement : if %prec aux
