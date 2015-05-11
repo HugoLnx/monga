@@ -31,3 +31,6 @@ program:
           attribution:
             var:x
             exp:2,j
+        statement:
+          return:
+            exp:0,10

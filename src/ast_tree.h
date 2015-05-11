@@ -61,6 +61,7 @@ void printVariables(ndVariables *pVariables, char *ident);
 void printVarDeclarations(ndVarDeclarations *pVarDecs, char *ident);
 void printStatements(ndStatements *pStats, char *ident);
 void printStatement(ndStatement *pStat, char *ident);
+void printReturn(ndReturn *pReturn, char *ident);
 void printAttribution(ndAttribution *pAttribution, char *ident);
 void printVar(ndVar *pVar, char *ident);
 void printExp(ndExpression *pExp, char *ident);

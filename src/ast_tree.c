@@ -348,7 +348,15 @@ void printStatement(ndStatement *pStat, char *ident) {
   switch(pStat->statType){
     case(STAT_BLOCK): printBlock((ndBlock*) pStat->pNode, ident); break;
     case(STAT_ATTRIBUTION): printAttribution((ndAttribution*) pStat->pNode, ident);break;
+    case(STAT_RETURN_CALL): printReturn((ndReturn*) pStat->pNode, ident);break;
   }
+}
+
+void printReturn(ndReturn *pReturn, char *ident) {
+  printf("%sreturn:\n",ident);
+
+  ident = addIdent(ident);
+  printExp(pReturn->pExp, ident);
 }
 
 void printAttribution(ndAttribution *pAttribution, char *ident) {

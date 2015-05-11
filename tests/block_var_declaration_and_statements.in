@@ -8,4 +8,6 @@ int main() {
   x = 10;
   x = 0xa;
   x = 'j';
+
+  return 10;
 }
