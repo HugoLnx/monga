@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "y.tab.i"
 
 int main()
 {
