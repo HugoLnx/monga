@@ -119,8 +119,8 @@ var : TK_ID { $$ = createVarNode($1); }
 exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | HEXADECIMAL { $$ = createExpressionIntegerNode($1, EXP_HEXADECIMAL); }
     | CHAR { $$ = createExpressionIntegerNode($1[1], EXP_CHAR); }
-		| FLOAT
-    | TEXT
+		| FLOAT { $$ = createExpressionFloatNode($1); }
+    | TEXT { $$ = createExpressionTextNode($1); }
     | var
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE

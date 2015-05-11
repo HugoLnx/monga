@@ -2,7 +2,7 @@
 #define AST_TREE_H
 enum enDeclaration { DEC_FUNCTION, DEC_VARIABLE };
 enum enStatType { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
-enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR };
+enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT };
 enum enVarType { VAR_ID, VAR_ARRAY };
 
 typedef struct stDeclaration tpDeclaration;
@@ -45,6 +45,8 @@ ndAttribution *createAttributionNode(ndVar *pVar, ndExpression *pExp);
 ndVar *createVarNode(char *name);
 ndVar *createArrayVarNode(ndExpression *ndExp, ndExpression *ndInxExp);
 ndExpression *createExpressionIntegerNode(int val, enum enExpType expType);
+ndExpression *createExpressionFloatNode(double val);
+ndExpression *createExpressionTextNode(char *val);
 
 char *strDup(char *str);
 void incrDepth(tpType *pType);

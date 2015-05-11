@@ -102,6 +102,13 @@ char *strDup(char *str) {
 	return dup;
 }
 
+char *noQuotes(char *str) {
+	char *newStr = (char*) malloc(sizeof(char)*strlen(str)-1);
+	strncpy(newStr, str+1, strlen(str)-2);
+	newStr[strlen(str)-2] = '\0';
+	return newStr;
+}
+
 void incrDepth(tpType *pType) {
   pType->depth += 1;
 }
@@ -246,6 +253,20 @@ ndExpression *createExpressionIntegerNode(int val, enum enExpType expType) {
   return pExp;
 }
 
+ndExpression *createExpressionFloatNode(double val) {
+  ndExpression *pExp = NEW(ndExpression);
+  pExp->value.fval = val;
+  pExp->expType = EXP_FLOAT;
+  return pExp;
+}
+
+ndExpression *createExpressionTextNode(char *val) {
+  ndExpression *pExp = NEW(ndExpression);
+  pExp->value.text = noQuotes(val);
+  pExp->expType = EXP_TEXT;
+  return pExp;
+}
+
 
 
 
@@ -385,6 +406,10 @@ void printExp(ndExpression *pExp, char *ident) {
       printf("%sexp:%d,0x%x\n", ident, pExp->expType, pExp->value.ival); break;
     case(EXP_CHAR):
       printf("%sexp:%d,%c\n", ident, pExp->expType, pExp->value.ival); break;
+    case(EXP_FLOAT):
+      printf("%sexp:%d,%.5f\n", ident, pExp->expType, pExp->value.fval); break;
+    case(EXP_TEXT):
+      printf("%sexp:%d,\"%s\"\n", ident, pExp->expType, pExp->value.text); break;
   }
 }
 

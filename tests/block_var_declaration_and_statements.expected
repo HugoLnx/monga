@@ -34,3 +34,9 @@ program:
         statement:
           return:
             exp:0,10
+        statement:
+          return:
+            exp:3,10.30000
+        statement:
+          return:
+            exp:4,"hey jude"

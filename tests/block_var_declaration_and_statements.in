@@ -10,4 +10,6 @@ int main() {
   x = 'j';
 
   return 10;
+  return 10.3;
+  return "hey jude";
 }
