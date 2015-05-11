@@ -121,9 +121,9 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | CHAR { $$ = createExpressionIntegerNode($1[1], EXP_CHAR); }
 		| FLOAT { $$ = createExpressionFloatNode($1); }
     | TEXT { $$ = createExpressionTextNode($1); }
-    | var
-    | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
-    | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE
+    | var { $$ = createExpressionGenericNode($1, EXPND_VAR); }
+    | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE { $$ = $2; }
+    | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE { void *pNewNode = createNewNode((tpType*)$2, (ndExpression*)$4); $$ = createExpressionGenericNode(pNewNode, EXPND_NEW); }
     | exp TK_DOUBLE_EQUAL exp
     | exp TK_BANG_EQUAL exp
     | exp TK_GREATER_EQUAL exp

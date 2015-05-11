@@ -76,6 +76,7 @@ typedef struct stExpressionNode {
     long long int ival;
     char *text;
     double fval;
+    void *pNode;
   } value;
 } ndExpression;
 
@@ -94,6 +95,11 @@ typedef struct stAttributionNode {
   ndVar *pVar;
   ndExpression *pExp;
 } ndAttribution;
+
+typedef struct stNewNode {
+  tpType *pType;
+  ndExpression *pExp;
+} ndNew;
 
  
 char *strDup(char *str) {
@@ -267,6 +273,19 @@ ndExpression *createExpressionTextNode(char *val) {
   return pExp;
 }
 
+ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType) {
+  ndExpression *pExp = NEW(ndExpression);
+  pExp->value.pNode = pNode;
+  pExp->expType = expType;
+  return pExp;
+}
+
+ndNew *createNewNode(tpType *pType, ndExpression *pExp) {
+	ndNew *pNew = NEW(ndNew);
+	pNew->pType = pType;
+	pNew->pExp = pExp;
+	return pNew;
+}
 
 
 
@@ -401,16 +420,30 @@ void printVar(ndVar *pVar, char *ident) {
 void printExp(ndExpression *pExp, char *ident) {
   switch(pExp->expType) {
     case(EXP_NUMBER):
-      printf("%sexp:%d,%lld\n", ident, pExp->expType, pExp->value.ival); break;
+      printf("%sexp:%d,%lld\n", ident, pExp->expType, pExp->value.ival);
+			break;
     case(EXP_HEXADECIMAL):
-      printf("%sexp:%d,0x%x\n", ident, pExp->expType, pExp->value.ival); break;
+      printf("%sexp:%d,0x%x\n", ident, pExp->expType, pExp->value.ival);
+			break;
     case(EXP_CHAR):
-      printf("%sexp:%d,%c\n", ident, pExp->expType, pExp->value.ival); break;
+      printf("%sexp:%d,%c\n", ident, pExp->expType, pExp->value.ival);
+			break;
     case(EXP_FLOAT):
-      printf("%sexp:%d,%.5f\n", ident, pExp->expType, pExp->value.fval); break;
+      printf("%sexp:%d,%.5f\n", ident, pExp->expType, pExp->value.fval);
+			break;
     case(EXP_TEXT):
-      printf("%sexp:%d,\"%s\"\n", ident, pExp->expType, pExp->value.text); break;
+      printf("%sexp:%d,\"%s\"\n", ident, pExp->expType, pExp->value.text);
+			break;
+    case(EXPND_NEW): 
+      printf("%sexp:%d\n", ident, pExp->expType);
+			printNewNode((ndNew*) (pExp->value.pNode), addIdent(ident));
+			break;
   }
+}
+
+void printNewNode(ndNew *pNew, char *ident) {
+	printf("%snew:%d,%d\n",ident, pNew->pType->token, pNew->pType->depth);
+	printExp(pNew->pExp, addIdent(ident));
 }
 
 char *addIdent(char *ident) {

@@ -1,0 +1,16 @@
+program:
+  function:main,259,0
+    block:
+      statements:
+        statement:
+          attribution:
+            var:x
+            exp:6
+              new:259,0
+                exp:0,10
+        statement:
+          attribution:
+            var:x
+            exp:6
+              new:259,0
+                exp:0,10

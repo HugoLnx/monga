@@ -2,7 +2,7 @@
 #define AST_TREE_H
 enum enDeclaration { DEC_FUNCTION, DEC_VARIABLE };
 enum enStatType { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
-enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT };
+enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT, EXPND_VAR, EXPND_NEW };
 enum enVarType { VAR_ID, VAR_ARRAY };
 
 typedef struct stDeclaration tpDeclaration;
@@ -21,6 +21,7 @@ typedef struct stReturnNode ndReturn;
 typedef struct stExpressionNode ndExpression;
 typedef struct stVarNode ndVar;
 typedef struct stAttributionNode ndAttribution;
+typedef struct stNewNode ndNew;
 
 ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
@@ -47,6 +48,8 @@ ndVar *createArrayVarNode(ndExpression *ndExp, ndExpression *ndInxExp);
 ndExpression *createExpressionIntegerNode(int val, enum enExpType expType);
 ndExpression *createExpressionFloatNode(double val);
 ndExpression *createExpressionTextNode(char *val);
+ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType);
+ndNew *createNewNode(tpType *pType, ndExpression *pExp);
 
 char *strDup(char *str);
 void incrDepth(tpType *pType);
@@ -67,5 +70,6 @@ void printReturn(ndReturn *pReturn, char *ident);
 void printAttribution(ndAttribution *pAttribution, char *ident);
 void printVar(ndVar *pVar, char *ident);
 void printExp(ndExpression *pExp, char *ident);
+void printNewNode(ndNew *pNew, char *ident);
 char *addIdent(char *ident);
 #endif
