@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "./ast_tree.h"
+ndProgram *pProgram = NULL;
 %}
 %union {
  	long long int ival;
@@ -10,7 +11,7 @@
 	void* pNode;
 }
 
-%type <pNode> program dec_function block type declaration
+%type <pNode> program dec_function block type declaration parameters parameter
 %type <ival> base_type
 
 %token
@@ -56,20 +57,20 @@ names_list : TK_ID
 					 ;
 
 type : base_type { $$ = newType($1, 0); }
-     | type TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE { $$ = $1; ((tpType*)$$)->depth += 1; }
+     | type TK_SQUARE_BRACKET_OPEN TK_SQUARE_BRACKET_CLOSE { $$ = $1; incrDepth((tpType*)$$); }
 		 ;
 base_type : TK_INT { $$ = TK_INT; }
           | TK_CHAR { $$ = TK_CHAR; }
 					| TK_FLOAT { $$ = TK_FLOAT; }
 					;
 
-dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndBlock*)$5); /* FIX */}
-						 | TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndBlock*)$4); }
+dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndParameters*) $3, (ndBlock*)$5); }
+						 | TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, NULL, (ndBlock*)$4); }
 						 ;
-parameters : parameter
-           | parameter TK_COMMA parameters
+parameters : parameter { $$ = createParametersNode((ndParameter*) $1); }
+           | parameter TK_COMMA parameters { $$ = $3; addParam((ndParameters*)$$, (ndParameter*)$1); }
 					 ;
-parameter : type TK_ID
+parameter : type TK_ID { $$ = createParameterNode((tpType*)$1, $2); }
           ;
 
 block : TK_CURLY_BRACE_OPEN var_declarations TK_CURLY_BRACE_CLOSE { $$ = createBlockNode(); /* FIX */}

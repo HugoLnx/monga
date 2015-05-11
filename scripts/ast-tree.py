@@ -69,6 +69,9 @@ def compile():
   os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_tree.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "list.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "list.c") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   current_dir = os.getcwd()
   os.chdir(BUILD)
@@ -76,7 +79,9 @@ def compile():
   os.chdir(current_dir)
   
   critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  critical_sys("gcc " + os.path.join(BUILD, "list.c") + " -o " + os.path.join(BUILD,"list.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD, "ast_tree.c") + " -o " + os.path.join(BUILD,"ast_tree.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"ast_tree.o") + " " + os.path.join(BUILD,"list.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):

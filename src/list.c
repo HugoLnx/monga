@@ -3,73 +3,71 @@
 #include <stdlib.h>
 
 struct stNodeList {
-    void *value;
-    int size;
-    struct stNodeList *next;
+  struct stNode *pHead;
+  struct stNode *pLast;
+  struct stNode *pCurrent;
 };
 
-nodeList *createNode(void *value){
-	nodeList * node = NULL;
-	node = malloc(sizeof(nodeList));
-	if (node == NULL) {
-	    return NULL;
-	}
+typedef struct stNode {
+  void *pValue;
+  struct stNode *pNext;
+  struct stNode *pPrevious;
+} tpNode;
 
-	node->value = value;
-	node->size = 1;
-	node->next = NULL;
-	return node;
+tpList *createList() {
+	tpList *pList = (tpList*) malloc(sizeof(tpList));
+  pList->pHead = NULL;
+  pList->pLast = NULL;
+  pList->pCurrent = NULL;
+  return pList;
 }
 
-void add(nodeList * headList, void *val) {
-    nodeList * current = headList;
-    while (current->next != NULL) {
-        current = current->next;
-    }
+void addLast(tpList *pList, void *val) {
+  tpNode *pOldLast = pList->pLast;
 
-    current->next = malloc(sizeof(nodeList));
-    current->next->value = val;
-    current->size++;
-    current->next->next = NULL;
+  tpNode *pNewNode = (tpNode*) malloc(sizeof(tpNode));
+  pNewNode->pValue = val;
+  pNewNode->pNext = NULL;
+  pNewNode->pPrevious = pList->pLast;
+  pList->pLast = pNewNode;
+
+  if(pOldLast == NULL) {
+    pList->pHead = pNewNode;
+  } else {
+    pOldLast->pNext = pNewNode;
+  }
 }
 
-void *removeLast(nodeList * headList) {
-    void *nodeVal = NULL;
-	nodeList * current = headList;
-
-    if (headList->next == NULL) {
-        nodeVal = headList->value;
-        headList->size--;
-        headList->next = NULL;
-        free(headList);
-        return nodeVal;
-    }
-
-    while (current->next != NULL) {
-        current = current->next;
-    }
-
-   	headList->size--;
-    nodeVal = current->value;
-    free(current);
-
-    return nodeVal;
+int goNext(tpList *pList){
+  if(pList->pCurrent == NULL) {
+    pList->pCurrent = pList->pHead;
+  } else {
+    pList->pCurrent = pList->pCurrent->pNext;
+  }
+  if(pList->pCurrent == NULL) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
-void *getValue(nodeList **headList, int index){
-	nodeList *current = (*headList);
-	int count = 0;
-	if (index == 0){
-		return current->value;
-	}
-	else{
-		for (count = 0; count < index; count++){
-			current = current->next;
-		}
-		return current->value;
-	}
+int goPrevious(tpList *pList){
+  if(pList->pCurrent == NULL) {
+    pList->pCurrent = pList->pLast;
+  } else {
+    pList->pCurrent = pList->pCurrent->pPrevious;
+  }
+  if(pList->pCurrent == NULL) {
+    return 0;
+  } else {
+    return 1;
+  }
 }
 
-int getSize(nodeList *headList){
-	return headList->size;
+void *getCurrentValue(tpList *pList){
+  return pList->pCurrent->pValue;
+}
+
+void resetList(tpList *pList) {
+  pList->pCurrent = NULL;
 }

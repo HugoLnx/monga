@@ -1,0 +1,6 @@
+program:
+  function:main,259,3
+    parameters:
+      parameter:nums,259,1
+      parameter:args,260,2
+    block:
