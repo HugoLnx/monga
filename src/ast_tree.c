@@ -106,6 +106,15 @@ typedef struct stNewNode {
   ndExpression *pExp;
 } ndNew;
 
+typedef struct stFunctionCallNode {
+  char *functionName;
+  ndExpList *pExpList;
+} ndFunctionCall;
+
+typedef struct stExpListNode {
+  tpList *pList;
+} ndExpList;
+
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -175,15 +184,27 @@ ndParameters* createParametersNode(ndParameter* pParam) {
 }
 
 ndParameter* createParameterNode(tpType *pType, char *name) {
-	ndParameter *pParam = NEW(ndParameter);
-	pParam->pType = pType;
-	pParam->name = name;
-	return pParam;
+  ndParameter *pParam = NEW(ndParameter);
+  pParam->pType = pType;
+  pParam->name = name;
+  return pParam;
 }
 
 void addParam(ndParameters *pParams, ndParameter *pParam) {
 	addLast(pParams->pList, (void*)pParam);
 }
+
+ndExpList* createExpListNode(ndExpression *pExp) {
+  ndExpList *pExpList = NEW(ndExpList);
+  pExpList->pList =  createList();
+  addExpListNode(pExpList, pExp);
+  return pExpList;
+}
+
+void addExpListNode(ndExpList *pExpList, ndExpression *pExp) {
+  addLast(pExpList->pList, (void*)pExp);
+}
+
 
 ndVariables *createVariablesNode(char *name) {
   ndVariables *pVars = NEW(ndVariables);
@@ -295,10 +316,18 @@ ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp
 }
 
 ndNew *createNewNode(tpType *pType, ndExpression *pExp) {
-	ndNew *pNew = NEW(ndNew);
-	pNew->pType = pType;
-	pNew->pExp = pExp;
-	return pNew;
+  ndNew *pNew = NEW(ndNew);
+  pNew->pType = pType;
+  pNew->pExp = pExp;
+  return pNew;
+}
+
+ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList) {
+  ndFunctionCall *pFunctionCall = NEW(ndFunctionCall);
+  pFunctionCall->functionName = functionName;
+  pFunctionCall->pExpList = pExpList;
+
+  return pFunctionCall;
 }
 
 
@@ -386,7 +415,7 @@ void printStatements(ndStatements *pStats, char *ident) {
   if(pStats == NULL) return;
   pList = pStats->pList;
   printf("%sstatements:\n", ident);
-
+printVariable
   ident = addIdent(ident);
   resetList(pList);
   while(goPrevious(pList)) {
@@ -402,6 +431,7 @@ void printStatement(ndStatement *pStat, char *ident) {
     case(STAT_BLOCK): printBlock((ndBlock*) pStat->pNode, ident); break;
     case(STAT_ATTRIBUTION): printAttribution((ndAttribution*) pStat->pNode, ident);break;
     case(STAT_RETURN_CALL): printReturn((ndReturn*) pStat->pNode, ident);break;
+    case(STAT_FUNCTION_CALL): printFunctionCallNode((ndFunctionCall*) pStat->pNode, ident);break;
   }
 }
 
@@ -464,8 +494,29 @@ void printExp(ndExpression *pExp, char *ident) {
 }
 
 void printNewNode(ndNew *pNew, char *ident) {
-	printf("%snew:%d,%d\n",ident, pNew->pType->token, pNew->pType->depth);
-	printExp(pNew->pExp, addIdent(ident));
+  printf("%snew:%d,%d\n",ident, pNew->pType->token, pNew->pType->depth);
+  printExp(pNew->pExp, addIdent(ident));
+}
+
+void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident) {
+  printf("%sfunction call:%s\n",ident, pFunctionCall->functionName);
+  
+  if (pfunctionCall->pExpList != NULL)
+    printExpListNode(pfunctionCall->pExpList, addIdent(ident));
+}
+
+void printExpListNode(ndExpList *pExpList, char *ident) {
+  tpList *pList;
+  if(pExpList == NULL) return;
+  pList = pExpList->pList;
+  printf("%sexp list:\n",ident);
+  
+  ident = addIdent(ident);
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariable *pStat = (ndVariable*) getCurrentValue(pList);
+    printVariable(pStat, ident);
+  }
 }
 
 char *addIdent(char *ident) {

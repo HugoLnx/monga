@@ -91,7 +91,7 @@ statement_list : statement { $$ = createStatements((ndStatement*)$1); }
                ;
 
 statement : attribution TK_SEMICOLON { $$ = createStatement($1, STAT_ATTRIBUTION); }
-          | function_call TK_SEMICOLON { $$ = createStatement(NULL, STAT_FUNCTION_CALL); /* INCOMPLETE */}
+          | function_call TK_SEMICOLON { $$ = createStatement($1, STAT_FUNCTION_CALL); }
           | return_call TK_SEMICOLON { $$ = createStatement($1, STAT_RETURN_CALL); }
           | block { $$ = createStatement($1, STAT_BLOCK); }
 					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createStatement(NULL, STAT_WHILE); /* INCOMPLETE */}
@@ -140,10 +140,10 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | TK_MINUS exp %prec TK_ASTERISK %prec TK_SLASH
     ;
 
-exp_list : exp
-         | exp TK_COMMA exp_list
+exp_list : exp { $$ = createExpListNode((ndVar*)$1); }
+         | exp TK_COMMA exp_list { $$ = $3; addExpListNode((ndExpList*)$$, (ndExpression*)$1); }
          ;
 
-function_call : TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE 
-              | TK_ID TK_PARENTHESES_OPEN exp_list TK_PARENTHESES_CLOSE 
+function_call : TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE { $$ = createFunctionCall((char*)$1, NULL); }
+              | TK_ID TK_PARENTHESES_OPEN exp_list TK_PARENTHESES_CLOSE { $$ = createFunctionCall((char*)$1, (ndExpList*)$3); }
               ;

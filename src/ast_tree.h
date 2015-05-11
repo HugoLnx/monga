@@ -26,6 +26,8 @@ typedef struct stExpressionNode ndExpression;
 typedef struct stVarNode ndVar;
 typedef struct stAttributionNode ndAttribution;
 typedef struct stNewNode ndNew;
+typedef struct stExpListNode ndExpList;
+typedef struct stFunctionCallNode ndFunctionCall;
 
 ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
@@ -34,6 +36,8 @@ tpType *newType(int token, int depth);
 tpDeclaration *newDeclaration(void *node, enum enDeclaration decType);
 ndParameters* createParametersNode(ndParameter* pParam);
 ndParameter* createParameterNode(tpType *pType, char *name);
+void addParam(ndParameters *pParams, ndParameter *pParam);
+ndExpList* createExpListNode(ndExpression *pExp);
 void addParam(ndParameters *pParams, ndParameter *pParam);
 
 ndVariables *createVariablesNode(char *name);
@@ -55,6 +59,7 @@ ndExpression *createExpressionTextNode(char *val);
 ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType);
 ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expType);
 ndNew *createNewNode(tpType *pType, ndExpression *pExp);
+ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList);
 
 char *strDup(char *str);
 void incrDepth(tpType *pType);
@@ -76,5 +81,7 @@ void printAttribution(ndAttribution *pAttribution, char *ident);
 void printVar(ndVar *pVar, char *ident);
 void printExp(ndExpression *pExp, char *ident);
 void printNewNode(ndNew *pNew, char *ident);
+void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident);
+void printExpListNode(ndExpList *pExpList, char *ident);
 char *addIdent(char *ident);
 #endif
