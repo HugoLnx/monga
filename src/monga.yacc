@@ -12,6 +12,7 @@ ndProgram *pProgram = NULL;
 }
 
 %type <pNode> program dec_function block type declaration parameters parameter
+	dec_variable names_list
 %type <ival> base_type
 
 %token
@@ -45,15 +46,15 @@ program : type declaration { $$ = createProgramNode((tpType*)$1, (tpDeclaration*
         | TK_VOID dec_function { $$ = createProgramNode(NULL, NULL); }
 				;
 
-declaration : dec_variable { $$ = newDeclaration(0, DEC_VARIABLE); }
+declaration : dec_variable { $$ = newDeclaration($1, DEC_VARIABLE); }
         | dec_function { $$ = newDeclaration($1, DEC_FUNCTION); }
 				;
 
-dec_variable : names_list TK_SEMICOLON
+dec_variable : names_list TK_SEMICOLON { $$ = $1; }
              ;
 
-names_list : TK_ID
-           | TK_ID TK_COMMA names_list
+names_list : TK_ID { $$ = createVariablesNode($1); }
+           | TK_ID TK_COMMA names_list { $$ = $3; addVariable((ndVariables*)$$, $1); }
 					 ;
 
 type : base_type { $$ = newType($1, 0); }

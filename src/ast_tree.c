@@ -41,6 +41,15 @@ typedef struct stParameterNode {
 	tpType *pType;
 	char *name;
 } ndParameter;
+
+typedef struct stVariablesNode {
+	tpList *pList;
+	tpType *pType;
+} ndVariables;
+
+typedef struct stVariableNode {
+	char *name;
+} ndVariable;
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -57,7 +66,10 @@ ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec) {
 	if (pDec->decType == DEC_FUNCTION) {
 		ndFunction *pFunc = (ndFunction*) pDec->pNode;
 		pFunc->pReturnType = pType;
-	}
+	} else {
+		ndVariables *pVars = (ndVariables*) pDec->pNode;
+		pVars->pType = pType;
+  }
 
 	pProgram->pDec = pDec;
 	return pProgram;
@@ -107,6 +119,19 @@ void addParam(ndParameters *pParams, ndParameter *pParam) {
 	addLast(pParams->pList, (void*)pParam);
 }
 
+ndVariables *createVariablesNode(char *name) {
+  ndVariables *pVars = NEW(ndVariables);
+  pVars->pList = createList();
+  addVariable(pVars, name);
+  return pVars;
+}
+
+void addVariable(ndVariables *pVars, char *name) {
+  ndVariable *pVar = NEW(ndVariable);
+  pVar->name = name;
+  addLast(pVars->pList, pVar);
+}
+
 
 
 
@@ -119,7 +144,9 @@ void printProgram() {
 	printf("program:\n");
 	if(pDec->decType == DEC_FUNCTION) {
 		printFunction((ndFunction*) pDec->pNode, strdup("  "));
-	}
+	} else {
+		printVariables((ndVariables*) pDec->pNode, strdup("  "));
+  }
 }
 
 void printFunction(ndFunction* pFunc, char *ident) {
@@ -149,6 +176,23 @@ void printParameters(ndParameters *pParameters, char *ident) {
 void printParameter(ndParameter *pParam, char *ident) {
   tpType *pType = pParam->pType;
   printf("%sparameter:%s,%d,%d\n", ident, pParam->name, pType->token, pType->depth);
+}
+
+void printVariables(ndVariables *pVariables, char *ident) {
+  tpList *pList = pVariables->pList;
+  tpType *pType = pVariables->pType;
+  printf("%svariables:%d,%d\n", ident, pType->token, pType->depth);
+
+  ident = addIdent(ident);
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+    printVariable(pVar, ident);
+  }
+}
+
+void printVariable(ndVariable *pVar, char *ident) {
+  printf("%svariable:%s\n", ident, pVar->name);
 }
 
 void printBlock(ndBlock *pBlock, char *ident) {
