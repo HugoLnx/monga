@@ -14,6 +14,7 @@ ndProgram *pProgram = NULL;
 %type <pNode> program dec_function block type declaration parameters parameter
 	dec_variable names_list
 	var_declarations statement_list statement
+	attribution return_call exp var
 %type <ival> base_type
 
 %token
@@ -89,7 +90,7 @@ statement_list : statement { $$ = createStatements((ndStatement*)$1); }
                | statement statement_list { $$ = $2; addStatement((ndStatements*)$$, (ndStatement*)$1); }
                ;
 
-statement : attribution TK_SEMICOLON { $$ = createStatement(NULL, STAT_ATTRIBUTION); /* INCOMPLETE */}
+statement : attribution TK_SEMICOLON { $$ = createStatement($1, STAT_ATTRIBUTION); }
           | function_call TK_SEMICOLON { $$ = createStatement(NULL, STAT_FUNCTION_CALL); /* INCOMPLETE */}
           | return_call TK_SEMICOLON { $$ = createStatement(NULL, STAT_RETURN_CALL); /* INCOMPLETE */}
           | block { $$ = createStatement($1, STAT_BLOCK); }
@@ -104,22 +105,22 @@ if_statement : if %prec aux
 if : TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
    ;
 
-return_call : TK_RETURN
-            | TK_RETURN exp
+return_call : TK_RETURN { $$ = createReturnNode(NULL); }
+            | TK_RETURN exp { $$ = createReturnNode((ndExpression*)$2); }
             ;
 
-attribution : var TK_ONE_EQUAL exp
+attribution : var TK_ONE_EQUAL exp { $$ = createAttributionNode((ndVar*)$1, (ndExpression*)$3); }
             ;
 
-var : TK_ID
-    | exp TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE
+var : TK_ID { $$ = createVarNode($1); }
+    | exp TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE { $$ = createArrayVarNode((ndExpression*)$1, (ndExpression*)$3); }
     ;
 
-exp : NUMBER
+exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
+    | HEXADECIMAL { $$ = createExpressionIntegerNode($1, EXP_HEXADECIMAL); }
+    | CHAR { $$ = createExpressionIntegerNode($1[1], EXP_CHAR); }
 		| FLOAT
     | TEXT
-    | HEXADECIMAL
-    | CHAR
     | var
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE

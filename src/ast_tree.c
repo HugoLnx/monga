@@ -66,6 +66,35 @@ typedef struct stStatementNode {
   enum enStatType statType;
 } ndStatement;
 
+typedef struct stReturnNode {
+  ndExpression *pExp;
+} ndReturn;
+
+typedef struct stExpressionNode {
+  enum enExpType expType;
+  union {
+    long long int ival;
+    char *text;
+    double fval;
+  } value;
+} ndExpression;
+
+typedef struct stVarNode {
+  enum enVarType varType;
+  union {
+    char *name;
+    struct {
+      ndExpression *pPointerExp;
+      ndExpression *pInxExp;
+    } address;
+  } value;
+} ndVar;
+
+typedef struct stAttributionNode {
+  ndVar *pVar;
+  ndExpression *pExp;
+} ndAttribution;
+
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -182,6 +211,41 @@ ndStatement *createStatement(void *pNode, enum enStatType statType) {
   return pStat;
 }
 
+ndReturn *createReturnNode(ndExpression *pExp) {
+  ndReturn *pReturn = NEW(ndReturn);
+  pReturn->pExp = pExp;
+  return pReturn;
+}
+
+ndAttribution *createAttributionNode(ndVar *pVar, ndExpression *pExp) {
+  ndAttribution *pAttribution = NEW(ndAttribution);
+  pAttribution->pVar = pVar;
+  pAttribution->pExp = pExp;
+  return pAttribution;
+}
+
+ndVar *createVarNode(char *name) {
+  ndVar *pVar = NEW(ndVar);
+  pVar->value.name = name;
+  pVar->varType = VAR_ID;
+  return pVar;
+}
+
+ndVar *createArrayVarNode(ndExpression *pPointerExp, ndExpression *pInxExp) {
+  ndVar *pVar = NEW(ndVar);
+  pVar->value.address.pPointerExp = pPointerExp;
+  pVar->value.address.pInxExp = pInxExp;
+  pVar->varType = VAR_ARRAY;
+  return pVar;
+}
+
+ndExpression *createExpressionIntegerNode(int val, enum enExpType expType) {
+  ndExpression *pExp = NEW(ndExpression);
+  pExp->value.ival = val;
+  pExp->expType = expType;
+  return pExp;
+}
+
 
 
 
@@ -283,6 +347,36 @@ void printStatement(ndStatement *pStat, char *ident) {
   ident = addIdent(ident);
   switch(pStat->statType){
     case(STAT_BLOCK): printBlock((ndBlock*) pStat->pNode, ident); break;
+    case(STAT_ATTRIBUTION): printAttribution((ndAttribution*) pStat->pNode, ident);break;
+  }
+}
+
+void printAttribution(ndAttribution *pAttribution, char *ident) {
+  printf("%sattribution:\n", ident);
+  ident = addIdent(ident);
+
+  printVar(pAttribution->pVar, ident);
+  printExp(pAttribution->pExp, ident);
+}
+
+void printVar(ndVar *pVar, char *ident) {
+  if(pVar->varType == VAR_ID) {
+    printf("%svar:%s\n", ident, pVar->value.name);
+  } else {
+    printf("%svar:\n", ident);
+    printExp(pVar->value.address.pPointerExp, ident);
+    printExp(pVar->value.address.pInxExp, ident);
+  }
+}
+
+void printExp(ndExpression *pExp, char *ident) {
+  switch(pExp->expType) {
+    case(EXP_NUMBER):
+      printf("%sexp:%d,%lld\n", ident, pExp->expType, pExp->value.ival); break;
+    case(EXP_HEXADECIMAL):
+      printf("%sexp:%d,0x%x\n", ident, pExp->expType, pExp->value.ival); break;
+    case(EXP_CHAR):
+      printf("%sexp:%d,%c\n", ident, pExp->expType, pExp->value.ival); break;
   }
 }
 

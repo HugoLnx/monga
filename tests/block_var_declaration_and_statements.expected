@@ -19,3 +19,15 @@ program:
             var_declarations:
               variables:260,2
                 variable:names
+        statement:
+          attribution:
+            var:x
+            exp:0,10
+        statement:
+          attribution:
+            var:x
+            exp:1,0xa
+        statement:
+          attribution:
+            var:x
+            exp:2,j

@@ -4,4 +4,8 @@ int main() {
 
   { int[] numbers, tokens; }
   { char[][] names; }
+
+  x = 10;
+  x = 0xa;
+  x = 'j';
 }
