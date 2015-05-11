@@ -74,3 +74,29 @@ program:
                     exp:0,10
                     exp:0,15
                 exp:0,20
+        statement:
+          attribution:
+            var:x
+            exp:7
+              binary:12
+                exp:7
+                  binary:5
+                    exp:0,10
+                    exp:0,15
+                exp:7
+                  binary:5
+                    exp:0,5
+                    exp:0,20
+        statement:
+          attribution:
+            var:x
+            exp:7
+              binary:11
+                exp:7
+                  binary:5
+                    exp:0,10
+                    exp:0,15
+                exp:7
+                  binary:5
+                    exp:0,5
+                    exp:0,20

@@ -131,12 +131,12 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | exp TK_LESS_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_LESS_EQUAL); }
     | exp TK_LESS exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_LESS); }
     | TK_EXCLAMATION_MARK exp
-    | exp TK_AND exp
-    | exp TK_OR exp
-    | exp TK_PLUS exp
-    | exp TK_MINUS exp
-    | exp TK_ASTERISK exp
-    | exp TK_SLASH exp
+    | exp TK_AND exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_AND); }
+    | exp TK_OR exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_OR); }
+    | exp TK_PLUS exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_PLUS); }
+    | exp TK_MINUS exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_MINUS); }
+    | exp TK_ASTERISK exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_ASTERISK); }
+    | exp TK_SLASH exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_SLASH); }
     | TK_MINUS exp %prec TK_ASTERISK %prec TK_SLASH
     ;
 
