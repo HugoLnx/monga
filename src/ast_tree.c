@@ -77,6 +77,11 @@ typedef struct stExpressionNode {
     char *text;
     double fval;
     void *pNode;
+    struct {
+      ndExpression *pExp1;
+      ndExpression *pExp2;
+      enum enExpBinType expType;
+    } bin;
   } value;
 } ndExpression;
 
@@ -280,13 +285,21 @@ ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType) {
   return pExp;
 }
 
+ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expBinType) {
+  ndExpression *pExp = NEW(ndExpression);
+  pExp->value.bin.pExp1 = pExp1;
+  pExp->value.bin.pExp2 = pExp2;
+  pExp->value.bin.expType = expBinType;
+  pExp->expType = EXPND_BIN;
+  return pExp;
+}
+
 ndNew *createNewNode(tpType *pType, ndExpression *pExp) {
 	ndNew *pNew = NEW(ndNew);
 	pNew->pType = pType;
 	pNew->pExp = pExp;
 	return pNew;
 }
-
 
 
 
@@ -437,6 +450,15 @@ void printExp(ndExpression *pExp, char *ident) {
     case(EXPND_NEW): 
       printf("%sexp:%d\n", ident, pExp->expType);
 			printNewNode((ndNew*) (pExp->value.pNode), addIdent(ident));
+			break;
+    case(EXPND_BIN): 
+      printf("%sexp:%d\n", ident, pExp->expType);
+
+			ident = addIdent(ident);
+      printf("%sbinary:%d\n", ident, pExp->value.bin.expType);	
+			ident = addIdent(ident);
+			printExp(pExp->value.bin.pExp1, ident);
+			printExp(pExp->value.bin.pExp2, ident);
 			break;
   }
 }

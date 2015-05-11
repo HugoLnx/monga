@@ -2,7 +2,8 @@
 #define AST_TREE_H
 enum enDeclaration { DEC_FUNCTION, DEC_VARIABLE };
 enum enStatType { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
-enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT, EXPND_VAR, EXPND_NEW };
+enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT, EXPND_VAR, EXPND_NEW, EXPND_BIN};
+enum enExpBinType { EXPBIN_PLUS, EXPBIN_MINUS, EXPBIN_ASTERISK, EXPBIN_SLASH, EXPBIN_EXCLAMATION_MARK, EXPBIN_DOUBLE_EQUAL, EXPBIN_BANG_EQUAL, EXPBIN_LESS_EQUAL, EXPBIN_GREATER_EQUAL, EXPBIN_LESS, EXPBIN_GREATER, EXPBIN_OR, EXPBIN_AND };
 enum enVarType { VAR_ID, VAR_ARRAY };
 
 typedef struct stDeclaration tpDeclaration;
@@ -49,6 +50,7 @@ ndExpression *createExpressionIntegerNode(int val, enum enExpType expType);
 ndExpression *createExpressionFloatNode(double val);
 ndExpression *createExpressionTextNode(char *val);
 ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType);
+ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expType);
 ndNew *createNewNode(tpType *pType, ndExpression *pExp);
 
 char *strDup(char *str);

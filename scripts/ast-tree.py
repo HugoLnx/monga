@@ -99,10 +99,6 @@ def execute_content(content):
 def execute_case(test_path):
   if re.search(r'.in$', test_path):
     return execute_normal_test(test_path)
-  elif re.search(r'.rejected$', test_path):
-    return execute_reject_test(test_path)
-  elif re.search(r'.accepted$', test_path):
-    return execute_accepted_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
@@ -110,57 +106,16 @@ def execute_normal_test(test_path):
   expected = (open(expected_path, 'r') if os.path.exists(expected_path) else None)
   return failing_msg(test_output, expected)
 
-def execute_reject_test(test_path):
-  return execute_multiline_case(test_path, is_not_rejected, "should be rejected but the output was")
-
-def execute_accepted_test(test_path):
-  return execute_multiline_case(test_path, is_rejected, "should be accepted but the output was")
-
-def execute_multiline_case(test_path, rejection_condition, middle_msg):
-  msgs = []
-  file_test = open(test_path, 'r')
-  file_content = file_test.read()
-  file_test.close()
-  for content in file_content.split("-----"):
-    content = content.strip()
-    test_output = execute_content(content)
-    if rejection_condition(test_output):
-      msgs.append(">>>\n" + content + "\n" + middle_msg + "\n" + test_output + "\n<<<\n")
-  if len(msgs) == 0:
-    return None
-  else:
-    return "\n".join(msgs)
-
-def match_arrays(matching, array):
-  if (len(matching) == 0):
-    return True
-  else:
-    for i,line in enumerate(array):
-      if matching[0].strip() == line.strip():
-        return match_arrays(matching[1:], array[i+1:])
-    return False
 
 def failing_msg(output, expected):
   outlines = output.split("\n")
   if expected:
-    expected = list(expected)
-    if not match_arrays(expected, outlines):
-        return "Expected output... \
-          \n  To match: \n" + "".join(expected) + "\
-          \n  But was: \n" + output
+    for index,line in enumerate(expected):
+      if line.strip() != outlines[index].strip():
+        return "Difference on line " + str(index+1) + ": \
+          \n  Expected: " + (line.strip() if line else "<no-line>") + "\
+          \n  Output: " + str(outlines[index].strip())
     return None
-  else:
-    if is_rejected(output):
-      return None
-    else:
-      return "Expected to reject but the output was: " + output + "".strip()
-
-def is_rejected(output):
-  matching = re.search(r'^error: syntax error', output)
-  return matching
-
-def is_not_rejected(output):
-  return not is_rejected(output)
 
 if (len(cmdargs) > 1):
   if (str(cmdargs[1]) == "clear"):

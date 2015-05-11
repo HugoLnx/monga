@@ -124,12 +124,12 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | var { $$ = createExpressionGenericNode($1, EXPND_VAR); }
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE { $$ = $2; }
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE { void *pNewNode = createNewNode((tpType*)$2, (ndExpression*)$4); $$ = createExpressionGenericNode(pNewNode, EXPND_NEW); }
-    | exp TK_DOUBLE_EQUAL exp
-    | exp TK_BANG_EQUAL exp
-    | exp TK_GREATER_EQUAL exp
-    | exp TK_GREATER exp
-    | exp TK_LESS_EQUAL exp
-    | exp TK_LESS exp
+    | exp TK_DOUBLE_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_DOUBLE_EQUAL); }
+    | exp TK_BANG_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_BANG_EQUAL); }
+    | exp TK_GREATER_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_GREATER_EQUAL); }
+    | exp TK_GREATER exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_GREATER); }
+    | exp TK_LESS_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_LESS_EQUAL); }
+    | exp TK_LESS exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_LESS); }
     | TK_EXCLAMATION_MARK exp
     | exp TK_AND exp
     | exp TK_OR exp
