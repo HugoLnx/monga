@@ -2,6 +2,37 @@ Students
  * Hugo Roque  - 1311162
  * Rômulo Dusi - 1213094
 
+Third Delivery: Syntax tree
+  Directory Structure
+	  * src/ - Source files that we are developing.
+	  * build/ - Temporary files that are automatically created.
+	  * build/dist - Distributions files. (The executable in our case)
+	  * tests/ - Where the tests are.
+	
+	Tasks
+	  * The syntax tasks were writen in python. To list all the commands run the script
+		  "scripts/syntax.py" with no parameters.
+		* To run the tests of all the projects execute the script "scripts/run_tests.sh".
+
+  Runner
+		* The output of the program is the tree printed. To do this, commands to create 
+		  or modify nodes of tree was inserted in monga.yacc file.
+
+	Tests
+	There are three types of test:
+		* Files named as "testname.in" and its pair "testname.expected":
+		  The "testname.expeted" file have the rules that should be in the output.
+			So the "testname.expected" may have not all the rules of output, but all the
+			rules in "testname.expected" must be in output respecting the expected order.
+		* Files named as "testname.rejected":
+		  Each block between "-----" represents a test case that should be rejected.
+		* Files named as "testname.accepted":
+		  Each block between "-----" represents a test case that should be accepted.
+	
+	Changes in Syntax validation:
+		* Doesn't include the minus signal in numbers tokens, so the expression "10-5"
+		  can be interpreted as three tokens, instead of two.
+
 Second Delivery: Syntax validation
   Directory Structure
 	  * src/ - Source files that we are developing.

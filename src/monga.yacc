@@ -14,7 +14,7 @@ ndProgram *pProgram = NULL;
 %type <pNode> program dec_function block type declaration parameters parameter
 	dec_variable names_list
 	var_declarations statement_list statement
-	attribution return_call exp var
+	attribution return_call exp var function_call exp_list
 %type <ival> base_type
 
 %token
