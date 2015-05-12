@@ -13,8 +13,8 @@ ndProgram *pProgram = NULL;
 
 %type <pNode> program dec_function block type declaration parameters parameter
 	dec_variable names_list
-	var_declarations statement_list statement
-	attribution return_call exp var function_call exp_list
+	var_declarations statement_list statement 
+	attribution return_call exp var function_call exp_list if_statement if
 %type <ival> base_type
 
 %token
@@ -95,14 +95,14 @@ statement : attribution TK_SEMICOLON { $$ = createStatement($1, STAT_ATTRIBUTION
           | return_call TK_SEMICOLON { $$ = createStatement($1, STAT_RETURN_CALL); }
           | block { $$ = createStatement($1, STAT_BLOCK); }
 					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createStatement(NULL, STAT_WHILE); /* INCOMPLETE */}
-          | if_statement { $$ = createStatement(NULL, STAT_IF); /* INCOMPLETE */}
+          | if_statement { $$ = createStatement($1, STAT_IF); /* INCOMPLETE */}
           ;
 
 if_statement : if %prec aux
-             | if TK_ELSE statement
+             | if TK_ELSE statement { $$ = addElseStatement((ndIfElse*) $1, (ndStatement*) $3); }
              ;
 
-if : TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement
+if : TK_IF TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createIfElseNode((ndExpression*)$3, (ndStatement *)$5); }
    ;
 
 return_call : TK_RETURN { $$ = createReturnNode(NULL); }

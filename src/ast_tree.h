@@ -28,6 +28,7 @@ typedef struct stAttributionNode ndAttribution;
 typedef struct stNewNode ndNew;
 typedef struct stExpListNode ndExpList;
 typedef struct stFunctionCallNode ndFunctionCall;
+typedef struct stIfElseNode ndIfElse;
 
 ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
@@ -61,6 +62,8 @@ ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType);
 ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expType);
 ndNew *createNewNode(tpType *pType, ndExpression *pExp);
 ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList);
+ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf);
+ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse);
 
 char *strDup(char *str);
 void incrDepth(tpType *pType);

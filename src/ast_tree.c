@@ -115,6 +115,12 @@ typedef struct stExpListNode {
   tpList *pList;
 } ndExpList;
 
+typedef struct stIfElseNode {
+  ndExpression *nExpIf;
+  ndStatement *nStatementIf;
+  ndStatement *nStatementElse;
+} ndIfElse;
+
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -330,6 +336,23 @@ ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList) {
   return pFunctionCall;
 }
 
+ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf){
+  ndIfElse *pIfElse = NEW(ndIfElse);
+
+  pIfElse->nExpIf = nExpIf;
+  pIfElse->nStatementIf = nStatementIf;
+  pIfElse->nStatementElse = NULL;
+
+  return pIfElse;
+}
+
+ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse){
+  pIfElse->nStatementElse = nStatementElse;
+  return pIfElse;
+}
+
+
+
 
 
 /* PRINTING */
@@ -432,6 +455,7 @@ void printStatement(ndStatement *pStat, char *ident) {
     case(STAT_ATTRIBUTION): printAttribution((ndAttribution*) pStat->pNode, ident);break;
     case(STAT_RETURN_CALL): printReturn((ndReturn*) pStat->pNode, ident);break;
     case(STAT_FUNCTION_CALL): printFunctionCallNode((ndFunctionCall*) pStat->pNode, ident);break;
+    case(STAT_IF): printIfElseNode((ndIfElse*) pStat->pNode, ident);break;
   }
 }
 
@@ -517,6 +541,19 @@ void printExpListNode(ndExpList *pExpList, char *ident) {
   while(goPrevious(pList)) {
     ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
     printExp(pStat, ident);
+  }
+}
+
+void printIfElseNode(ndIfElse *pIfElse, char *ident) {
+  printf("%sif:\n",ident);
+  printExp(pIfElse->nExpIf, addIdent(ident));
+  
+  if (pIfElse->nStatementIf != NULL){
+    printStatement(pIfElse->nStatementIf, addIdent(ident));
+  }
+  if (pIfElse->nStatementElse != NULL){
+    printf("%selse:\n",ident);
+    printStatement(pIfElse->nStatementElse, addIdent(ident));
   }
 }
 
