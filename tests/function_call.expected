@@ -1,0 +1,12 @@
+program:
+  function:main,259,0
+    block:
+      statements:
+        statement:
+          function call:a
+            exp list:
+              exp:0,3
+              exp:4,"asx"
+              exp:3,4.52000
+        statement:
+          function call:b
