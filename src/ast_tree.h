@@ -87,5 +87,6 @@ void printExp(ndExpression *pExp, char *ident);
 void printNewNode(ndNew *pNew, char *ident);
 void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident);
 void printExpListNode(ndExpList *pExpList, char *ident);
+void printIfElseNode(ndIfElse *pNode, char *ident);
 char *addIdent(char *ident);
 #endif
