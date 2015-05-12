@@ -121,6 +121,11 @@ typedef struct stIfElseNode {
   ndStatement *nStatementElse;
 } ndIfElse;
 
+typedef struct stWhileNode {
+  ndExpression *pExp;
+  ndStatement *pStat;
+} ndWhile;
+
  
 char *strDup(char *str) {
 	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
@@ -346,6 +351,15 @@ ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf){
   return pIfElse;
 }
 
+ndWhile *createWhileNode(ndExpression *pExp, ndStatement *pStat){
+  ndWhile *pWhile = NEW(ndWhile);
+
+  pWhile->pExp = pExp;
+  pWhile->pStat = pStat;
+
+  return pWhile;
+}
+
 ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse){
   pIfElse->nStatementElse = nStatementElse;
   return pIfElse;
@@ -456,6 +470,7 @@ void printStatement(ndStatement *pStat, char *ident) {
     case(STAT_RETURN_CALL): printReturn((ndReturn*) pStat->pNode, ident);break;
     case(STAT_FUNCTION_CALL): printFunctionCallNode((ndFunctionCall*) pStat->pNode, ident);break;
     case(STAT_IF): printIfElseNode((ndIfElse*) pStat->pNode, ident);break;
+    case(STAT_WHILE): printWhileNode((ndWhile*) pStat->pNode, ident);break;
   }
 }
 
@@ -564,6 +579,13 @@ void printIfElseNode(ndIfElse *pIfElse, char *ident) {
     printf("%selse:\n",ident);
     printStatement(pIfElse->nStatementElse, addIdent(ident));
   }
+}
+
+void printWhileNode(ndWhile *pWhile, char *ident) {
+  printf("%swhile:\n",ident);
+  ident = addIdent(ident);
+  printExp(pWhile->pExp, ident);
+  printStatement(pWhile->pStat, ident);
 }
 
 char *addIdent(char *ident) {

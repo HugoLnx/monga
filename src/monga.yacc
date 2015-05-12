@@ -94,8 +94,8 @@ statement : attribution TK_SEMICOLON { $$ = createStatement($1, STAT_ATTRIBUTION
           | function_call TK_SEMICOLON { $$ = createStatement($1, STAT_FUNCTION_CALL); }
           | return_call TK_SEMICOLON { $$ = createStatement($1, STAT_RETURN_CALL); }
           | block { $$ = createStatement($1, STAT_BLOCK); }
-					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createStatement(NULL, STAT_WHILE); /* INCOMPLETE */}
-          | if_statement { $$ = createStatement($1, STAT_IF); /* INCOMPLETE */}
+					| TK_WHILE TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE statement { $$ = createStatement(createWhileNode((ndExpression*)$3, (ndStatement*)$5), STAT_WHILE);}
+          | if_statement { $$ = createStatement($1, STAT_IF);}
           ;
 
 if_statement : if %prec aux

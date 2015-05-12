@@ -29,6 +29,7 @@ typedef struct stNewNode ndNew;
 typedef struct stExpListNode ndExpList;
 typedef struct stFunctionCallNode ndFunctionCall;
 typedef struct stIfElseNode ndIfElse;
+typedef struct stWhileNode ndWhile;
 
 ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
@@ -63,6 +64,7 @@ ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp
 ndNew *createNewNode(tpType *pType, ndExpression *pExp);
 ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList);
 ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf);
+ndWhile *createWhileNode(ndExpression *pExp, ndStatement *pStat);
 ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse);
 
 char *strDup(char *str);
@@ -88,5 +90,6 @@ void printNewNode(ndNew *pNew, char *ident);
 void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident);
 void printExpListNode(ndExpList *pExpList, char *ident);
 void printIfElseNode(ndIfElse *pNode, char *ident);
+void printWhileNode(ndWhile *pWhile, char *ident);
 char *addIdent(char *ident);
 #endif
