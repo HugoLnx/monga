@@ -15,8 +15,8 @@ Third Delivery: Syntax tree
 		* To run the tests of all the projects execute the script "scripts/run_tests.sh".
 
   Runner
-		* The output of the program is the tree printed. To do this, commands to create 
-		  or modify nodes of tree was inserted in monga.yacc file.
+		* The output of the program is the tree printed. Commands to create or modify 
+		  nodes of tree were inserted in monga.yacc file.
 
 	Tests
 	There are three types of test:
@@ -30,8 +30,7 @@ Third Delivery: Syntax tree
 		  Each block between "-----" represents a test case that should be accepted.
 	
 	Changes in Syntax validation:
-		* Doesn't include the minus signal in numbers tokens, so the expression "10-5"
-		  can be interpreted as three tokens, instead of two.
+		* 
 
 Second Delivery: Syntax validation
   Directory Structure
