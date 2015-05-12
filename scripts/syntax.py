@@ -67,7 +67,7 @@ def critical_sys(cmd):
 def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
+  os.system("cp " + os.path.join(SYNTAX_SRC, "monga.yacc") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "ast_tree.h") + " " + BUILD)
@@ -163,7 +163,7 @@ def is_not_rejected(output):
 def adapt_yacc_file_to_debug(path):
   f = open(path, "r+")
   content = f.read()
-  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n%]+)([^{\n]*)[^\n]*', r'\1\2\3 { printf("\2\\n"); }', content)
+  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n%]+)', r'\1\2 { printf("\2\\n"); }', content)
   f.seek(0)
   f.write(new_content)
   f.close()
