@@ -140,7 +140,7 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
     | TK_MINUS exp %prec TK_ASTERISK %prec TK_SLASH
     ;
 
-exp_list : exp { $$ = createExpListNode((ndVar*)$1); }
+exp_list : exp { $$ = createExpListNode((ndExpression*)$1); }
          | exp TK_COMMA exp_list { $$ = $3; addExpListNode((ndExpList*)$$, (ndExpression*)$1); }
          ;
 

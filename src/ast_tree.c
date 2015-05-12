@@ -415,7 +415,7 @@ void printStatements(ndStatements *pStats, char *ident) {
   if(pStats == NULL) return;
   pList = pStats->pList;
   printf("%sstatements:\n", ident);
-printVariable
+
   ident = addIdent(ident);
   resetList(pList);
   while(goPrevious(pList)) {
@@ -498,11 +498,12 @@ void printNewNode(ndNew *pNew, char *ident) {
   printExp(pNew->pExp, addIdent(ident));
 }
 
-void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident) {
+void printFunctionCallNode(ndFunctionCall *pFunctionCall, char *ident) {
   printf("%sfunction call:%s\n",ident, pFunctionCall->functionName);
   
-  if (pfunctionCall->pExpList != NULL)
-    printExpListNode(pfunctionCall->pExpList, addIdent(ident));
+  if (pFunctionCall->pExpList != NULL){
+    printExpListNode(pFunctionCall->pExpList, addIdent(ident));
+  }
 }
 
 void printExpListNode(ndExpList *pExpList, char *ident) {
@@ -514,8 +515,8 @@ void printExpListNode(ndExpList *pExpList, char *ident) {
   ident = addIdent(ident);
   resetList(pList);
   while(goPrevious(pList)) {
-    ndVariable *pStat = (ndVariable*) getCurrentValue(pList);
-    printVariable(pStat, ident);
+    ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+    printExp(pStat, ident);
   }
 }
 

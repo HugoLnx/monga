@@ -38,6 +38,7 @@ ndParameters* createParametersNode(ndParameter* pParam);
 ndParameter* createParameterNode(tpType *pType, char *name);
 void addParam(ndParameters *pParams, ndParameter *pParam);
 ndExpList* createExpListNode(ndExpression *pExp);
+void addExpListNode(ndExpList *pExpList, ndExpression *pExp);
 void addParam(ndParameters *pParams, ndParameter *pParam);
 
 ndVariables *createVariablesNode(char *name);
