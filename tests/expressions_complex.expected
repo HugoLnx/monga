@@ -5,6 +5,11 @@ program:
         statement:
           attribution:
             var:x
+            exp:5
+              var:y
+        statement:
+          attribution:
+            var:x
             exp:6
               new:259,0
                 exp:0,10
@@ -78,7 +83,7 @@ program:
           attribution:
             var:x
             exp:7
-              binary:12
+              binary:4
                 exp:7
                   binary:5
                     exp:0,10
