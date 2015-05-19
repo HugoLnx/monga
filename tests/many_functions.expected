@@ -6,7 +6,7 @@ declarations:
     variables:260,1
       variable:hey
   declaration:
-    function:main,260,0
+    function:main,262,0
       block:
   declaration:
     function:func,259,0

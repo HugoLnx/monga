@@ -1,6 +1,6 @@
 int xpto;
 char[] hey;
-char main() {
+void main() {
 }
 
 int func() {

@@ -20,9 +20,9 @@ ndDeclarations *pDeclarations = NULL;
 %token TK_INT 259
 %token TK_CHAR 260
 %token TK_FLOAT 261
+%token TK_VOID 262
 %token
 	END INVALID
-	TK_VOID
 	TK_IF TK_ELSE TK_WHILE TK_NEW TK_RETURN
 	TK_CURLY_BRACE_OPEN  TK_SQUARE_BRACKET_OPEN  TK_PARENTHESES_OPEN
 	TK_CURLY_BRACE_CLOSE TK_SQUARE_BRACKET_CLOSE TK_PARENTHESES_CLOSE
@@ -51,7 +51,7 @@ declaration_list : full_declaration { $$ = createFullDeclarationsNode((ndDeclara
                  | full_declaration declaration_list { $$ = addFullDeclaration((ndDeclarations*)$2,(ndDeclaration*)$1); }
 
 full_declaration : type declaration { $$ = finishDeclaration((tpType*)$1, (ndDeclaration*)$2); }
-        | TK_VOID dec_function { $$ = finishDeclaration(newType($1, 0), (ndDeclaration*)$2); }
+        | TK_VOID dec_function { $$ = finishDeclaration(newType(TK_VOID, 0), createDeclarationNode($2, DEC_FUNCTION)); }
 				;
 
 declaration : dec_variable { $$ = createDeclarationNode($1, DEC_VARIABLE); }
