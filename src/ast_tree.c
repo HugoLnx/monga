@@ -127,12 +127,6 @@ typedef struct stWhileNode {
 } ndWhile;
 
  
-char *strDup(char *str) {
-	char* dup = (char*) malloc(sizeof(char)*(strlen(str)+1));
-	strcpy(dup, str);
-	return dup;
-}
-
 char *noQuotes(char *str) {
 	char *newStr = (char*) malloc(sizeof(char)*strlen(str)-1);
 	strncpy(newStr, str+1, strlen(str)-2);
@@ -170,7 +164,7 @@ ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec) {
 
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock) {
 	ndFunction *pFunc = NEW(ndFunction);
-	pFunc->name = strDup(name);
+	pFunc->name = name;
 	pFunc->pParameters = pParams;
 	pFunc->pBlock = pBlock;
 	return pFunc;

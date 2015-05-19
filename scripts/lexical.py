@@ -65,14 +65,17 @@ def test_all():
 def lex_test_compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + LEX_BUILD)
-  os.system("cp " + os.path.join(LEX_SRC, "main.c") + " " + LEX_BUILD)
   os.system("cp " + os.path.join(LEX_SRC, "y.tab.h") + " " + LEX_BUILD)
+  os.system("cp " + os.path.join(LEX_SRC, "main.c") + " " + LEX_BUILD)
   os.system("cp " + os.path.join(LEX_SRC, "main.h") + " " + LEX_BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.c") + " " + LEX_BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.h") + " " + LEX_BUILD)
   os.system("lex --header-file=" + os.path.join(LEX_BUILD, 'lex.yy.h') + " -o " + os.path.join(LEX_BUILD, "lex.yy.c") + " " + os.path.join(LEX_BUILD, "monga.lex"))
   os.system("gcc -ll " + os.path.join(LEX_BUILD,"lex.yy.c") + " -o " + os.path.join(LEX_BUILD,"lex.yy.o") + " -c")
   
   os.system("gcc " + os.path.join(LEX_BUILD, "main.c") + " -o " + os.path.join(LEX_BUILD,"main.o") + " -c")
-  os.system("gcc " + os.path.join(LEX_BUILD,"main.o") + " " + os.path.join(LEX_BUILD,"lex.yy.o") + " -o " + os.path.join(LEX_DIST,"main"))
+  os.system("gcc " + os.path.join(LEX_BUILD, "utils.c") + " -o " + os.path.join(LEX_BUILD,"utils.o") + " -c")
+  os.system("gcc " + os.path.join(LEX_BUILD,"utils.o") + " " + os.path.join(LEX_BUILD,"main.o") + " " + os.path.join(LEX_BUILD,"lex.yy.o") + " -o " + os.path.join(LEX_DIST,"main"))
   return
 
 def execute(input_path):

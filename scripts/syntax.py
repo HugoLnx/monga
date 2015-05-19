@@ -68,6 +68,8 @@ def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.h") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "ast_tree.h") + " " + BUILD)
@@ -79,7 +81,8 @@ def compile():
   os.chdir(current_dir)
   
   critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  critical_sys("gcc " + os.path.join(BUILD, "utils.c") + " -o " + os.path.join(BUILD,"utils.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"utils.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):
