@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "./ast_tree.h"
-ndProgram *pProgram = NULL;
+ndDeclarations *pDeclarations = NULL;
 %}
 %union {
  	long long int ival;
@@ -11,15 +11,18 @@ ndProgram *pProgram = NULL;
 	void* pNode;
 }
 
-%type <pNode> program dec_function block type declaration parameters parameter
+%type <pNode> dec_function block type declaration_list full_declaration declaration parameters parameter
 	dec_variable names_list
 	var_declarations statement_list statement 
 	attribution return_call exp var function_call exp_list if_statement if
-%type <ival> base_type
+%type <ival> base_type TK_VOID
 
+%token TK_INT 259
+%token TK_CHAR 260
+%token TK_FLOAT 261
 %token
 	END INVALID
-	TK_INT TK_CHAR TK_FLOAT TK_VOID
+	TK_VOID
 	TK_IF TK_ELSE TK_WHILE TK_NEW TK_RETURN
 	TK_CURLY_BRACE_OPEN  TK_SQUARE_BRACKET_OPEN  TK_PARENTHESES_OPEN
 	TK_CURLY_BRACE_CLOSE TK_SQUARE_BRACKET_CLOSE TK_PARENTHESES_CLOSE
@@ -44,13 +47,16 @@ ndProgram *pProgram = NULL;
 %nonassoc aux
 %nonassoc TK_ELSE
 %%
-program : type declaration { $$ = createProgramNode((tpType*)$1, (tpDeclaration*)$2); }
-        | TK_VOID dec_function { $$ = createProgramNode(NULL, NULL); }
+declaration_list : full_declaration { $$ = createFullDeclarationsNode((ndDeclaration*)$1); }
+                 | full_declaration declaration_list { $$ = addFullDeclaration((ndDeclarations*)$2,(ndDeclaration*)$1); }
+
+full_declaration : type declaration { $$ = finishDeclaration((tpType*)$1, (ndDeclaration*)$2); }
+        | TK_VOID dec_function { $$ = finishDeclaration(newType($1, 0), (ndDeclaration*)$2); }
 				;
 
-declaration : dec_variable { $$ = newDeclaration($1, DEC_VARIABLE); }
-        | dec_function { $$ = newDeclaration($1, DEC_FUNCTION); }
-				;
+declaration : dec_variable { $$ = createDeclarationNode($1, DEC_VARIABLE); }
+            | dec_function { $$ = createDeclarationNode($1, DEC_FUNCTION); }
+				    ;
 
 dec_variable : names_list TK_SEMICOLON { $$ = $1; }
              ;

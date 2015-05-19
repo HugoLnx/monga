@@ -3,7 +3,7 @@
 int main()
 {
 	yyparse();
-  printProgram();
+  printDeclarations();
   return 0;
 }
 

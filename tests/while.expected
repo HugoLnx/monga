@@ -1,18 +1,19 @@
-program:
-  function:main,259,0
-    block:
-      statements:
-        statement:
-          while:
-            exp:7
-              binary:5
-                exp:5
-                  var:x
-                exp:0,10
-            statement:
-              block:
-                statements:
-                  statement:
-                    attribution:
-                      var:y
-                      exp:0,20
+declarations:
+  declaration:
+    function:main,259,0
+      block:
+        statements:
+          statement:
+            while:
+              exp:7
+                binary:5
+                  exp:5
+                    var:x
+                  exp:0,10
+              statement:
+                block:
+                  statements:
+                    statement:
+                      attribution:
+                        var:y
+                        exp:0,20

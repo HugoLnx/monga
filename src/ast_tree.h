@@ -9,9 +9,9 @@ enum enExpBinType { EXPBIN_PLUS, EXPBIN_MINUS, EXPBIN_ASTERISK, EXPBIN_SLASH, EX
 
 enum enVarType { VAR_ID, VAR_ARRAY };
 
-typedef struct stDeclaration tpDeclaration;
+typedef struct stDeclaration ndDeclaration;
+typedef struct stDeclarations ndDeclarations;
 typedef struct stType tpType;
-typedef struct stProgramNode ndProgram;
 typedef struct stBlockNode ndBlock;
 typedef struct stFunctionNode ndFunction;
 typedef struct stParametersNode ndParameters;
@@ -31,11 +31,13 @@ typedef struct stFunctionCallNode ndFunctionCall;
 typedef struct stIfElseNode ndIfElse;
 typedef struct stWhileNode ndWhile;
 
-ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
+ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec);
+ndDeclarations *createFullDeclarationsNode(ndDeclaration *pDec);
+ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
 ndBlock *createBlockNode(ndVarDeclarations *pVarDecs, ndStatements *pStats);
 tpType *newType(int token, int depth);
-tpDeclaration *newDeclaration(void *node, enum enDeclaration decType);
+ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType);
 ndParameters* createParametersNode(ndParameter* pParam);
 ndParameter* createParameterNode(tpType *pType, char *name);
 void addParam(ndParameters *pParams, ndParameter *pParam);
@@ -72,7 +74,8 @@ void incrDepth(tpType *pType);
 
 
 
-void printProgram();
+void printDeclarations();
+void printDeclaration(ndDeclaration *pDec, char *ident);
 void printFunction(ndFunction* pFunc, char *ident);
 void printBlock(ndBlock *pBlock, char *ident);
 void printParameters(ndParameters *pParameters, char *ident);

@@ -7,21 +7,21 @@
 #include "./list.h"
 #include "./ast_tree.h"
 #define NEW(type) (type*) malloc(sizeof(type))
-extern ndProgram *pProgram;
+extern ndDeclarations *pDeclarations;
 
 typedef struct stDeclaration {
 	enum enDeclaration decType;
 	void *pNode;
-} tpDeclaration;
+} ndDeclaration;
+
+typedef struct stDeclarations {
+	tpList *pList;
+} ndDeclarations;
 
 typedef struct stType {
 	int token;
 	int depth;
 } tpType;
-
-typedef struct stProgramNode {
-	tpDeclaration *pDec;
-} ndProgram;
 
 typedef struct stBlockNode {
   ndVarDeclarations *pVarDecs;
@@ -144,8 +144,7 @@ void incrDepth(tpType *pType) {
   pType->depth += 1;
 }
 
-ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec) {
-	pProgram = NEW(ndProgram);
+ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec) {
 	if (pDec->decType == DEC_FUNCTION) {
 		ndFunction *pFunc = (ndFunction*) pDec->pNode;
 		pFunc->pReturnType = pType;
@@ -154,8 +153,19 @@ ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec) {
 		pVars->pType = pType;
   }
 
-	pProgram->pDec = pDec;
-	return pProgram;
+	return pDec;
+}
+
+ndDeclarations *createFullDeclarationsNode(ndDeclaration *pDec) {
+	pDeclarations = NEW(ndDeclarations);
+	pDeclarations->pList = createList();
+	addFullDeclaration(pDeclarations, pDec);
+	return pDeclarations;
+}
+
+ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec) {
+	addLast(pDecs->pList, (void*)pDec);
+	return pDecs;
 }
 
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock) {
@@ -180,8 +190,8 @@ tpType *newType(int token, int depth) {
 	return pType;
 }
 
-tpDeclaration *newDeclaration(void *node, enum enDeclaration decType) {
-	tpDeclaration *pDec = NEW(tpDeclaration);
+ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType) {
+	ndDeclaration *pDec = NEW(ndDeclaration);
 	pDec->decType = decType;
 	pDec->pNode = node;
 	return pDec;
@@ -371,13 +381,26 @@ ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse){
 
 /* PRINTING */
 
-void printProgram() {
-	tpDeclaration* pDec = pProgram->pDec;
-	printf("program:\n");
+void printDeclarations() {
+	printf("declarations:\n");
+  tpList *pList;
+  if(pDeclarations == NULL) return;
+  pList = pDeclarations->pList;
+  resetList(pList);
+
+  while(goPrevious(pList)) {
+    ndDeclaration *pDec = (ndDeclaration*) getCurrentValue(pList);
+    printDeclaration(pDec, strdup("  "));
+  }
+}
+
+void printDeclaration(ndDeclaration *pDec, char *ident) {
+	printf("%sdeclaration:\n", ident);
+	ident = addIdent(ident);
 	if(pDec->decType == DEC_FUNCTION) {
-		printFunction((ndFunction*) pDec->pNode, strdup("  "));
+		printFunction((ndFunction*) pDec->pNode, ident);
 	} else {
-		printVariables((ndVariables*) pDec->pNode, strdup("  "));
+		printVariables((ndVariables*) pDec->pNode, ident);
   }
 }
 
