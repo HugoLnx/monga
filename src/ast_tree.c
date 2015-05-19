@@ -39,17 +39,12 @@ typedef struct stParametersNode {
 	tpList *pList;
 } ndParameters;
 
-typedef struct stParameterNode {
-	tpType *pType;
-	char *name;
-} ndParameter;
-
 typedef struct stVariablesNode {
 	tpList *pList;
-	tpType *pType;
 } ndVariables;
 
 typedef struct stVariableNode {
+	tpType *pType;
 	char *name;
 } ndVariable;
 
@@ -138,13 +133,22 @@ void incrDepth(tpType *pType) {
   pType->depth += 1;
 }
 
+void addTypeToVars(tpType *pType, ndVariables *pVars) {
+	tpList *pList = pVars->pList;	
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+		pVar->pType = pType;
+  }
+}
+
 ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec) {
 	if (pDec->decType == DEC_FUNCTION) {
 		ndFunction *pFunc = (ndFunction*) pDec->pNode;
 		pFunc->pReturnType = pType;
 	} else {
 		ndVariables *pVars = (ndVariables*) pDec->pNode;
-		pVars->pType = pType;
+		addTypeToVars(pType, pVars);
   }
 
 	return pDec;
@@ -191,22 +195,22 @@ ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType) {
 	return pDec;
 }
 
-ndParameters* createParametersNode(ndParameter* pParam) {
+ndParameters* createParametersNode(ndVariable* pVar) {
 	ndParameters *pParams = NEW(ndParameters);
 	pParams->pList = createList();
-	addParam(pParams, pParam);
+	addParam(pParams, pVar);
 	return pParams;
 }
 
-ndParameter* createParameterNode(tpType *pType, char *name) {
-  ndParameter *pParam = NEW(ndParameter);
-  pParam->pType = pType;
-  pParam->name = name;
-  return pParam;
+ndVariable* createParameterNode(tpType *pType, char *name) {
+  ndVariable *pVar = NEW(ndVariable);
+  pVar->pType = pType;
+  pVar->name = name;
+  return pVar;
 }
 
-void addParam(ndParameters *pParams, ndParameter *pParam) {
-	addLast(pParams->pList, (void*)pParam);
+void addParam(ndParameters *pParams, ndVariable *pVar) {
+	addLast(pParams->pList, (void*)pVar);
 }
 
 ndExpList* createExpListNode(ndExpression *pExp) {
@@ -242,7 +246,7 @@ ndVarDeclarations *createVarDeclarations(tpType *pType, ndVariables *pVars) {
 }
 
 void addVarDeclaration(ndVarDeclarations *pVarDecs, tpType *pType, ndVariables *pVars) {
-  pVars->pType = pType;
+	addTypeToVars(pType, pVars);
   tpList *pList = pVarDecs->pList;
   addLast(pList, (void*)pVars);
 }
@@ -374,6 +378,27 @@ ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse){
 
 
 /* PRINTING */
+void printDeclaration(ndDeclaration *pDec, char *ident);
+void printFunction(ndFunction* pFunc, char *ident);
+void printBlock(ndBlock *pBlock, char *ident);
+void printParameters(ndParameters *pParameters, char *ident);
+void printParameter(ndVariable *pVar, char *ident);
+void printVariable(ndVariable *pVar, char *ident);
+void printVariables(ndVariables *pVariables, char *ident);
+void printVarDeclarations(ndVarDeclarations *pVarDecs, char *ident);
+void printStatements(ndStatements *pStats, char *ident);
+void printStatement(ndStatement *pStat, char *ident);
+void printReturn(ndReturn *pReturn, char *ident);
+void printAttribution(ndAttribution *pAttribution, char *ident);
+void printVar(ndVar *pVar, char *ident);
+void printExp(ndExpression *pExp, char *ident);
+void printNewNode(ndNew *pNew, char *ident);
+void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident);
+void printExpListNode(ndExpList *pExpList, char *ident);
+void printIfElseNode(ndIfElse *pNode, char *ident);
+void printWhileNode(ndWhile *pWhile, char *ident);
+char *addIdent(char *ident);
+
 
 void printDeclarations() {
 	printf("declarations:\n");
@@ -416,20 +441,19 @@ void printParameters(ndParameters *pParameters, char *ident) {
   ident = addIdent(ident);
   resetList(pList);
   while(goPrevious(pList)) {
-    ndParameter *pParam = (ndParameter*) getCurrentValue(pList);
-    printParameter(pParam, ident);
+    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+    printParameter(pVar, ident);
   }
 }
 
-void printParameter(ndParameter *pParam, char *ident) {
-  tpType *pType = pParam->pType;
-  printf("%sparameter:%s,%d,%d\n", ident, pParam->name, pType->token, pType->depth);
+void printParameter(ndVariable *pVar, char *ident) {
+  tpType *pType = pVar->pType;
+  printf("%sparameter:%s,%d,%d\n", ident, pVar->name, pType->token, pType->depth);
 }
 
 void printVariables(ndVariables *pVariables, char *ident) {
   tpList *pList = pVariables->pList;
-  tpType *pType = pVariables->pType;
-  printf("%svariables:%d,%d\n", ident, pType->token, pType->depth);
+  printf("%svariables:\n", ident);
 
   ident = addIdent(ident);
   resetList(pList);
@@ -440,7 +464,8 @@ void printVariables(ndVariables *pVariables, char *ident) {
 }
 
 void printVariable(ndVariable *pVar, char *ident) {
-  printf("%svariable:%s\n", ident, pVar->name);
+  tpType *pType = pVar->pType;
+  printf("%svariable:%s,%d,%d\n", ident, pVar->name, pType->token, pType->depth);
 }
 
 void printBlock(ndBlock *pBlock, char *ident) {

@@ -1,10 +1,10 @@
 declarations:
   declaration:
-    variables:259,0
-      variable:xpto
+    variables:
+      variable:xpto,259,0
   declaration:
-    variables:260,1
-      variable:hey
+    variables:
+      variable:hey,260,1
   declaration:
     function:main,262,0
       block:

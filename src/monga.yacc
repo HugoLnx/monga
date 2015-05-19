@@ -76,8 +76,8 @@ base_type : TK_INT { $$ = TK_INT; }
 dec_function : TK_ID TK_PARENTHESES_OPEN parameters TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, (ndParameters*) $3, (ndBlock*)$5); }
 						 | TK_ID TK_PARENTHESES_OPEN TK_PARENTHESES_CLOSE block { $$ = createFunctionNode($1, NULL, (ndBlock*)$4); }
 						 ;
-parameters : parameter { $$ = createParametersNode((ndParameter*) $1); }
-           | parameter TK_COMMA parameters { $$ = $3; addParam((ndParameters*)$$, (ndParameter*)$1); }
+parameters : parameter { $$ = createParametersNode((ndVariable*) $1); }
+           | parameter TK_COMMA parameters { $$ = $3; addParam((ndParameters*)$$, (ndVariable*)$1); }
 					 ;
 parameter : type TK_ID { $$ = createParameterNode((tpType*)$1, $2); }
           ;
