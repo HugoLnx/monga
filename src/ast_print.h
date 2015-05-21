@@ -1,2 +1,2 @@
 #include "ast_tree.h"
-void printDeclarations(ndDeclarations *pDeclarations);
+void printTree(ndDeclarations *pDeclarations);

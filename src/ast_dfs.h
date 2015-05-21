@@ -21,8 +21,8 @@ typedef void (*DFS_fcOnExpList)(ndExpList *pExpList                   , void *pS
 typedef void (*DFS_fcOnIf)(ndIfElse *pNode                            , void *pShared);
 typedef void (*DFS_fcOnElse)(ndIfElse *pNode                          , void *pShared);
 typedef void (*DFS_fcOnWhile)(ndWhile *pWhile                         , void *pShared);
-typedef void (*DFS_fcOnNewLevel)(void *pShared);
-typedef void (*DFS_fcOnBackLevel)(void *pShared);
+typedef void (*DFS_fcOnNewLevel)(char *evtName, void *pShared);
+typedef void (*DFS_fcOnBackLevel)(char *evtName, void *pShared);
 
 typedef struct DFS_stEvents {
 	DFS_fcOnDeclarations onDeclarations;
