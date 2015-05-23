@@ -1,5 +1,6 @@
-program:
-  variables:259,1
-    variable:main
-    variable:xpto
-    variable:hey
+declarations:
+  declaration:
+    variables:
+      variable:main,259,1
+      variable:xpto,259,1
+      variable:hey,259,1

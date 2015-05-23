@@ -67,7 +67,9 @@ def critical_sys(cmd):
 def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
-  os.system("cp " + os.path.join(SYNTAX_SRC, "monga.yacc") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "utils.h") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SYNTAX_SRC, "ast_tree.h") + " " + BUILD)
@@ -79,7 +81,8 @@ def compile():
   os.chdir(current_dir)
   
   critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  critical_sys("gcc " + os.path.join(BUILD, "utils.c") + " -o " + os.path.join(BUILD,"utils.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"utils.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):
@@ -163,8 +166,9 @@ def is_not_rejected(output):
 def adapt_yacc_file_to_debug(path):
   f = open(path, "r+")
   content = f.read()
-  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n%]+)', r'\1\2 { printf("\2\\n"); }', content)
+  new_content = re.sub(r'([^\n]+[:|]\s?)([^{\n%]+)([^{\n]*)({[^}]+})?', r'\1\2\3 { printf("\2\\n"); }', content)
   f.seek(0)
+  f.truncate()
   f.write(new_content)
   f.close()
 

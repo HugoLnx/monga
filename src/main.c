@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include "ast_tree.h"
+
+extern ndDeclarations *pDeclarations;
 
 int main()
 {
 	yyparse();
-  printProgram();
+  printTree(pDeclarations);
   return 0;
 }
 

@@ -1,5 +1,6 @@
 #ifndef AST_TREE_H
 #define AST_TREE_H
+#include "list.h"
 enum enDeclaration { DEC_FUNCTION, DEC_VARIABLE };
 enum enStatType { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
 
@@ -9,13 +10,12 @@ enum enExpBinType { EXPBIN_PLUS, EXPBIN_MINUS, EXPBIN_ASTERISK, EXPBIN_SLASH, EX
 
 enum enVarType { VAR_ID, VAR_ARRAY };
 
-typedef struct stDeclaration tpDeclaration;
+typedef struct stDeclaration ndDeclaration;
+typedef struct stDeclarations ndDeclarations;
 typedef struct stType tpType;
-typedef struct stProgramNode ndProgram;
 typedef struct stBlockNode ndBlock;
 typedef struct stFunctionNode ndFunction;
 typedef struct stParametersNode ndParameters;
-typedef struct stParameterNode ndParameter;
 typedef struct stVariablesNode ndVariables;
 typedef struct stVariableNode ndVariable;
 typedef struct stVarDeclarationsNode ndVarDeclarations;
@@ -31,17 +31,131 @@ typedef struct stFunctionCallNode ndFunctionCall;
 typedef struct stIfElseNode ndIfElse;
 typedef struct stWhileNode ndWhile;
 
-ndProgram *createProgramNode(tpType *pType, tpDeclaration *pDec);
+typedef struct stDeclaration {
+	enum enDeclaration decType;
+	void *pNode;
+} ndDeclaration;
+
+typedef struct stDeclarations {
+	tpList *pList;
+} ndDeclarations;
+
+typedef struct stType {
+	int token;
+	int depth;
+} tpType;
+
+typedef struct stBlockNode {
+  ndVarDeclarations *pVarDecs;
+  ndStatements *pStats;
+} ndBlock;
+
+typedef struct stFunctionNode {
+	char *name;
+	ndBlock *pBlock;
+	ndParameters *pParameters;
+	tpType *pReturnType;
+} ndFunction;
+
+typedef struct stParametersNode {
+	tpList *pList;
+} ndParameters;
+
+typedef struct stVariablesNode {
+	tpList *pList;
+} ndVariables;
+
+typedef struct stVariableNode {
+	tpType *pType;
+	char *name;
+} ndVariable;
+
+typedef struct stVarDeclarationsNode {
+	tpList *pList;
+} ndVarDeclarations;
+
+typedef struct stStatementsNode {
+	tpList *pList;
+} ndStatements;
+
+typedef struct stStatementNode {
+	void *pNode;
+  enum enStatType statType;
+} ndStatement;
+
+typedef struct stReturnNode {
+  ndExpression *pExp;
+} ndReturn;
+
+typedef struct stExpressionNode {
+  enum enExpType expType;
+  union {
+    long long int ival;
+    char *text;
+    double fval;
+    void *pNode;
+    struct {
+      ndExpression *pExp1;
+      ndExpression *pExp2;
+      enum enExpBinType expType;
+    } bin;
+  } value;
+} ndExpression;
+
+typedef struct stVarNode {
+  enum enVarType varType;
+  union {
+    char *name;
+    struct {
+      ndExpression *pPointerExp;
+      ndExpression *pInxExp;
+    } address;
+  } value;
+} ndVar;
+
+typedef struct stAttributionNode {
+  ndVar *pVar;
+  ndExpression *pExp;
+} ndAttribution;
+
+typedef struct stNewNode {
+  tpType *pType;
+  ndExpression *pExp;
+} ndNew;
+
+typedef struct stFunctionCallNode {
+  char *functionName;
+  ndExpList *pExpList;
+} ndFunctionCall;
+
+typedef struct stExpListNode {
+  tpList *pList;
+} ndExpList;
+
+typedef struct stIfElseNode {
+  ndExpression *nExpIf;
+  ndStatement *nStatementIf;
+  ndStatement *nStatementElse;
+} ndIfElse;
+
+typedef struct stWhileNode {
+  ndExpression *pExp;
+  ndStatement *pStat;
+} ndWhile;
+
+ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec);
+ndDeclarations *createFullDeclarationsNode(ndDeclaration *pDec);
+ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
 ndBlock *createBlockNode(ndVarDeclarations *pVarDecs, ndStatements *pStats);
 tpType *newType(int token, int depth);
-tpDeclaration *newDeclaration(void *node, enum enDeclaration decType);
-ndParameters* createParametersNode(ndParameter* pParam);
-ndParameter* createParameterNode(tpType *pType, char *name);
-void addParam(ndParameters *pParams, ndParameter *pParam);
+ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType);
+ndParameters* createParametersNode(ndVariable* pParam);
+ndVariable* createParameterNode(tpType *pType, char *name);
+void addParam(ndParameters *pParams, ndVariable *pParam);
 ndExpList* createExpListNode(ndExpression *pExp);
 void addExpListNode(ndExpList *pExpList, ndExpression *pExp);
-void addParam(ndParameters *pParams, ndParameter *pParam);
+void addParam(ndParameters *pParams, ndVariable *pParam);
 
 ndVariables *createVariablesNode(char *name);
 void addVariable(ndVariables *pVars, char *name);
@@ -67,29 +181,8 @@ ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf);
 ndWhile *createWhileNode(ndExpression *pExp, ndStatement *pStat);
 ndIfElse *addElseStatement(ndIfElse *pIfElse, ndStatement *nStatementElse);
 
-char *strDup(char *str);
 void incrDepth(tpType *pType);
 
 
-
-void printProgram();
-void printFunction(ndFunction* pFunc, char *ident);
-void printBlock(ndBlock *pBlock, char *ident);
-void printParameters(ndParameters *pParameters, char *ident);
-void printParameter(ndParameter *pParameter, char *ident);
-void printVariable(ndVariable *pVar, char *ident);
-void printVariables(ndVariables *pVariables, char *ident);
-void printVarDeclarations(ndVarDeclarations *pVarDecs, char *ident);
-void printStatements(ndStatements *pStats, char *ident);
-void printStatement(ndStatement *pStat, char *ident);
-void printReturn(ndReturn *pReturn, char *ident);
-void printAttribution(ndAttribution *pAttribution, char *ident);
-void printVar(ndVar *pVar, char *ident);
-void printExp(ndExpression *pExp, char *ident);
-void printNewNode(ndNew *pNew, char *ident);
-void printFunctionCallNode(ndFunctionCall *pfunctionCall, char *ident);
-void printExpListNode(ndExpList *pExpList, char *ident);
-void printIfElseNode(ndIfElse *pNode, char *ident);
-void printWhileNode(ndWhile *pWhile, char *ident);
-char *addIdent(char *ident);
+void printDeclarations();
 #endif

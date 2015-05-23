@@ -1,1 +1,1 @@
-typedef struct mockProgramNode ndProgram;
+typedef struct mockRootNode ndDeclarations;

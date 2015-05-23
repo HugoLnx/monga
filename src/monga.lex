@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "main.h"
+#include "utils.h"
 #include "y.tab.h"
 %}
 
@@ -14,29 +15,29 @@ HEX_CHAR [0-9a-fA-F]
 COMMENT ([^*]|\*+[^/*])*
 
 %%
-\/\*{COMMENT}\*+\/ yylval.text = strdup(yytext); return COMMENT; // comments
-(\/\*|\*\/) yylval.text = strdup(yytext); return INVALID;
+\/\*{COMMENT}\*+\/ yylval.text = strDup(yytext); return COMMENT; // comments
+(\/\*|\*\/) yylval.text = strDup(yytext); return INVALID;
 
-\"\\\" yylval.text = strdup(yytext); return INVALID;
-\"{STR_NON_ESCAPED_CHAR}*\\[^nt\\\"]{STR_NON_ESCAPED_CHAR}*\" yylval.text = strdup(yytext); return INVALID;  // strings
-\"{STR_CHAR}*\" yylval.text = strdup(yytext); return TEXT;
+\"\\\" yylval.text = strDup(yytext); return INVALID;
+\"{STR_NON_ESCAPED_CHAR}*\\[^nt\\\"]{STR_NON_ESCAPED_CHAR}*\" yylval.text = strDup(yytext); return INVALID;  // strings
+\"{STR_CHAR}*\" yylval.text = strDup(yytext); return TEXT;
 
-'\\' yylval.text = strdup(yytext); return INVALID;
-'{CHAR_CHAR}?' yylval.text = strdup(yytext); return CHAR;  // chars
-'\\[a-zA-Z0-9]' yylval.text = strdup(yytext); return INVALID;
-'{CHAR_CHAR}+' yylval.text = strdup(yytext); return INVALID;
+'\\' yylval.text = strDup(yytext); return INVALID;
+'{CHAR_CHAR}?' yylval.text = strDup(yytext); return CHAR;  // chars
+'\\[a-zA-Z0-9]' yylval.text = strDup(yytext); return INVALID;
+'{CHAR_CHAR}+' yylval.text = strDup(yytext); return INVALID;
 
 0x{HEX_CHAR}+ yylval.ival = strtol(yytext, NULL, 16); return HEXADECIMAL; // hexadecimals
-0x{HEX_CHAR}+{ID_CHAR}+ yylval.text = strdup(yytext); return INVALID;
+0x{HEX_CHAR}+{ID_CHAR}+ yylval.text = strDup(yytext); return INVALID;
 
-0+[0-9]+ yylval.text = strdup(yytext); return INVALID; // numbers
+0+[0-9]+ yylval.text = strDup(yytext); return INVALID; // numbers
 [0-9]+ yylval.ival = atoi(yytext); return NUMBER;
-[0-9]+{ID_CHAR}+ yylval.text = strdup(yytext); return INVALID;
+[0-9]+{ID_CHAR}+ yylval.text = strDup(yytext); return INVALID;
 
 ([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)([eE][-+]?[0-9]+)?f? yylval.fval = atof(yytext); return FLOAT; // floats
-([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE][-+]f? yylval.text = strdup(yytext); return INVALID;
-([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE]([+-][\n ]|[+-][^0-9\n ]+) yylval.text = strdup(yytext); return INVALID;
-\.[^0-9] yylval.text = strdup(yytext); return INVALID;
+([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE][-+]f? yylval.text = strDup(yytext); return INVALID;
+([0-9]*\.[0-9]+|[0-9]+\.[0-9]*|[0-9]+)[eE]([+-][\n ]|[+-][^0-9\n ]+) yylval.text = strDup(yytext); return INVALID;
+\.[^0-9] yylval.text = strDup(yytext); return INVALID;
 
 \[   yylval.text = ""; return TK_SQUARE_BRACKET_OPEN;
 \]   yylval.text = ""; return TK_SQUARE_BRACKET_CLOSE;
@@ -71,11 +72,11 @@ while yylval.text = "";  return TK_WHILE;
 new yylval.text = "";    return TK_NEW;
 return yylval.text = ""; return TK_RETURN;
 
-[a-zA-Z_][a-zA-Z_0-9]* yylval.text = strdup(yytext); return TK_ID;
+[a-zA-Z_][a-zA-Z_0-9]* yylval.text = strDup(yytext); return TK_ID;
 
 [ \t\n]+ // ignore white space
 
-. yylval.text = strdup(yytext); return INVALID;
+. yylval.text = strDup(yytext); return INVALID;
 %%
 yywrap()
 {

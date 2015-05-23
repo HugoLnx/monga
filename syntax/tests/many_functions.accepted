@@ -1,0 +1,9 @@
+int xpto, xvzd;
+
+void my_function() {
+  my_cool_stuff();
+}
+
+int main() {
+	my_main_stuff = "awesome";
+}

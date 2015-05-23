@@ -1,0 +1,13 @@
+declarations:
+  declaration:
+    variables:
+      variable:xpto,259,0
+  declaration:
+    variables:
+      variable:hey,260,1
+  declaration:
+    function:main,262,0
+      block:
+  declaration:
+    function:func,259,0
+      block:
