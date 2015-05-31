@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include "ast_tree.h"
 
+
+struct stScopeStack {
+  struct stNode *pStackVariables;
+  struct stNode *pStackCountVariables;
+};
 typedef struct stScopeStack tpScopeStack;
 
 tpScopeStack *createStack();

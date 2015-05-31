@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct stScopeStack {
-  struct stNode *pStackVariables;
-  struct stNode *pStackCountVariables;
-};
 
 typedef struct stNode {
   void *pValue;

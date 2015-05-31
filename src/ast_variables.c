@@ -26,7 +26,13 @@ void checkVariablesScopes(ndDeclarations *pDeclarations) {
 }
 
 void pushVariable(ndVariable *pVar, void *pShared) {
-	addToCurrentScope((tpScopeStack*) pShared, pVar);
+	tpScopeStack *pStack = (tpScopeStack*) pShared;
+	
+	if(pStack->pStackVariables == NULL){
+		pushNewScope(pStack);
+	}
+
+	addToCurrentScope(pStack, pVar);
 }
 
 void checkVar(ndVar *pVar, void *pShared) {
