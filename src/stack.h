@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "ast_tree.h"
 
-typedef struct stScopeStack tpScopeStack;
+typedef struct STK_stScopeStack STK_tpScopeStack;
 
-tpScopeStack *createStack();
-void pushNewScope(tpScopeStack *pStack);
-void popScope(tpScopeStack *pStack);
-void addToCurrentScope(tpScopeStack *pStack, ndVariable *pVar);
-ndVariable *getCurrentReferenceTo(tpScopeStack *pStack, char *name);
+STK_tpScopeStack *STK_create();
+void STK_pushNewScope(STK_tpScopeStack *pStack);
+void STK_popScope(STK_tpScopeStack *pStack);
+void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar);
+ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name);

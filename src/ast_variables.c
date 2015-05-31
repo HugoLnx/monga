@@ -13,7 +13,7 @@ void popScopeVariablesIfBlock(char *evtName, void *pShared);
 VAR_tpReport VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
-	tpScopeStack *pStackVariables = createStack();
+	STK_tpScopeStack *pStackVariables = STK_create();
 
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
@@ -26,11 +26,11 @@ VAR_tpReport VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 }
 
 void pushVariable(ndVariable *pVar, void *pShared) {
-	addToCurrentScope((tpScopeStack*) pShared, pVar);
+	STK_addToCurrentScope((STK_tpScopeStack*) pShared, pVar);
 }
 
 void checkVar(ndVar *pVar, void *pShared) {
-	if (getCurrentReferenceTo((tpScopeStack*) pShared, pVar->value.name) == NULL){
+	if (STK_getCurrentReferenceTo((STK_tpScopeStack*) pShared, pVar->value.name) == NULL){
 		// TODO erro variável não encontrada
 	} else {
 		// Connect to variable declaration
@@ -41,12 +41,12 @@ void checkVar(ndVar *pVar, void *pShared) {
 
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onBlock") != 0) {
-		pushNewScope((tpScopeStack*) pShared);
+		STK_pushNewScope((STK_tpScopeStack*) pShared);
 	}
 }
 
 void popScopeVariablesIfBlock(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onBlock") != 0) {
-		popScope((tpScopeStack*) pShared);
+		STK_popScope((STK_tpScopeStack*) pShared);
 	}
 }

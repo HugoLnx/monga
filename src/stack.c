@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct stScopeStack {
+struct STK_stScopeStack {
   struct stNode *pStackVariables;
   struct stNode *pStackCountVariables;
 };
@@ -14,8 +14,8 @@ typedef struct stNode {
 } tpNode;
 
 
-tpScopeStack *createStack() {
-  tpScopeStack *pStack = (tpScopeStack*) malloc(sizeof(tpScopeStack));
+STK_tpScopeStack *STK_create() {
+  STK_tpScopeStack *pStack = (STK_tpScopeStack*) malloc(sizeof(STK_tpScopeStack));
   
   if (pStack == NULL){
   	return;
@@ -26,7 +26,7 @@ tpScopeStack *createStack() {
   return pStack;
 }
 
-void pushNewScope(tpScopeStack *pStack){
+void STK_pushNewScope(STK_tpScopeStack *pStack){
   tpNode *pNodeStackCount = (tpNode*) malloc(sizeof(tpNode));
 
   if (pNodeStackCount == NULL){
@@ -45,7 +45,7 @@ void pushNewScope(tpScopeStack *pStack){
   }
 };
 
-void popScope(tpScopeStack *pStack){
+void STK_popScope(STK_tpScopeStack *pStack){
   int totalVariablesInScope = *(int*) pStack->pStackCountVariables->pValue;
   int i;
   tpNode *auxNode;
@@ -63,7 +63,7 @@ void popScope(tpScopeStack *pStack){
   free(auxNode);
 }
 
-void addToCurrentScope(tpScopeStack *pStack, ndVariable *pVar){
+void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar){
 
   tpNode *pNodeStackVariable = (tpNode*) malloc(sizeof(tpNode));
   
@@ -84,7 +84,7 @@ void addToCurrentScope(tpScopeStack *pStack, ndVariable *pVar){
   }
 }
 
-ndVariable *getCurrentReferenceTo(tpScopeStack *pStack, char *name){
+ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name){
   int i;
   tpNode *auxNode = NULL;
   ndVariable *currentVariable;
