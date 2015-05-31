@@ -74,8 +74,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "list.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_dfs.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_dfs.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_traversing.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_print.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_print.c") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
@@ -88,9 +88,9 @@ def compile():
   critical_sys("gcc " + os.path.join(BUILD, "list.c") + " -o " + os.path.join(BUILD,"list.o") + " -c")
   critical_sys("gcc " + os.path.join(BUILD, "utils.c") + " -o " + os.path.join(BUILD,"utils.o") + " -c")
   critical_sys("gcc " + os.path.join(BUILD, "ast_tree.c") + " -o " + os.path.join(BUILD,"ast_tree.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "ast_dfs.c") + " -o " + os.path.join(BUILD,"ast_dfs.o") + " -c")
+  critical_sys("gcc " + os.path.join(BUILD, "ast_traversing.c") + " -o " + os.path.join(BUILD,"ast_traversing.o") + " -c")
   critical_sys("gcc " + os.path.join(BUILD, "ast_print.c") + " -o " + os.path.join(BUILD,"ast_print.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"ast_print.o") + " " + os.path.join(BUILD,"ast_dfs.o") + " " + os.path.join(BUILD,"ast_tree.o") + " " + os.path.join(BUILD,"utils.o")  + " " + os.path.join(BUILD,"list.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"ast_print.o") + " " + os.path.join(BUILD,"ast_traversing.o") + " " + os.path.join(BUILD,"ast_tree.o") + " " + os.path.join(BUILD,"utils.o")  + " " + os.path.join(BUILD,"list.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
   return
 
 def execute(input_path):
