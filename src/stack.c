@@ -46,7 +46,7 @@ void pushNewScope(tpScopeStack *pStack){
 };
 
 void popScope(tpScopeStack *pStack){
-  int totalVariablesInScope = (int) pStack->pStackCountVariables->pValue;
+  int totalVariablesInScope = *(int*) pStack->pStackCountVariables->pValue;
   int i;
   tpNode *auxNode;
 
@@ -71,7 +71,7 @@ void addToCurrentScope(tpScopeStack *pStack, ndVariable *pVar){
   	return;
   }
 
-  pStack->pStackCountVariables->pValue = (void*) ((int) pStack->pStackCountVariables->pValue + 1);
+  *(int*) pStack->pStackCountVariables->pValue++;
   pNodeStackVariable->pValue = pVar;
 
   if(pStack->pStackVariables == NULL){
@@ -93,11 +93,11 @@ ndVariable *getCurrentReferenceTo(tpScopeStack *pStack, char *name){
   if (pStack->pStackCountVariables == NULL){
   	return NULL;
   }
-  totalVariables = (int) pStack->pStackCountVariables->pValue;
+  totalVariables = *(int*) pStack->pStackCountVariables->pValue;
   auxNode = pStack->pStackCountVariables;
 
   while(auxNode->pPrevious != NULL){
-  	totalVariables += (int) auxNode->pValue;
+  	totalVariables += *(int*) auxNode->pValue;
   	auxNode = auxNode->pPrevious;
   }
 

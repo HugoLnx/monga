@@ -10,7 +10,7 @@ void checkVar(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
 
-void VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
+VAR_tpReport VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
 	tpScopeStack *pStackVariables = createStack();

@@ -78,20 +78,29 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_print.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_print.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_variables.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_variables.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   current_dir = os.getcwd()
   os.chdir(BUILD)
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  critical_sys("gcc " + os.path.join(BUILD, "main.c") + " -o " + os.path.join(BUILD,"main.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "list.c") + " -o " + os.path.join(BUILD,"list.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "utils.c") + " -o " + os.path.join(BUILD,"utils.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "ast_tree.c") + " -o " + os.path.join(BUILD,"ast_tree.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "ast_traversing.c") + " -o " + os.path.join(BUILD,"ast_traversing.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD, "ast_print.c") + " -o " + os.path.join(BUILD,"ast_print.o") + " -c")
-  critical_sys("gcc " + os.path.join(BUILD,"y.tab.c") + " " + os.path.join(BUILD,"lex.yy.c") + " " + os.path.join(BUILD,"ast_print.o") + " " + os.path.join(BUILD,"ast_traversing.o") + " " + os.path.join(BUILD,"ast_tree.o") + " " + os.path.join(BUILD,"utils.o")  + " " + os.path.join(BUILD,"list.o") + " " + os.path.join(BUILD,"main.o") + " -o " + os.path.join(DIST,"main"))
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables"])
   return
+
+def compile_main(artefacts):
+  compiling_paths = []
+  compiling_paths.append(os.path.join(BUILD,"y.tab.c"))
+  compiling_paths.append(os.path.join(BUILD,"lex.yy.c"))
+  for artefact in artefacts:
+    source_path = os.path.join(BUILD, artefact + ".c")
+    object_path = os.path.join(BUILD, artefact + ".o")
+    compiling_paths.append(object_path)
+    critical_sys("gcc " + source_path + " -o " + object_path + " -c")
+  critical_sys("gcc " + " ".join(compiling_paths) + " -o " + os.path.join(DIST,"main"))
 
 def execute(input_path):
   import commands
