@@ -4,9 +4,15 @@
 
 enum VAR_enReportType { RUNNING, CORRECT, UNMATCH_TYPE, UNDEFINED_VARIABLE };
 
+typedef struct VAR_stVarResume {
+  int depth;
+  char *name;
+  ndVar *pVarTop;
+} VAR_tpVarResume;
+
 typedef struct VAR_stReport {
 	enum VAR_enReportType type;
-	ndVar *pVar;
+	VAR_tpVarResume *pVarResume;
 	ndVariable *pVariable;
 } VAR_tpReport;
 

@@ -11,7 +11,7 @@ int main()
   if (pReport->type == CORRECT) {
     printTree(pDeclarations);
   } else if(pReport->type == UNDEFINED_VARIABLE) {
-    printf("Error: Undefined variable '%s'\n", pReport->pVar->value.name);
+    printf("Error: Undefined variable '%s'\n", pReport->pVarResume->name);
   }
   return 0;
 }
