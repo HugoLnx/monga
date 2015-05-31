@@ -2,7 +2,7 @@
 #define AST_TREE_VAR
 #include "ast_tree.h"
 
-enum VAR_enReportType { CORRECT, UNMATCH_TYPE, UNDEFINED_VARIABLE };
+enum VAR_enReportType { RUNNING, CORRECT, UNMATCH_TYPE, UNDEFINED_VARIABLE };
 
 typedef struct VAR_stReport {
 	enum VAR_enReportType type;
@@ -10,6 +10,6 @@ typedef struct VAR_stReport {
 	ndVariable *pVariable;
 } VAR_tpReport;
 
-VAR_tpReport VAR_checkVariablesScopes(ndDeclarations *pDeclarations);
+VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations);
 
 #endif

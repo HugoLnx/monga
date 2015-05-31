@@ -28,12 +28,13 @@ STK_tpScopeStack *STK_create() {
 
 void STK_pushNewScope(STK_tpScopeStack *pStack){
   tpNode *pNodeStackCount = (tpNode*) malloc(sizeof(tpNode));
+  pNodeStackCount->pValue = malloc(sizeof(int));
 
   if (pNodeStackCount == NULL){
   	return;
   }
 
-  pNodeStackCount->pValue = (void*) 0;
+  *(int*)pNodeStackCount->pValue = 0;
 
   if(pStack->pStackCountVariables == NULL){
     pNodeStackCount->pPrevious = NULL;
@@ -51,7 +52,7 @@ void STK_popScope(STK_tpScopeStack *pStack){
   tpNode *auxNode;
 
   for (i=0; i < totalVariablesInScope; i++){
-	auxNode = pStack->pStackVariables;
+	  auxNode = pStack->pStackVariables;
 
     pStack->pStackVariables = pStack->pStackVariables->pPrevious;
     free(auxNode);
@@ -64,17 +65,17 @@ void STK_popScope(STK_tpScopeStack *pStack){
 }
 
 void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar){
-
   tpNode *pNodeStackVariable = (tpNode*) malloc(sizeof(tpNode));
   
   if (pNodeStackVariable == NULL){
   	return;
   }
 
-  *(int*) pStack->pStackCountVariables->pValue++;
-  pNodeStackVariable->pValue = pVar;
+  (*(int*) pStack->pStackCountVariables->pValue)++;
+  pNodeStackVariable->pValue = (void*) pVar;
 
   if(pStack->pStackVariables == NULL){
+		STK_pushNewScope(pStack);
     pNodeStackVariable->pPrevious = NULL;
     pStack->pStackVariables = pNodeStackVariable;
   }
