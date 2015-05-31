@@ -1,35 +1,35 @@
-#include "ast_dfs.h"
+#include "ast_traversing.h"
 #define CALL_EVENT(evtName, evtVar) if (pEvents->evtName != NULL) pEvents->evtName(evtVar, pShared)
 #define CALL_LEVEL_EVENT(evtName,relatedEvt) if (pEvents->evtName != NULL) pEvents->evtName(#relatedEvt, pShared)
 
-void goDeclarations(ndDeclarations *pDecs             ,DFS_tpEvents *pEvents, void *pShared);
-void goDeclaration(ndDeclaration *pDec                ,DFS_tpEvents *pEvents, void *pShared);
-void goFunction(ndFunction* pFunc                     ,DFS_tpEvents *pEvents, void *pShared);
-void goBlock(ndBlock *pBlock                          ,DFS_tpEvents *pEvents, void *pShared);
-void goParameters(ndParameters *pParameters           ,DFS_tpEvents *pEvents, void *pShared);
-void goParameter(ndVariable *pVar                     ,DFS_tpEvents *pEvents, void *pShared);
-void goVariable(ndVariable *pVar                      ,DFS_tpEvents *pEvents, void *pShared);
-void goVariables(ndVariables *pVariables              ,DFS_tpEvents *pEvents, void *pShared);
-void goVarDeclarations(ndVarDeclarations *pVarDecs    ,DFS_tpEvents *pEvents, void *pShared);
-void goStatements(ndStatements *pStats                ,DFS_tpEvents *pEvents, void *pShared);
-void goStatement(ndStatement *pStat                   ,DFS_tpEvents *pEvents, void *pShared);
-void goReturn(ndReturn *pReturn                       ,DFS_tpEvents *pEvents, void *pShared);
-void goAttribution(ndAttribution *pAttribution        ,DFS_tpEvents *pEvents, void *pShared);
-void goVar(ndVar *pVar                                ,DFS_tpEvents *pEvents, void *pShared);
-void goExp(ndExpression *pExp                         ,DFS_tpEvents *pEvents, void *pShared);
-void goNewNode(ndNew *pNew                            ,DFS_tpEvents *pEvents, void *pShared);
-void goFunctionCallNode(ndFunctionCall *pfunctionCall ,DFS_tpEvents *pEvents, void *pShared);
-void goExpListNode(ndExpList *pExpList                ,DFS_tpEvents *pEvents, void *pShared);
-void goIfNode(ndIfElse *pNode                         ,DFS_tpEvents *pEvents, void *pShared);
-void goElseNode(ndIfElse *pNode                       ,DFS_tpEvents *pEvents, void *pShared);
-void goWhileNode(ndWhile *pWhile                      ,DFS_tpEvents *pEvents, void *pShared);
+void goDeclarations(ndDeclarations *pDecs             ,TRA_tpEvents *pEvents, void *pShared);
+void goDeclaration(ndDeclaration *pDec                ,TRA_tpEvents *pEvents, void *pShared);
+void goFunction(ndFunction* pFunc                     ,TRA_tpEvents *pEvents, void *pShared);
+void goBlock(ndBlock *pBlock                          ,TRA_tpEvents *pEvents, void *pShared);
+void goParameters(ndParameters *pParameters           ,TRA_tpEvents *pEvents, void *pShared);
+void goParameter(ndVariable *pVar                     ,TRA_tpEvents *pEvents, void *pShared);
+void goVariable(ndVariable *pVar                      ,TRA_tpEvents *pEvents, void *pShared);
+void goVariables(ndVariables *pVariables              ,TRA_tpEvents *pEvents, void *pShared);
+void goVarDeclarations(ndVarDeclarations *pVarDecs    ,TRA_tpEvents *pEvents, void *pShared);
+void goStatements(ndStatements *pStats                ,TRA_tpEvents *pEvents, void *pShared);
+void goStatement(ndStatement *pStat                   ,TRA_tpEvents *pEvents, void *pShared);
+void goReturn(ndReturn *pReturn                       ,TRA_tpEvents *pEvents, void *pShared);
+void goAttribution(ndAttribution *pAttribution        ,TRA_tpEvents *pEvents, void *pShared);
+void goVar(ndVar *pVar                                ,TRA_tpEvents *pEvents, void *pShared);
+void goExp(ndExpression *pExp                         ,TRA_tpEvents *pEvents, void *pShared);
+void goNewNode(ndNew *pNew                            ,TRA_tpEvents *pEvents, void *pShared);
+void goFunctionCallNode(ndFunctionCall *pfunctionCall ,TRA_tpEvents *pEvents, void *pShared);
+void goExpListNode(ndExpList *pExpList                ,TRA_tpEvents *pEvents, void *pShared);
+void goIfNode(ndIfElse *pNode                         ,TRA_tpEvents *pEvents, void *pShared);
+void goElseNode(ndIfElse *pNode                       ,TRA_tpEvents *pEvents, void *pShared);
+void goWhileNode(ndWhile *pWhile                      ,TRA_tpEvents *pEvents, void *pShared);
 
 
-void DFS_execute(ndDeclarations* pDeclarations, DFS_tpEvents *pEvents, void *pShared) {
+void TRA_execute(ndDeclarations* pDeclarations, TRA_tpEvents *pEvents, void *pShared) {
 	goDeclarations(pDeclarations, pEvents, pShared);
 }
 
-void goDeclarations(ndDeclarations *pDeclarations ,DFS_tpEvents *pEvents, void *pShared) {
+void goDeclarations(ndDeclarations *pDeclarations ,TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList;
   if(pDeclarations == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onDeclarations);
@@ -44,7 +44,7 @@ void goDeclarations(ndDeclarations *pDeclarations ,DFS_tpEvents *pEvents, void *
 	CALL_LEVEL_EVENT(onBackLevel,onDeclarations);
 }
 
-void goDeclaration(ndDeclaration *pDec, DFS_tpEvents *pEvents, void *pShared) {
+void goDeclaration(ndDeclaration *pDec, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onDeclaration);
 	CALL_EVENT(onDeclaration, pDec);
 	if(pDec->decType == DEC_FUNCTION) {
@@ -55,7 +55,7 @@ void goDeclaration(ndDeclaration *pDec, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onDeclaration);
 }
 
-void goFunction(ndFunction* pFunc, DFS_tpEvents *pEvents, void *pShared) {
+void goFunction(ndFunction* pFunc, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onFunction);
 	CALL_EVENT(onFunction, pFunc);
 
@@ -64,7 +64,7 @@ void goFunction(ndFunction* pFunc, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onFunction);
 }
 
-void goParameters(ndParameters *pParameters, DFS_tpEvents *pEvents, void *pShared) {
+void goParameters(ndParameters *pParameters, TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList;
   if(pParameters == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onParameters);
@@ -79,13 +79,13 @@ void goParameters(ndParameters *pParameters, DFS_tpEvents *pEvents, void *pShare
 	CALL_LEVEL_EVENT(onBackLevel,onParameters);
 }
 
-void goParameter(ndVariable *pVar, DFS_tpEvents *pEvents, void *pShared) {
+void goParameter(ndVariable *pVar, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onParameter);
 	CALL_EVENT(onParameter, pVar);
 	CALL_LEVEL_EVENT(onBackLevel,onParameter);
 }
 
-void goVariables(ndVariables *pVariables, DFS_tpEvents *pEvents, void *pShared) {
+void goVariables(ndVariables *pVariables, TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList = pVariables->pList;
 	CALL_LEVEL_EVENT(onNewLevel,onVariables);
 	CALL_EVENT(onVariables, pVariables);
@@ -98,13 +98,13 @@ void goVariables(ndVariables *pVariables, DFS_tpEvents *pEvents, void *pShared) 
 	CALL_LEVEL_EVENT(onBackLevel,onVariables);
 }
 
-void goVariable(ndVariable *pVar, DFS_tpEvents *pEvents, void *pShared) {
+void goVariable(ndVariable *pVar, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onVariable);
 	CALL_EVENT(onVariable, pVar);
 	CALL_LEVEL_EVENT(onBackLevel,onVariable);
 }
 
-void goBlock(ndBlock *pBlock ,DFS_tpEvents *pEvents, void *pShared) {
+void goBlock(ndBlock *pBlock ,TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onBlock);
 	CALL_EVENT(onBlock, pBlock);
   goVarDeclarations(pBlock->pVarDecs, pEvents, pShared);
@@ -112,7 +112,7 @@ void goBlock(ndBlock *pBlock ,DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onBlock);
 }
 
-void goVarDeclarations(ndVarDeclarations *pVarDecs, DFS_tpEvents *pEvents, void *pShared) {
+void goVarDeclarations(ndVarDeclarations *pVarDecs, TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList;
   if(pVarDecs == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onVarDeclarations);
@@ -127,7 +127,7 @@ void goVarDeclarations(ndVarDeclarations *pVarDecs, DFS_tpEvents *pEvents, void 
 	CALL_LEVEL_EVENT(onBackLevel,onVarDeclarations);
 }
 
-void goStatements(ndStatements *pStats, DFS_tpEvents *pEvents, void *pShared) {
+void goStatements(ndStatements *pStats, TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList;
   if(pStats == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onStatements);
@@ -142,7 +142,7 @@ void goStatements(ndStatements *pStats, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onStatements);
 }
 
-void goStatement(ndStatement *pStat, DFS_tpEvents *pEvents, void *pShared) {
+void goStatement(ndStatement *pStat, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onStatement);
 	CALL_EVENT(onStatement, pStat);
   switch(pStat->statType){
@@ -156,14 +156,14 @@ void goStatement(ndStatement *pStat, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onStatement);
 }
 
-void goReturn(ndReturn *pReturn, DFS_tpEvents *pEvents, void *pShared) {
+void goReturn(ndReturn *pReturn, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onReturn);
 	CALL_EVENT(onReturn, pReturn);
   goExp(pReturn->pExp, pEvents, pShared);
 	CALL_LEVEL_EVENT(onBackLevel,onReturn);
 }
 
-void goAttribution(ndAttribution *pAttribution, DFS_tpEvents *pEvents, void *pShared) {
+void goAttribution(ndAttribution *pAttribution, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onAttribution);
 	CALL_EVENT(onAttribution, pAttribution);
 
@@ -172,7 +172,7 @@ void goAttribution(ndAttribution *pAttribution, DFS_tpEvents *pEvents, void *pSh
 	CALL_LEVEL_EVENT(onBackLevel,onAttribution);
 }
 
-void goVar(ndVar *pVar, DFS_tpEvents *pEvents, void *pShared) {
+void goVar(ndVar *pVar, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onVar);
 	CALL_EVENT(onVar, pVar);
   if(pVar->varType == VAR_ARRAY) {
@@ -182,7 +182,7 @@ void goVar(ndVar *pVar, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onVar);
 }
 
-void goExp(ndExpression *pExp, DFS_tpEvents *pEvents, void *pShared) {
+void goExp(ndExpression *pExp, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onExp);
 	CALL_EVENT(onExp, pExp);
   switch(pExp->expType) {
@@ -204,14 +204,14 @@ void goExp(ndExpression *pExp, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onExp);
 }
 
-void goNewNode(ndNew *pNew, DFS_tpEvents *pEvents, void *pShared) {
+void goNewNode(ndNew *pNew, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onNew);
 	CALL_EVENT(onNew, pNew);
   goExp(pNew->pExp, pEvents, pShared);
 	CALL_LEVEL_EVENT(onBackLevel,onNew);
 }
 
-void goFunctionCallNode(ndFunctionCall *pFunctionCall, DFS_tpEvents *pEvents, void *pShared) {
+void goFunctionCallNode(ndFunctionCall *pFunctionCall, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onFunctionCall);
 	CALL_EVENT(onFunctionCall, pFunctionCall);
   
@@ -219,7 +219,7 @@ void goFunctionCallNode(ndFunctionCall *pFunctionCall, DFS_tpEvents *pEvents, vo
 	CALL_LEVEL_EVENT(onBackLevel,onFunctionCall);
 }
 
-void goExpListNode(ndExpList *pExpList, DFS_tpEvents *pEvents, void *pShared) {
+void goExpListNode(ndExpList *pExpList, TRA_tpEvents *pEvents, void *pShared) {
   tpList *pList;
   if(pExpList == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onExpList);
@@ -234,7 +234,7 @@ void goExpListNode(ndExpList *pExpList, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onExpList);
 }
 
-void goIfNode(ndIfElse *pIfElse, DFS_tpEvents *pEvents, void *pShared) {
+void goIfNode(ndIfElse *pIfElse, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onIf);
 	CALL_EVENT(onIf, pIfElse);
   goExp(pIfElse->nExpIf, pEvents, pShared);
@@ -244,7 +244,7 @@ void goIfNode(ndIfElse *pIfElse, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onIf);
 }
 
-void goElseNode(ndIfElse *pIfElse, DFS_tpEvents *pEvents, void *pShared) {
+void goElseNode(ndIfElse *pIfElse, TRA_tpEvents *pEvents, void *pShared) {
   if (pIfElse->nStatementElse == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onElse);
 	CALL_EVENT(onElse, pIfElse);
@@ -252,7 +252,7 @@ void goElseNode(ndIfElse *pIfElse, DFS_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onBackLevel,onElse);
 }
 
-void goWhileNode(ndWhile *pWhile, DFS_tpEvents *pEvents, void *pShared) {
+void goWhileNode(ndWhile *pWhile, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onWhile);
 	CALL_EVENT(onWhile, pWhile);
   goExp(pWhile->pExp, pEvents, pShared);

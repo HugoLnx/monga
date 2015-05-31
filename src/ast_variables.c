@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include "ast_variables.h"
-#include "ast_dfs.h"
+#include "ast_traversing.h"
 #include "stack.h"
 
 void pushVariable(ndVariable *pVar, void *pShared);
@@ -10,10 +10,10 @@ void checkVar(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
 
-void checkVariablesScopes(ndDeclarations *pDeclarations) {
+VAR_tpReport VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 
-	DFS_tpEvents *pEvents = NEW(DFS_tpEvents);
-	tpScopeStack *pStackVariables = createStack();
+	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+	STK_tpScopeStack *pStackVariables = STK_create();
 
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
@@ -22,33 +22,37 @@ void checkVariablesScopes(ndDeclarations *pDeclarations) {
   pEvents->onNewLevel = pushNewScopeVariablesIfBlock; 
   pEvents->onBackLevel = popScopeVariablesIfBlock; 
 
-  DFS_execute(pDeclarations, pEvents, (void*) &pStackVariables);
+  TRA_execute(pDeclarations, pEvents, (void*) &pStackVariables);
 }
 
 void pushVariable(ndVariable *pVar, void *pShared) {
-	tpScopeStack *pStack = (tpScopeStack*) pShared;
+	STK_tpScopeStack *pStack = (STK_tpScopeStack*) pShared;
 	
 	if(pStack->pStackVariables == NULL){
-		pushNewScope(pStack);
+		STK_pushNewScope(pStack);
 	}
 
-	addToCurrentScope(pStack, pVar);
+	STK_addToCurrentScope(pStack, pVar);
 }
 
 void checkVar(ndVar *pVar, void *pShared) {
-	if (getCurrentReferenceTo((tpScopeStack*) pShared, pVar->value.name) == NULL){
+	if (STK_getCurrentReferenceTo((STK_tpScopeStack*) pShared, pVar->value.name) == NULL){
 		// TODO erro variável não encontrada
+	} else {
+		// Connect to variable declaration
 	}
 }
 
+//} else if(true) { // TODO Check types
+
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onBlock") != 0) {
-		pushNewScope((tpScopeStack*) pShared);
+		STK_pushNewScope((STK_tpScopeStack*) pShared);
 	}
 }
 
 void popScopeVariablesIfBlock(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onBlock") != 0) {
-		popScope((tpScopeStack*) pShared);
+		STK_popScope((STK_tpScopeStack*) pShared);
 	}
 }
