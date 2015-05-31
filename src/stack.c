@@ -23,6 +23,7 @@ STK_tpScopeStack *STK_create() {
   
   pStack->pStackVariables = NULL;
   pStack->pStackCountVariables = NULL;
+	STK_pushNewScope(pStack);
   return pStack;
 }
 
@@ -71,11 +72,7 @@ void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar){
   	return;
   }
 
-  (*(int*) pStack->pStackCountVariables->pValue)++;
-  pNodeStackVariable->pValue = (void*) pVar;
-
   if(pStack->pStackVariables == NULL){
-		STK_pushNewScope(pStack);
     pNodeStackVariable->pPrevious = NULL;
     pStack->pStackVariables = pNodeStackVariable;
   }
@@ -83,6 +80,9 @@ void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar){
     pNodeStackVariable->pPrevious = pStack->pStackVariables;
     pStack->pStackVariables = pNodeStackVariable;
   }
+
+  (*(int*) pStack->pStackCountVariables->pValue)++;
+  pNodeStackVariable->pValue = (void*) pVar;
 }
 
 ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name){
@@ -94,21 +94,19 @@ ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name){
   if (pStack->pStackCountVariables == NULL){
   	return NULL;
   }
-  totalVariables = *(int*) pStack->pStackCountVariables->pValue;
   auxNode = pStack->pStackCountVariables;
 
-  while(auxNode->pPrevious != NULL){
+  while(auxNode != NULL){
   	totalVariables += *(int*) auxNode->pValue;
   	auxNode = auxNode->pPrevious;
   }
 
   auxNode = NULL;
-  
+
   for(i=0; i<totalVariables; i++){
   	if(auxNode == NULL){
       auxNode = pStack->pStackVariables;
-  	}
-  	else{
+  	}else{
       auxNode = auxNode->pPrevious;
   	}
 
