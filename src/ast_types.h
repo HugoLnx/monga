@@ -2,7 +2,7 @@
 #define AST_TREE_TYP
 #include "ast_tree.h"
 
-enum TYP_enReportType { RUNNING, WELL_TYPED, UNMATCH_TYPE };
+enum TYP_enReportType { TYP_RUNNING, TYP_WELL_TYPED, TYP_UNMATCH };
 
 typedef struct TYP_stExpResume {
 	tpType *pType;	
@@ -11,7 +11,7 @@ typedef struct TYP_stExpResume {
 
 typedef struct TYP_stReport {
 	enum TYP_enReportType type;
-	tpVarBackDeclaration *pVarDec;
+	tpVarBackDeclaration *pVarBack;
 	TYP_tpExpResume *pExpResume;
 } TYP_tpReport;
 

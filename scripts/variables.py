@@ -80,6 +80,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_print.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_variables.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_variables.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_types.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_types.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
@@ -88,7 +90,7 @@ def compile():
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types"])
   return
 
 def compile_main(artefacts):
