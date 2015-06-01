@@ -119,6 +119,8 @@ def execute_content(content):
 def execute_case(test_path):
   if re.search(r'.in$', test_path):
     return execute_normal_test(test_path)
+  elif re.search(r'.rejected$', test_path):
+    return execute_reject_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
@@ -126,6 +128,15 @@ def execute_normal_test(test_path):
   expected = (open(expected_path, 'r') if os.path.exists(expected_path) else None)
   return failing_msg(test_output, expected)
 
+def is_rejected(output):
+  matching = re.search(r'^Error:', output)
+  return matching
+
+def is_not_rejected(output):
+  return not is_rejected(output)
+
+def execute_reject_test(test_path):
+  return execute_multiline_case(test_path, is_not_rejected, "should be rejected but the output was")
 
 def failing_msg(output, expected):
   outlines = output.split("\n")
@@ -136,6 +147,22 @@ def failing_msg(output, expected):
           \n  Expected: " + (line.strip() if line else "<no-line>") + "\
           \n  Output: " + str(outlines[index].strip())
     return None
+
+def execute_multiline_case(test_path, rejection_condition, middle_msg):
+  msgs = []
+  file_test = open(test_path, 'r')
+  file_content = file_test.read()
+  file_test.close()
+  for content in file_content.split("-----"):
+    content = content.strip()
+    test_output = execute_content(content)
+    if rejection_condition(test_output):
+      msgs.append(">>>\n" + content + "\n" + middle_msg + "\n" + test_output + "\n<<<\n")
+  if len(msgs) == 0:
+    return None
+  else:
+    return "\n".join(msgs)
+
 
 if (len(cmdargs) > 1):
   if (str(cmdargs[1]) == "clear"):
