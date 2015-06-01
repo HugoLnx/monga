@@ -13,3 +13,9 @@ int main() {
   int[] c;
   a = c[0];
 }
+-----
+int main(){
+  int[] a;
+  char[] b;
+  b[0] = a[0];
+}
