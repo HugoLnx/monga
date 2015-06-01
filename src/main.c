@@ -8,10 +8,12 @@ int main()
 {
 	yyparse();
   VAR_tpReport *pReport = VAR_checkVariablesScopes(pDeclarations);
-  if (pReport->type == CORRECT) {
+  if (pReport->type == VAR_ALL_REFERENCED) {
     printTree(pDeclarations);
-  } else if(pReport->type == UNDEFINED_VARIABLE) {
+  } else if(pReport->type == VAR_UNDEFINED) {
     printf("Error: Undefined variable '%s'\n", pReport->pVarResume->name);
+  //} else if(pReport->type == UNMATCH_TYPE) {
+  //  printf("Error: Unmatching type in attribution of '%s' to type '%d'\n", pReport->pVarResume->name, pReport->pExpResume->pType->token);
   }
   return 0;
 }

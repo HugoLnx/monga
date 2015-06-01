@@ -87,6 +87,11 @@ typedef struct stReturnNode {
   ndExpression *pExp;
 } ndReturn;
 
+typedef struct stVarBackDeclaration {
+	ndVariable *pVarDec;
+	int usedDepth;
+} tpVarBackDeclaration;
+
 typedef struct stExpressionNode {
   enum enExpType expType;
   union {
@@ -104,6 +109,7 @@ typedef struct stExpressionNode {
 
 typedef struct stVarNode {
   enum enVarType varType;
+	tpVarBackDeclaration *pBackDeclaration;
   union {
     char *name;
     struct {
