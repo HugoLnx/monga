@@ -1,5 +1,5 @@
 int main() {
-  int x, h;
+  float x, h;
   char y;
   h = 3.0;
   x = h;
