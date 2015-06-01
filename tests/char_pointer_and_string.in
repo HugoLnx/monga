@@ -1,0 +1,5 @@
+int main() {
+  char[] a;
+  a = new char[5];
+  a = "teste";
+}

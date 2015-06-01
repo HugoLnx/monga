@@ -1,0 +1,6 @@
+int main() {
+  int x, h;
+  char y;
+  h = 3.0;
+  x = h;
+}

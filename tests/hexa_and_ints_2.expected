@@ -1,0 +1,20 @@
+declarations:
+  declaration:
+    function:main,259,0
+      block:
+        var_declarations:
+          variables:
+            variable:x,259,0
+        statements:
+          statement:
+            attribution:
+              var:x
+              exp:1,0x542
+          statement:
+            attribution:
+              var:x
+              exp:7
+              binary:0
+                exp:5
+                  var:x
+                exp:3,3.00000

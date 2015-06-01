@@ -1,0 +1,12 @@
+declarations:
+  declaration:
+    function:main,259,0
+      block:
+        var_declarations:
+          variables:
+            variable:x,259,0
+        statements:
+          statement:
+            attribution:
+              var:x
+              exp:1,0x542
