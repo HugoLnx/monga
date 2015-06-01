@@ -4,8 +4,8 @@ declarations:
       block:
         var_declarations:
           variables:
-            variable:x,259,0
-            variable:h,259,0
+            variable:x,261,0
+            variable:h,261,0
           variables:
             variable:y,260,0
         statements:

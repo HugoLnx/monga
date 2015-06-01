@@ -15,6 +15,7 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp);
 int typeIsCompatible(tpType *pVarType, tpType *pExpType);
 enum enTokenGroup tokenGroup(int tk);
 void setTypeOfVar(ndVar* pVar, tpType *pType);
+void setTypeOfNew(ndNew* pNew, tpType *pType);
 
 TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
@@ -67,9 +68,9 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 		case EXPND_VAR:
 			setTypeOfVar((ndVar*)pExp->value.pNode, pResume->pType);
 			break;
-		// case EXPND_NEW:
-		// 	setTypeOfNew(pExp->value.pNode, pResume->pType);
-		// 	break;
+		case EXPND_NEW:
+			setTypeOfNew(pExp->value.pNode, pResume->pType);
+			break;
 		case EXPND_BIN:
 		case EXPND_EXCLAMATION:
 		case EXPND_MINUS:
@@ -106,4 +107,9 @@ enum enTokenGroup tokenGroup(int tk) {
 void setTypeOfVar(ndVar* pVar, tpType *pType) {
 	pType->token = pVar->pBackDeclaration->pVarDec->pType->token;
 	pType->depth = pVar->pBackDeclaration->usedDepth;
+}
+
+void setTypeOfNew(ndNew* pNew, tpType *pType) {
+	pType->token = pNew->pType->token;
+	pType->depth = pNew->pType->depth + 1;
 }
