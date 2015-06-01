@@ -1,0 +1,15 @@
+int main() {
+  char[] a;
+  a = b[1];
+}
+-----
+int main() {
+  int b;
+  char[] a;
+  a[0] = b[0];
+}
+-----
+int main() {
+  int[] c;
+  a = c[0];
+}
