@@ -1,0 +1,15 @@
+int main() {
+	char a;
+	a = 10;
+}
+-----
+int a;
+int main() {
+	char a;
+	a = 10;
+}
+-----
+int a;
+int main(char a) {
+	a = 10;
+}

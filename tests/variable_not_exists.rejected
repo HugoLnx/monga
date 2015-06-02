@@ -13,3 +13,9 @@ int main() {
   int a;
   b = a + c;
 }
+-----
+int main(int a) {
+}
+int func() {
+	a = 10;
+}

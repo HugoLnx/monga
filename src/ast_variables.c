@@ -75,14 +75,14 @@ VAR_tpVarResume *resumeVar(ndVar *pVar) {
 
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {
   if(REPORT(pShared)->type != VAR_RUNNING) return;
-	if (strcmp(evtName, "onBlock") == 0) {
+	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
 		STK_pushNewScope(STACK(pShared));
 	}
 }
 
 void popScopeVariablesIfBlock(char *evtName, void *pShared) {
   if(REPORT(pShared)->type != VAR_RUNNING) return;
-	if (strcmp(evtName, "onBlock") == 0) {
+	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
 		STK_popScope(STACK(pShared));
 	}
 }
