@@ -11,6 +11,9 @@
 enum enTokenGroup { GR_NUMBER, GR_FLOAT, GR_CHAR };
 
 void checkAttribution(ndAttribution *pAttr, void *pShared);
+void checkExpression(ndExpression *pExp, void *pShared);
+void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport);
+void checkArithmeticExp(TYP_tpExpResume *pResume, TYP_tpReport *pReport);
 TYP_tpExpResume *resumeExp(ndExpression *pExp);
 int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
 enum enTokenGroup tokenGroup(int tk);
@@ -23,6 +26,7 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
   pReport->type = TYP_RUNNING;
 
   pEvents->onAttribution = checkAttribution;
+  pEvents->onExp = checkExpression;
 
   TRA_execute(pDeclarations, pEvents, (void*) pReport);
   if (pReport->type == TYP_RUNNING) {
@@ -41,6 +45,40 @@ void checkAttribution(ndAttribution *pAttr, void *pShared) {
 		REPORT(pShared)->pExpResume = pExpResume;
 		REPORT(pShared)->pVarBack = pVarBack;
 	}
+}
+
+void checkExpression(ndExpression *pExp, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(pExp->expType == EXPND_BIN) {
+    checkBinExpression(pExp, REPORT(pShared));
+  }
+}
+
+void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport) {
+  TYP_tpExpResume *pResume1 = resumeExp(pExp->value.bin.pExp1);
+  TYP_tpExpResume *pResume2 = resumeExp(pExp->value.bin.pExp2);
+  switch(pExp->value.bin.expType) {
+    case EXPBIN_PLUS:
+    case EXPBIN_MINUS:
+    case EXPBIN_ASTERISK:
+    case EXPBIN_SLASH:
+    case EXPBIN_LESS_EQUAL:
+    case EXPBIN_GREATER_EQUAL:
+    case EXPBIN_LESS:
+    case EXPBIN_GREATER:
+    case EXPBIN_AND:
+    case EXPBIN_OR:
+      checkArithmeticExp(pResume1, pReport);
+      checkArithmeticExp(pResume2, pReport);
+  }
+}
+
+void checkArithmeticExp(TYP_tpExpResume *pResume, TYP_tpReport *pReport) {
+  if(pReport->type != TYP_RUNNING) return;
+  if (pResume->pType->depth > 0) {
+    pReport->type = TYP_NO_ARITHMETIC_TYPE;
+    pReport->pExpResume = pResume;
+  }
 }
 
 TYP_tpExpResume *resumeExp(ndExpression *pExp) {
