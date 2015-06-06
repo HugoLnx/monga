@@ -1,0 +1,11 @@
+int main() {
+  int[][] matrix;
+  int[] line;
+  matrix[0] = line;
+}
+-----
+int main() {
+  int[][] matrix;
+  int[] line;
+  line = matrix[0];
+}

@@ -12,7 +12,7 @@ enum enTokenGroup { GR_NUMBER, GR_FLOAT, GR_CHAR };
 
 void checkAttribution(ndAttribution *pAttr, void *pShared);
 TYP_tpExpResume *resumeExp(ndExpression *pExp);
-int typeIsCompatible(tpType *pVarType, tpType *pExpType);
+int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
 enum enTokenGroup tokenGroup(int tk);
 void setTypeOfVar(ndVar* pVar, tpType *pType);
 void setTypeOfNew(ndNew* pNew, tpType *pType);
@@ -36,7 +36,7 @@ void checkAttribution(ndAttribution *pAttr, void *pShared) {
   tpVarBackDeclaration *pVarBack = pAttr->pVar->pBackDeclaration;
 
 	TYP_tpExpResume *pExpResume = resumeExp(pAttr->pExp);
-	if (!typeIsCompatible(pVarBack->pVarDec->pType, pExpResume->pType)) {
+	if (!typeIsCompatible(pVarBack, pExpResume->pType)) {
 		REPORT(pShared)->type = TYP_UNMATCH;
 		REPORT(pShared)->pExpResume = pExpResume;
 		REPORT(pShared)->pVarBack = pVarBack;
@@ -80,13 +80,14 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 	return pResume;
 }
 
-int typeIsCompatible(tpType *pVarType, tpType *pExpType) {
-	return (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)
-		&& pVarType->depth == pExpType->depth) || 
-		(tokenGroup(pVarType->token) == GR_NUMBER && tokenGroup(pExpType->token) == GR_FLOAT
-		&& pVarType->depth == pExpType->depth) || 
-		(tokenGroup(pVarType->token) == GR_FLOAT && tokenGroup(pExpType->token) == GR_NUMBER
-		&& pVarType->depth == pExpType->depth);
+int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
+  tpType *pVarType = pVarBack->pVarDec->pType;
+  int varDepth = pVarType->depth - pVarBack->usedDepth;
+	return (varDepth == pExpType->depth) && (
+    (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)) ||
+    (tokenGroup(pVarType->token) == GR_NUMBER && tokenGroup(pExpType->token) == GR_FLOAT) ||
+    (tokenGroup(pVarType->token) == GR_FLOAT && tokenGroup(pExpType->token) == GR_NUMBER)
+  );
 }
 
 enum enTokenGroup tokenGroup(int tk) {
@@ -106,7 +107,7 @@ enum enTokenGroup tokenGroup(int tk) {
 
 void setTypeOfVar(ndVar* pVar, tpType *pType) {
 	pType->token = pVar->pBackDeclaration->pVarDec->pType->token;
-	pType->depth = pVar->pBackDeclaration->usedDepth;
+	pType->depth = pVar->pBackDeclaration->pVarDec->pType->depth - pVar->pBackDeclaration->usedDepth;
 }
 
 void setTypeOfNew(ndNew* pNew, tpType *pType) {

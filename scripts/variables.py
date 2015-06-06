@@ -121,6 +121,8 @@ def execute_case(test_path):
     return execute_normal_test(test_path)
   elif re.search(r'.rejected$', test_path):
     return execute_reject_test(test_path)
+  elif re.search(r'.accepted$', test_path):
+    return execute_accepted_test(test_path)
 
 def execute_normal_test(test_path):
   test_output = execute(test_path)
@@ -137,6 +139,9 @@ def is_not_rejected(output):
 
 def execute_reject_test(test_path):
   return execute_multiline_case(test_path, is_not_rejected, "should be rejected but the output was")
+
+def execute_accepted_test(test_path):
+  return execute_multiline_case(test_path, is_rejected, "should be accepted but the output was")
 
 def failing_msg(output, expected):
   outlines = output.split("\n")
