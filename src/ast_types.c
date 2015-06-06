@@ -15,6 +15,9 @@ void checkExpression(ndExpression *pExp, void *pShared);
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport);
 void checkArithmeticExp(TYP_tpExpResume *pResume, TYP_tpReport *pReport);
 TYP_tpExpResume *resumeExp(ndExpression *pExp);
+void checkVarInx(ndVar *pVar, void *pShared);
+void checkNewInx(ndNew *pNew, void *pShared);
+int isValidInxType(tpType *pType);
 int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
 enum enTokenGroup tokenGroup(int tk);
 void setTypeOfVar(ndVar* pVar, tpType *pType);
@@ -27,6 +30,8 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 
   pEvents->onAttribution = checkAttribution;
   pEvents->onExp = checkExpression;
+  pEvents->onVar = checkVarInx;
+  pEvents->onNew = checkNewInx;
 
   TRA_execute(pDeclarations, pEvents, (void*) pReport);
   if (pReport->type == TYP_RUNNING) {
@@ -81,6 +86,32 @@ void checkArithmeticExp(TYP_tpExpResume *pResume, TYP_tpReport *pReport) {
   }
 }
 
+void checkVarInx(ndVar *pVar, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(pVar->varType == VAR_ARRAY) {
+    ndExpression *pExp = pVar->value.address.pInxExp;
+    TYP_tpExpResume *pResume = resumeExp(pExp);
+    if(!isValidInxType(pResume->pType)) {
+      REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
+      REPORT(pShared)->pExpResume = pResume;
+    }
+  }
+}
+
+void checkNewInx(ndNew *pNew, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  TYP_tpExpResume *pResume = resumeExp(pNew->pExp);
+  if(!isValidInxType(pResume->pType)) {
+    REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
+    REPORT(pShared)->pExpResume = pResume;
+  }
+}
+
+int isValidInxType(tpType *pType) {
+  return pType->depth == 0
+    && tokenGroup(pType->token) != GR_FLOAT;
+}
+
 TYP_tpExpResume *resumeExp(ndExpression *pExp) {
   TYP_tpExpResume *pResume = NEW(TYP_tpExpResume);
 	pResume->pType = NEW(tpType);
@@ -120,8 +151,7 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 
 int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
   tpType *pVarType = pVarBack->pVarDec->pType;
-  int varDepth = pVarType->depth - pVarBack->usedDepth;
-	return (varDepth == pExpType->depth) && (
+	return (pVarBack->usedDepth == pExpType->depth) && (
     (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)) ||
     (tokenGroup(pVarType->token) == GR_NUMBER && tokenGroup(pExpType->token) == GR_FLOAT) ||
     (tokenGroup(pVarType->token) == GR_FLOAT && tokenGroup(pExpType->token) == GR_NUMBER)
@@ -145,7 +175,7 @@ enum enTokenGroup tokenGroup(int tk) {
 
 void setTypeOfVar(ndVar* pVar, tpType *pType) {
 	pType->token = pVar->pBackDeclaration->pVarDec->pType->token;
-	pType->depth = pVar->pBackDeclaration->pVarDec->pType->depth - pVar->pBackDeclaration->usedDepth;
+	pType->depth = pVar->pBackDeclaration->usedDepth;
 }
 
 void setTypeOfNew(ndNew* pNew, tpType *pType) {

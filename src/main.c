@@ -23,6 +23,10 @@ int main()
 		  printf("Error: Expression in aritmetic operation have invalid type %d,%d\n",
 				pTypReport->pExpResume->pType->token, pTypReport->pExpResume->pType->depth);
       break;
+    case TYP_NO_VALID_ARRAY_INDEX:
+		  printf("Error: Expression as array index have invalid type %d,%d\n",
+				pTypReport->pExpResume->pType->token, pTypReport->pExpResume->pType->depth);
+      break;
 		}
   } else {
     printf("Error: Undefined variable '%s'\n", pVarReport->pVarResume->name);
