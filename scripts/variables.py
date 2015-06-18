@@ -12,13 +12,15 @@ total = len(sys.argv)
 cmdargs = sys.argv
 
 ROOT = os.path.abspath('.')
+VARS_ROOT = os.path.join(ROOT, "variables")
 
-BUILD = os.path.join(ROOT, "build")
-TMP = os.path.join(ROOT, "tmp")
+BUILD = os.path.join(VARS_ROOT, "build")
+TMP = os.path.join(VARS_ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 
 SRC = os.path.join(ROOT, "src")
-TESTS = os.path.join(ROOT, "tests")
+VARS_SRC = os.path.join(VARS_ROOT, "src")
+TESTS = os.path.join(VARS_ROOT, "tests")
 
 def clear():
   os.system("rm -rf " + BUILD)
@@ -66,8 +68,8 @@ def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
+  os.system("cp " + os.path.join(VARS_SRC, "main.c") + " " + BUILD)
+  os.system("cp " + os.path.join(VARS_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "list.h") + " " + BUILD)
