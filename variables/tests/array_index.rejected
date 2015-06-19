@@ -1,0 +1,37 @@
+int main() {
+  int[] x;
+  x[10.0] = 20;
+}
+-----
+int main() {
+  int[] x;
+  int y;
+  y = x[10.0];
+}
+-----
+int main() {
+  int[] x;
+  x["test"] = 20;
+}
+-----
+int main() {
+  int[] x;
+  int y;
+  y = x["test"];
+}
+-----
+int main() {
+  int[] x, z;
+  x[z] = 20;
+}
+-----
+int main() {
+  int[] x, z;
+  int y;
+  y = x[z];
+}
+-----
+int main() {
+  int[] x;
+  x = new int[10.0];
+}

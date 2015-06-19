@@ -12,15 +12,14 @@ total = len(sys.argv)
 cmdargs = sys.argv
 
 ROOT = os.path.abspath('.')
-VARS_ROOT = os.path.join(ROOT, "variables")
 
-BUILD = os.path.join(VARS_ROOT, "build")
-TMP = os.path.join(VARS_ROOT, "tmp")
+BUILD = os.path.join(ROOT, "build")
+TMP = os.path.join(ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 
 SRC = os.path.join(ROOT, "src")
-VARS_SRC = os.path.join(VARS_ROOT, "src")
-TESTS = os.path.join(VARS_ROOT, "tests")
+VARS_SRC = os.path.join(ROOT, "src")
+TESTS = os.path.join(ROOT, "tests")
 
 def clear():
   os.system("rm -rf " + BUILD)
@@ -68,8 +67,8 @@ def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
-  os.system("cp " + os.path.join(VARS_SRC, "main.c") + " " + BUILD)
-  os.system("cp " + os.path.join(VARS_SRC, "main.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "main.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "list.h") + " " + BUILD)
@@ -86,13 +85,15 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_types.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "label_generator.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "label_generator.h") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   current_dir = os.getcwd()
   os.chdir(BUILD)
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types", "label_generator"])
   return
 
 def compile_main(artefacts):

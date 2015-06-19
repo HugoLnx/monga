@@ -57,7 +57,7 @@ void checkVar(ndVar *pVar, void *pShared) {
 	} else {
 		pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
 		pVar->pBackDeclaration->pVarDec = pVarDec;
-		pVar->pBackDeclaration->usedDepth = pVarResume->depth;
+		pVar->pBackDeclaration->usedDepth = pVarDec->pType->depth - pVarResume->depth;
 	}
 }
 

@@ -9,3 +9,7 @@ python scripts/syntax.py test_all
 echo
 echo "Running ast-tree Tests"
 python scripts/ast-tree.py test_all
+
+echo
+echo "Running variables and types Tests"
+python scripts/variables.py test_all

@@ -2,6 +2,29 @@ Students
  * Hugo Roque  - 1311162
  * Rômulo Dusi - 1213094
 
+Fourth Delivery: Syntax tree
+  Runner
+		* The output of the program is the tree printed or an error message in case of
+		  an undefined variable have been used or an type mismatch in the assignment.
+
+	Tests
+	There are three types of test:
+		* Files named as "testname.in" and its pair "testname.expected":
+		  The "testname.expeted" file have the rules that should be in the output.
+			So the "testname.expected" may have not all the rules of output, but all the
+			rules in "testname.expected" must be in output respecting the expected order.
+		* Files named as "testname.rejected":
+		  Each block between "-----" represents a test case that should be rejected.
+	
+	Changelog:
+		* Module created: ast_traversing - Encapsulates the logic of traversing the AST.
+		* Module modified: ast_print - Now uses the ast_traversing
+		* Module created: stack - ADT representing an stack of variable scopes.
+		* Module created: ast_variables - Traverse the AST referencing each variable to its
+		  declaration (if any) and output a report of success or error.
+		* Module created: ast_types - Traverse the AST verifying verifying the types of the
+		  variables in assignments.
+
 Third Delivery: Syntax tree
   Directory Structure
 	  * src/ - Source files that we are developing.
