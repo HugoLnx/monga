@@ -10,15 +10,9 @@ typedef struct VAR_stVarResume {
   ndVar *pVarTop;
 } VAR_tpVarResume;
 
-typedef struct VAR_stExpResume {
-	tpType *pType;	
-  ndExpression *pExpTop;
-} VAR_tpExpResume;
-
 typedef struct VAR_stReport {
 	enum VAR_enReportType type;
 	VAR_tpVarResume *pVarResume;
-	VAR_tpExpResume *pExpResume;
 } VAR_tpReport;
 
 VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations);

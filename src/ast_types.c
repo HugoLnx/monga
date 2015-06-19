@@ -82,10 +82,6 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 
 int typeIsCompatible(tpType *pVarType, tpType *pExpType) {
 	return (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)
-		&& pVarType->depth == pExpType->depth) || 
-		(tokenGroup(pVarType->token) == GR_NUMBER && tokenGroup(pExpType->token) == GR_FLOAT
-		&& pVarType->depth == pExpType->depth) || 
-		(tokenGroup(pVarType->token) == GR_FLOAT && tokenGroup(pExpType->token) == GR_NUMBER
 		&& pVarType->depth == pExpType->depth);
 }
 
