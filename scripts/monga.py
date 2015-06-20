@@ -39,18 +39,16 @@ def execute_assembly(input_name):
   compile()
   assembly = execute(input_name)
   name_file = input_name.split('/')[-1].split('.')[0]
+  file_path = os.path.join(TMP, name_file)
   
-  assembly_file = open(name_file + ".s", "w")
+  assembly_file = open(file_path + ".s", "w")
   assembly_file.write(assembly.strip())
   assembly_file.close()
   
-  os.system("gcc -m32 " + name_file + ".s -o " + name_file)
+  os.system("gcc -m32 " + file_path + ".s -o " + file_path)
   import commands
-  output = commands.getoutput("./" + name_file)
+  output = commands.getoutput(file_path)
   print output
-
-  os.remove(name_file)
-  os.remove(name_file+".s")
 
 def test(type_test):
   compile()
