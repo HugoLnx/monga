@@ -149,9 +149,13 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 	return pResume;
 }
 
-int typeIsCompatible(tpType *pVarType, tpType *pExpType) {
-	return (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)
-		&& pVarType->depth == pExpType->depth);
+int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
+  tpType *pVarType = pVarBack->pVarDec->pType;
+	return (pVarBack->usedDepth == pExpType->depth) && (
+    (tokenGroup(pVarType->token) == tokenGroup(pExpType->token)) ||
+    (tokenGroup(pVarType->token) == GR_NUMBER && tokenGroup(pExpType->token) == GR_FLOAT) ||
+    (tokenGroup(pVarType->token) == GR_FLOAT && tokenGroup(pExpType->token) == GR_NUMBER)
+  );
 }
 
 enum enTokenGroup tokenGroup(int tk) {
