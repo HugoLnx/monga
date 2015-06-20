@@ -89,4 +89,5 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onBackLevel = afterEvent; 
 
   TRA_execute(pDeclarations, pEvents, NULL);
+	ASY_raw(".end\n\n");
 }

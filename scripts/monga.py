@@ -42,7 +42,7 @@ def execute_assembly(input_name):
   file_path = os.path.join(TMP, name_file)
   
   assembly_file = open(file_path + ".s", "w")
-  assembly_file.write(assembly.strip())
+  assembly_file.write(assembly)
   assembly_file.close()
   
   os.system("gcc -m32 " + file_path + ".s -o " + file_path)
