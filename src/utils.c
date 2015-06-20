@@ -24,8 +24,11 @@ char *toRawStr(char *str) {
 					*outStr++ = '\t';
 					counterPointerMove++;
 					break;
+				case '\\':
+					*outStr++ = '\\';
+					counterPointerMove++;
+					break;
 				default:
-					// erro
 					break;
 			}
 			index++;
