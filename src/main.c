@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include "label_generator.h"
+#include "assembly_writer.h"
 
 int main()
 {
-	printf(LBL_generate(LBL_next()));
+	ASY_raw(".data\n");
+	ASY_globalVar("msg", "string", "hello world!");
+	ASY_raw(".text\n");
+	ASY_function("main");
+	ASY_functionBeginning();
+	ASY_functionCall("printf", 1, "$msg");
+	ASY_functionEnding();
   return 0;
 }
 

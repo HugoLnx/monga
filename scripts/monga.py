@@ -87,13 +87,15 @@ def compile():
   os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "label_generator.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "label_generator.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "assembly_writer.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "assembly_writer.h") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   current_dir = os.getcwd()
   os.chdir(BUILD)
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types", "label_generator"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types", "label_generator", "assembly_writer"])
   return
 
 def compile_main(artefacts):
