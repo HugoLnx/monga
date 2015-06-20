@@ -35,6 +35,23 @@ def run(input_name):
   print execute(input_name)
   return
 
+def execute_assembly(input_name):
+  compile()
+  assembly = execute(input_name)
+  name_file = input_name.split('/')[-1].split('.')[0]
+  
+  assembly_file = open(name_file + ".s", "w")
+  assembly_file.write(assembly.strip())
+  assembly_file.close()
+  
+  os.system("gcc -m32 " + name_file + ".s -o " + name_file)
+  import commands
+  output = commands.getoutput("./" + name_file)
+  print output
+
+  os.remove(name_file)
+  os.remove(name_file+".s")
+
 def test(type_test):
   compile()
   error_msg = execute_case(type_test)
@@ -181,6 +198,8 @@ if (len(cmdargs) > 1):
     clear()
   elif (str(cmdargs[1]) == "compile"):
     compile()
+  elif (str(cmdargs[1]) == "exec"):
+    execute_assembly(cmdargs[2])
   elif (str(cmdargs[1]) == "run"):
     if len(cmdargs) > 2:
       run(cmdargs[2])
