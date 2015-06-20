@@ -31,10 +31,35 @@ void codeForFunction(ndFunction *pFunc, void *pShared) {
 
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label = LBL_generate(LBL_next());
-	ASY_raw(".data\n");
-	ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
-	ASY_raw(".text\n");
-	ASY_raw("movl $%s, %%eax\n", label);
+	
+	switch(pExp->expType) {
+		case(EXPND_VAR):
+			// TODO
+			break;
+		case(EXPND_NEW): 
+			// TODO
+			break;
+		case(EXP_TEXT):
+			ASY_raw(".data\n");
+			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
+			ASY_raw(".text\n");
+			ASY_raw("movl $%s, %%eax\n", label);
+			break;
+		case(EXP_FLOAT):
+			// ASY_raw("fstpl ")
+			break;
+		case(EXP_HEXADECIMAL):
+		case(EXP_NUMBER):
+			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
+			break;
+		case(EXPND_MINUS):
+		case(EXPND_EXCLAMATION): 
+			// TODO
+			break;
+		case(EXPND_BIN): 
+			// TODO
+			break;
+	}
 }
 
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
@@ -43,7 +68,7 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	ASY_functionCallHeader();
   pList = pCall->pExpList->pList;
   resetList(pList);
-  while(goPrevious(pList)) {
+  while(goNext(pList)) {
     ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
 		codeForExp(pStat, pShared);
 		ASY_raw("pushl %%eax\n");
