@@ -1,0 +1,5 @@
+int main() {
+	printf("\n");
+	printf("hello \n");
+	printf("world\n");
+}

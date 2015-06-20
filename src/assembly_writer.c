@@ -25,29 +25,24 @@ void ASY_label(char *labelName) {
 void ASY_functionBeginning() {
 	ASY_raw("pushl %%ebp\n");
 	ASY_raw("movl %%esp, %%ebp\n");
-	ASY_raw("pushl %%ebx\n");
 }
 
-void ASY_functionCall(char *funcName, int qntParams, ...) {
-	va_list params;
-	int i;
+void ASY_functionCallHeader() {
+	ASY_raw("pushl %%ebx\n");
 	ASY_raw("pushl %%ecx\n");
 	ASY_raw("pushl %%edx\n");
 	ASY_raw("pushl %%eax\n");
-	va_start(params, qntParams);
-	for(i = 0; i < qntParams; i++) {
-		char *arg = va_arg(params, char*);
-		ASY_raw("pushl %s\n", arg);
-	}
-	va_end(params);
+}
+
+void ASY_functionCall(char *funcName, int qntParams) {
 	ASY_raw("call %s\n", funcName);
 	ASY_raw("addl $%d, %%esp\n", qntParams*4+4);
 	ASY_raw("popl %%edx\n");
 	ASY_raw("popl %%ecx\n");
+	ASY_raw("popl %%ebx\n");
 }
 
 void ASY_functionEnding() {
-	ASY_raw("popl %%ebx\n");
 	ASY_raw("movl %%ebp, %%esp\n");
 	ASY_raw("popl %%ebp\n");
 }
