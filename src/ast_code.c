@@ -27,15 +27,34 @@ void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
 void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
 }
 
+void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
+	pVar->stackPadding = STATE(pShared)->lastVarPadding;
+	STATE(pShared)->lastVarPadding += 4;
+}
+
+void codeForParameters(ndParameters *pParams, void *pShared) {
+	tpList *pList;
+	int paramPadding = 8;
+	if (pParams == NULL) return;
+
+  pList = pParams->pList;
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+		int padding = STATE(pShared)->lastVarPadding;
+		codeForVarDeclaration(pVar, pShared);
+		ASY_raw("movl $vars, %%ecx\n");
+		ASY_raw("addl $%d, %%ecx\n", padding);
+		ASY_raw("movl %d(%%ebp), %%edx\n", paramPadding);
+		ASY_raw("movl %%edx, (%%ecx)\n");
+		paramPadding += 4;
+  }
+}
+
 void codeForFunction(ndFunction *pFunc, void *pShared) {
 	ASY_raw(".text\n");
 	ASY_function(pFunc->name);
 	ASY_functionBeginning();
-}
-
-void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
-	pVar->stackPadding = STATE(pShared)->lastVarPadding;
-	STATE(pShared)->lastVarPadding += 4;
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
@@ -83,14 +102,16 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
   int qntParams = 0;
 	tpList *pList;
 	ASY_functionCallHeader();
-  pList = pCall->pExpList->pList;
-  resetList(pList);
-  while(goNext(pList)) {
-    ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
-		codeForExp(pStat, pShared);
-		ASY_raw("pushl %%eax\n");
-		qntParams++;
-  }
+	if(pCall->pExpList != NULL) {
+    pList = pCall->pExpList->pList;
+		resetList(pList);
+		while(goNext(pList)) {
+			ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+			codeForExp(pStat, pShared);
+			ASY_raw("pushl %%eax\n");
+			qntParams++;
+		}
+	}
 	ASY_functionCall(pCall->functionName, qntParams);
 }
 
@@ -115,6 +136,7 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onVariable = codeForVarDeclaration;
 	pEvents->onVarDeclarations = initVarDeclarationsState;
 	pEvents->onAttribution = codeForAttribution;
+	pEvents->onParameters = codeForParameters;
 
   pEvents->onNewLevel = beforeEvent; 
   pEvents->onBackLevel = afterEvent; 
