@@ -6,6 +6,12 @@
 #include "list.h"
 #include <string.h>
 
+#define STATE(varName) ((tpState*) varName)
+
+typedef struct stState {
+	int lastVarPadding;
+} tpState;
+
 void beforeEvent(char *evtName, void *pShared) {
 }
 
@@ -16,7 +22,6 @@ void afterEvent(char *evtName, void *pShared) {
 }
 
 void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
-	ASY_raw(".data\n");
 }
 
 void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
@@ -29,12 +34,25 @@ void codeForFunction(ndFunction *pFunc, void *pShared) {
 	ASY_functionBeginning();
 }
 
+void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
+	ASY_raw("subl $4, %%esp\n");
+	pVar->stackPadding = STATE(pShared)->lastVarPadding;
+	STATE(pShared)->lastVarPadding += 4;
+}
+
+void codeForVar(ndVar *pVar, void *pShared) {
+	int padding = pVar->pBackDeclaration->pVarDec->stackPadding;
+	ASY_raw("movl %%ebp, %%eax\n");
+	ASY_raw("subl $%d, %%eax\n", padding);
+}
+
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label = LBL_generate(LBL_next());
 	
 	switch(pExp->expType) {
 		case(EXPND_VAR):
-			// TODO
+      codeForVar(pExp->value.pNode, pShared);
+			ASY_raw("movl (%%eax), %%eax\n");
 			break;
 		case(EXPND_NEW): 
 			// TODO
@@ -77,6 +95,17 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	ASY_functionCall(pCall->functionName, qntParams);
 }
 
+void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
+	STATE(pShared)->lastVarPadding = 0;
+}
+
+void codeForAttribution(ndAttribution *pAttr, void *pShared) {
+	codeForVar(pAttr->pVar, pShared);
+	ASY_raw("movl %%eax, %%ecx\n");
+	codeForExp(pAttr->pExp, pShared);
+	ASY_raw("movl %%eax, (%%ecx)\n");
+}
+
 void COD_codeForTree(ndDeclarations *pDeclarations) {
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
 
@@ -84,10 +113,15 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onVariable = codeForGlobalVariable;
   pEvents->onFunction = codeForFunction;
   pEvents->onFunctionCall = codeForFunctionCall;
+  pEvents->onVariable = codeForVarDeclaration;
+	pEvents->onVarDeclarations = initVarDeclarationsState;
+	pEvents->onAttribution = codeForAttribution;
 
   pEvents->onNewLevel = beforeEvent; 
   pEvents->onBackLevel = afterEvent; 
 
-  TRA_execute(pDeclarations, pEvents, NULL);
+	tpState *pState = NEW(tpState);
+
+  TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }

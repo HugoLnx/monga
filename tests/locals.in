@@ -1,0 +1,5 @@
+int main() {
+  int num;
+  num = 10;
+	printf("hello %d", num);
+}

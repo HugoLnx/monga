@@ -35,20 +35,9 @@ def run(input_name):
   print execute(input_name)
   return
 
-def execute_assembly(input_name):
+def exec_task(input_name):
   compile()
-  assembly = execute(input_name)
-  name_file = input_name.split('/')[-1].split('.')[0]
-  file_path = os.path.join(TMP, name_file)
-  
-  assembly_file = open(file_path + ".s", "w")
-  assembly_file.write(assembly)
-  assembly_file.close()
-  
-  os.system("gcc -m32 " + file_path + ".s -o " + file_path)
-  import commands
-  output = commands.getoutput(file_path)
-  print output
+  print execute_assembly(input_name)
 
 def test(type_test):
   compile()
@@ -72,11 +61,6 @@ def test_all():
         print
         fails += 1
   print "Result: " + str(len(list_files) - fails) + " of " + str(len(list_files)) + " test cases passed."
-
-def critical_sys(cmd):
-  outcode = os.system(cmd)
-  if outcode != 0:
-    exit()
 
 def compile():
   clear()
@@ -115,6 +99,24 @@ def compile():
   compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types", "label_generator", "assembly_writer", "ast_code"])
   return
 
+def critical_sys(cmd):
+  outcode = os.system(cmd)
+  if outcode != 0:
+    exit()
+
+def execute_assembly(input_name):
+  assembly = execute(input_name)
+  name_file = input_name.split('/')[-1].split('.')[0]
+  file_path = os.path.join(TMP, name_file)
+  
+  assembly_file = open(file_path + ".s", "w")
+  assembly_file.write(assembly)
+  assembly_file.close()
+  
+  os.system("gcc -m32 " + file_path + ".s -o " + file_path)
+  import commands
+  return commands.getoutput(file_path)
+
 def compile_main(artefacts):
   compiling_paths = []
   compiling_paths.append(os.path.join(BUILD,"y.tab.c"))
@@ -147,7 +149,7 @@ def execute_case(test_path):
     return execute_accepted_test(test_path)
 
 def execute_normal_test(test_path):
-  test_output = execute(test_path)
+  test_output = execute_assembly(test_path)
   expected_path = test_path[:-3] + ".expected"
   expected = (open(expected_path, 'r') if os.path.exists(expected_path) else None)
   return failing_msg(test_output, expected)
@@ -197,7 +199,7 @@ if (len(cmdargs) > 1):
   elif (str(cmdargs[1]) == "compile"):
     compile()
   elif (str(cmdargs[1]) == "exec"):
-    execute_assembly(cmdargs[2])
+    exec_task(cmdargs[2])
   elif (str(cmdargs[1]) == "run"):
     if len(cmdargs) > 2:
       run(cmdargs[2])

@@ -68,6 +68,7 @@ typedef struct stVariablesNode {
 typedef struct stVariableNode {
 	tpType *pType;
 	char *name;
+  int stackPadding;
 } ndVariable;
 
 typedef struct stVarDeclarationsNode {
