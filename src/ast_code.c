@@ -47,30 +47,40 @@ void codeForVar(ndVar *pVar, void *pShared) {
 }
 
 void codeForExp(ndExpression *pExp, void *pShared) {
-	char *label = LBL_generate(LBL_next());
-	
+	char *label;
 	switch(pExp->expType) {
 		case(EXPND_VAR):
-      codeForVar(pExp->value.pNode, pShared);
+			codeForVar(pExp->value.pNode, pShared);
 			ASY_raw("movl (%%eax), %%eax\n");
 			break;
 		case(EXPND_NEW): 
 			// TODO
 			break;
 		case(EXP_TEXT):
+			label = LBL_generate(LBL_next());
 			ASY_raw(".data\n");
 			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
 			ASY_raw(".text\n");
 			ASY_raw("movl $%s, %%eax\n", label);
 			break;
 		case(EXP_FLOAT):
-			// ASY_raw("fstpl ")
+			// TODO
+			label = LBL_generate(LBL_next());
+			ASY_raw(".data\n");
+			ASY_raw("%s: .float %f\n", label, pExp->value.fval);
+			ASY_raw(".text\n");
+			ASY_raw("flds %s\n", label);
+			ASY_raw("fstps (%%ecx)\n");
+			ASY_raw("movl %%ecx, %%eax\n", label);
 			break;
 		case(EXP_HEXADECIMAL):
 		case(EXP_NUMBER):
+		case(EXP_CHAR):
 			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
 			break;
 		case(EXPND_MINUS):
+			// TODO
+			break;
 		case(EXPND_EXCLAMATION): 
 			// TODO
 			break;
@@ -87,7 +97,7 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
   pList = pCall->pExpList->pList;
   resetList(pList);
   while(goNext(pList)) {
-    ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+		ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
 		codeForExp(pStat, pShared);
 		ASY_raw("pushl %%eax\n");
 		qntParams++;
