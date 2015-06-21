@@ -68,6 +68,7 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			break;
 		case(EXP_HEXADECIMAL):
 		case(EXP_NUMBER):
+		case(EXP_CHAR):
 			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
 			break;
 		case(EXPND_MINUS):
