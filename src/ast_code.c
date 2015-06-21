@@ -21,6 +21,14 @@ void afterEvent(char *evtName, void *pShared) {
 	}
 }
 
+int isIntExpression(ndExpression *pExp){
+	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
+}
+
+int isIntResult(ndExpression *pExp1, ndExpression *pExp2){
+	return isIntExpression(pExp1) && isIntExpression(pExp2);
+}
+
 void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
 }
 
@@ -63,6 +71,74 @@ void codeForVar(ndVar *pVar, void *pShared) {
 	ASY_raw("addl $%d, %%eax\n", padding);
 }
 
+void codeForExpBin(ndExpression *pExp, void *pShared) {
+	switch(pExp->value.bin.expType) {
+		case(EXPBIN_PLUS):
+			if(isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)){
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("addl %%ecx, %%eax\n");
+			}
+			else{
+				
+			}
+			break;
+		case(EXPBIN_SLASH):
+			if(isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)){
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("movl %%eax, %%edx\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				ASY_raw("movl %%edx, %%eax\n");
+				ASY_raw("idivl %%ecx\n");
+			}
+			else{
+				
+			}
+			break;
+		case(EXPBIN_MINUS):
+			if(isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)){
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("subl %%eax, %%ecx\n");
+				ASY_raw("movl %%ecx, %%eax\n");
+			}
+			else{
+				
+			}
+			break;
+		case(EXPBIN_ASTERISK):
+			if(isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)){
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("imull %%ecx, %%eax\n");
+			}
+			else{
+				
+			}
+			break;
+		case(EXPBIN_AND):
+		break;
+		case(EXPBIN_DOUBLE_EQUAL):
+		break;
+		case(EXPBIN_BANG_EQUAL):
+		break;
+		case(EXPBIN_LESS_EQUAL):
+		break;
+		case(EXPBIN_GREATER_EQUAL):
+		break;
+		case(EXPBIN_LESS):
+		break;
+		case(EXPBIN_GREATER):
+		break;
+		case(EXPBIN_OR):
+		break;
+	}
+}
+
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label;
 	switch(pExp->expType) {
@@ -102,7 +178,7 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			// TODO
 			break;
 		case(EXPND_BIN): 
-			// TODO
+			codeForExpBin(pExp, pShared);
 			break;
 	}
 }
@@ -122,7 +198,7 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 			qntParams++;
 		}
 	}
-	
+
 	ASY_functionCall(pCall->functionName, qntParams);
 }
 
