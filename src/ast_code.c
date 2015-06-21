@@ -25,7 +25,6 @@ void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
 }
 
 void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
-	//ASY_globalVar(pVar->name, );
 }
 
 void codeForFunction(ndFunction *pFunc, void *pShared) {
@@ -35,15 +34,14 @@ void codeForFunction(ndFunction *pFunc, void *pShared) {
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
-	ASY_raw("subl $4, %%esp\n");
 	pVar->stackPadding = STATE(pShared)->lastVarPadding;
 	STATE(pShared)->lastVarPadding += 4;
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
 	int padding = pVar->pBackDeclaration->pVarDec->stackPadding;
-	ASY_raw("movl %%ebp, %%eax\n");
-	ASY_raw("subl $%d, %%eax\n", padding);
+	ASY_raw("movl $vars, %%eax\n");
+	ASY_raw("addl $%d, %%eax\n", padding);
 }
 
 void codeForExp(ndExpression *pExp, void *pShared) {
@@ -97,7 +95,7 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 }
 
 void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
-	STATE(pShared)->lastVarPadding = 0;
+	//STATE(pShared)->lastVarPadding = 0;
 }
 
 void codeForAttribution(ndAttribution *pAttr, void *pShared) {
@@ -122,7 +120,10 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onBackLevel = afterEvent; 
 
 	tpState *pState = NEW(tpState);
+	pState->lastVarPadding = 0;
 
+	ASY_raw(".data\n");
+	ASY_raw("vars: .space 4000\n");
   TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }

@@ -1,0 +1,24 @@
+int numGlobal;
+char cGlobal;
+int main() {
+  int num;
+  char c;
+  {
+    int num2;
+    char c2;
+
+    numGlobal = 29;
+    num = 13;
+    num2 = 17;
+    cGlobal = 'Z';
+    c = 'X';
+    c2 = 'K';
+
+    printf("numGlobal: %d\n", numGlobal);
+    printf("num: %d\n", num);
+    printf("num2: %d\n", num2);
+    printf("cGlobal: %c\n", cGlobal);
+    printf("c: %c\n", c);
+    printf("c2: %c", c2);
+  }
+}
