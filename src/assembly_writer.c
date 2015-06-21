@@ -31,12 +31,11 @@ void ASY_functionCallHeader() {
 	ASY_raw("pushl %%ebx\n");
 	ASY_raw("pushl %%ecx\n");
 	ASY_raw("pushl %%edx\n");
-	ASY_raw("pushl %%eax\n");
 }
 
 void ASY_functionCall(char *funcName, int qntParams) {
 	ASY_raw("call %s\n", funcName);
-	ASY_raw("addl $%d, %%esp\n", qntParams*4+4);
+	ASY_raw("addl $%d, %%esp\n", qntParams*4);
 	ASY_raw("popl %%edx\n");
 	ASY_raw("popl %%ecx\n");
 	ASY_raw("popl %%ebx\n");
@@ -45,4 +44,5 @@ void ASY_functionCall(char *funcName, int qntParams) {
 void ASY_functionEnding() {
 	ASY_raw("movl %%ebp, %%esp\n");
 	ASY_raw("popl %%ebp\n");
+	ASY_raw("ret\n");
 }

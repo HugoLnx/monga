@@ -25,7 +25,30 @@ void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
 }
 
 void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
-	//ASY_globalVar(pVar->name, );
+}
+
+void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
+	pVar->stackPadding = STATE(pShared)->lastVarPadding;
+	STATE(pShared)->lastVarPadding += 4;
+}
+
+void codeForParameters(ndParameters *pParams, void *pShared) {
+	tpList *pList;
+	int paramPadding = 8;
+	if (pParams == NULL) return;
+
+  pList = pParams->pList;
+  resetList(pList);
+  while(goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+		int padding = STATE(pShared)->lastVarPadding;
+		codeForVarDeclaration(pVar, pShared);
+		ASY_raw("movl $vars, %%ecx\n");
+		ASY_raw("addl $%d, %%ecx\n", padding);
+		ASY_raw("movl %d(%%ebp), %%edx\n", paramPadding);
+		ASY_raw("movl %%edx, (%%ecx)\n");
+		paramPadding += 4;
+  }
 }
 
 void codeForFunction(ndFunction *pFunc, void *pShared) {
@@ -34,16 +57,10 @@ void codeForFunction(ndFunction *pFunc, void *pShared) {
 	ASY_functionBeginning();
 }
 
-void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
-	ASY_raw("subl $4, %%esp\n");
-	pVar->stackPadding = STATE(pShared)->lastVarPadding;
-	STATE(pShared)->lastVarPadding += 4;
-}
-
 void codeForVar(ndVar *pVar, void *pShared) {
 	int padding = pVar->pBackDeclaration->pVarDec->stackPadding;
-	ASY_raw("movl %%ebp, %%eax\n");
-	ASY_raw("subl $%d, %%eax\n", padding);
+	ASY_raw("movl $vars, %%eax\n");
+	ASY_raw("addl $%d, %%eax\n", padding);
 }
 
 void codeForExp(ndExpression *pExp, void *pShared) {
@@ -94,19 +111,23 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
   int qntParams = 0;
 	tpList *pList;
 	ASY_functionCallHeader();
-  pList = pCall->pExpList->pList;
-  resetList(pList);
-  while(goNext(pList)) {
-		ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
-		codeForExp(pStat, pShared);
-		ASY_raw("pushl %%eax\n");
-		qntParams++;
-  }
+
+	if(pCall->pExpList != NULL) {
+    pList = pCall->pExpList->pList;
+		resetList(pList);
+		while(goNext(pList)) {
+			ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+			codeForExp(pStat, pShared);
+			ASY_raw("pushl %%eax\n");
+			qntParams++;
+		}
+	}
+	
 	ASY_functionCall(pCall->functionName, qntParams);
 }
 
 void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
-	STATE(pShared)->lastVarPadding = 0;
+	//STATE(pShared)->lastVarPadding = 0;
 }
 
 void codeForAttribution(ndAttribution *pAttr, void *pShared) {
@@ -126,12 +147,16 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onVariable = codeForVarDeclaration;
 	pEvents->onVarDeclarations = initVarDeclarationsState;
 	pEvents->onAttribution = codeForAttribution;
+	pEvents->onParameters = codeForParameters;
 
   pEvents->onNewLevel = beforeEvent; 
   pEvents->onBackLevel = afterEvent; 
 
 	tpState *pState = NEW(tpState);
+	pState->lastVarPadding = 0;
 
+	ASY_raw(".data\n");
+	ASY_raw("vars: .space 4000\n");
   TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }

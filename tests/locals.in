@@ -1,5 +1,11 @@
-int main() {
-  int num;
-  num = 10;
-	printf("hello %d", num);
+void main() {
+	int num;
+	char c;
+	int num2;
+	num = 99;
+	c = 'D';
+	num2 = 18;
+	printf("num: %d\n", num);
+	printf("c: %c\n", c);
+	printf("num2: %d", num2);
 }

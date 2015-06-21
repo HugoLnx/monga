@@ -1,0 +1,9 @@
+void func(int num, int num2) {
+	printf("num: %d\n", num);
+	{printf("num2: %d\n", num2);}
+}
+
+void main() {
+	func(15, 20);
+	func(25, 30);
+}
