@@ -200,6 +200,8 @@ void goExp(ndExpression *pExp, TRA_tpEvents *pEvents, void *pShared) {
 			goExp(pExp->value.bin.pExp1, pEvents, pShared);
 			goExp(pExp->value.bin.pExp2, pEvents, pShared);
 			break;
+    case(EXPND_CALL): 
+      goFunctionCallNode((ndFunctionCall*) pExp->value.pNode, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onExp);
 }

@@ -20,6 +20,7 @@ DIST = os.path.join(BUILD, "dist")
 
 SRC = os.path.join(ROOT, "src")
 VARS_SRC = os.path.join(VARS_ROOT, "src")
+TREE_SRC = os.path.join(ROOT, "ast-tree", "src")
 TESTS = os.path.join(VARS_ROOT, "tests")
 
 def clear():
@@ -78,8 +79,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_traversing.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_print.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_print.c") + " " + BUILD)
+  os.system("cp " + os.path.join(TREE_SRC, "ast_print.h") + " " + BUILD)
+  os.system("cp " + os.path.join(TREE_SRC, "ast_print.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_variables.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_variables.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_types.h") + " " + BUILD)

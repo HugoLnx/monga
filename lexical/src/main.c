@@ -10,7 +10,7 @@ int main()
 		printf("%s,", TOKEN_STR[token]);
 		switch(token) {
 			case NUMBER:
-			case HEXADECIMAL: printf("%d\n", yylval.ival); break;
+			case HEXADECIMAL: printf("%lld\n", yylval.ival); break;
 			case FLOAT: printf("%.5f\n", yylval.fval); break;
 			default: printf("%s\n", yylval.text);
 		}

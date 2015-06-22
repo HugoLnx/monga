@@ -10,7 +10,7 @@ void ASY_raw(char *fmt, ...) {
 }
 
 void ASY_globalVar(char *varName, char *varType, char *varValue) {
-	ASY_raw("%s: .%s \"%s\"\n", varName, varType, varValue);
+	ASY_raw("%s: .%s %s\n", varName, varType, varValue);
 }
 
 void ASY_function(char *funcName) {

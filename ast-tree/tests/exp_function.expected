@@ -1,0 +1,13 @@
+declarations:
+  declaration:
+    function:main,262,0
+      block:
+        statements:
+          statement:
+            attribution:
+              var:x
+              exp:10
+                function call:func
+									exp list:
+										exp:0,10
+										exp:0,20

@@ -128,6 +128,7 @@ exp : NUMBER { $$ = createExpressionIntegerNode($1, EXP_NUMBER); }
 		| FLOAT { $$ = createExpressionFloatNode($1); }
     | TEXT { $$ = createExpressionTextNode($1); }
     | var { $$ = createExpressionGenericNode($1, EXPND_VAR); }
+    | function_call { $$ = createExpressionGenericNode($1, EXPND_CALL); }
     | TK_PARENTHESES_OPEN exp TK_PARENTHESES_CLOSE { $$ = $2; }
     | TK_NEW type TK_SQUARE_BRACKET_OPEN exp TK_SQUARE_BRACKET_CLOSE { void *pNewNode = createNewNode((tpType*)$2, (ndExpression*)$4); $$ = createExpressionGenericNode(pNewNode, EXPND_NEW); }
     | exp TK_DOUBLE_EQUAL exp { $$ = createExpressionBinaryNode((ndExpression*)$1, (ndExpression*)$3, EXPBIN_DOUBLE_EQUAL); }

@@ -8,15 +8,18 @@
 
 #define REPORT(varName) ((struct stState*) varName)->pReport
 #define STACK(varName) ((struct stState*) varName)->pStackVariables 
+#define LFUNC(varName) ((struct stState*) varName)->pLastFunc 
 
 void pushVariable(ndVariable *pVar, void *pShared);
 void checkVar(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
+void updateLastFunction(ndFunction *pFunc, void *pShared);
 
 struct stState {
   STK_tpScopeStack *pStackVariables;
   VAR_tpReport *pReport;
+	ndFunction *pLastFunc;
 };
 
 VAR_tpVarResume *resumeVar(ndVar *pVar);
@@ -31,6 +34,7 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
   pEvents->onVar = checkVar;
+	pEvents->onFunction = updateLastFunction;
 
   pEvents->onNewLevel = pushNewScopeVariablesIfBlock; 
   pEvents->onBackLevel = popScopeVariablesIfBlock; 
@@ -45,6 +49,12 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 void pushVariable(ndVariable *pVar, void *pShared) {
   if(REPORT(pShared)->type != VAR_RUNNING) return;
 	STK_addToCurrentScope(STACK(pShared), pVar);
+	if(LFUNC(pShared) == NULL) {
+		pVar->isGlobal = 1;
+	} else {
+		pVar->isGlobal = 0;
+		LFUNC(pShared)->varsStackSize += 4;
+	}
 }
 
 void checkVar(ndVar *pVar, void *pShared) {
@@ -85,4 +95,9 @@ void popScopeVariablesIfBlock(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
 		STK_popScope(STACK(pShared));
 	}
+}
+
+void updateLastFunction(ndFunction *pFunc, void *pShared) {
+	pFunc->varsStackSize = 0;
+	LFUNC(pShared) = pFunc;
 }
