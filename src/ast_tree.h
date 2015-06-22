@@ -55,6 +55,7 @@ typedef struct stFunctionNode {
 	ndBlock *pBlock;
 	ndParameters *pParameters;
 	tpType *pReturnType;
+	int varsStackSize;
 } ndFunction;
 
 typedef struct stParametersNode {
@@ -69,6 +70,7 @@ typedef struct stVariableNode {
 	tpType *pType;
 	char *name;
   int stackPadding;
+	int isGlobal;
 } ndVariable;
 
 typedef struct stVarDeclarationsNode {

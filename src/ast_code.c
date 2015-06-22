@@ -36,8 +36,12 @@ void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
-	pVar->stackPadding = STATE(pShared)->lastVarPadding;
-	STATE(pShared)->lastVarPadding += 4;
+	if(pVar->isGlobal) {
+		ASY_globalVar(pVar->name, "int", "0");
+	} else {
+		pVar->stackPadding = STATE(pShared)->lastVarPadding;
+		STATE(pShared)->lastVarPadding -= 4;
+	}
 }
 
 void codeForParameters(ndParameters *pParams, void *pShared) {
@@ -49,26 +53,28 @@ void codeForParameters(ndParameters *pParams, void *pShared) {
   resetList(pList);
   while(goPrevious(pList)) {
     ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
-		int padding = STATE(pShared)->lastVarPadding;
-		codeForVarDeclaration(pVar, pShared);
-		ASY_raw("movl $vars, %%ecx\n");
-		ASY_raw("addl $%d, %%ecx\n", padding);
-		ASY_raw("movl %d(%%ebp), %%edx\n", paramPadding);
-		ASY_raw("movl %%edx, (%%ecx)\n");
+		pVar->stackPadding = paramPadding;
 		paramPadding += 4;
   }
 }
 
 void codeForFunction(ndFunction *pFunc, void *pShared) {
+	STATE(pShared)->lastVarPadding = 0;
 	ASY_raw(".text\n");
 	ASY_function(pFunc->name);
 	ASY_functionBeginning();
+	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize);
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
-	int padding = pVar->pBackDeclaration->pVarDec->stackPadding;
-	ASY_raw("movl $vars, %%eax\n");
-	ASY_raw("addl $%d, %%eax\n", padding);
+	ndVariable *pDec = pVar->pBackDeclaration->pVarDec;
+	if(pDec->isGlobal) {
+		ASY_raw("movl $%s, %%eax\n", pDec->name);
+	} else {
+		int padding = pDec->stackPadding;
+		ASY_raw("movl %%ebp, %%eax\n");
+		ASY_raw("addl $%d, %%eax\n", padding);
+	}
 }
 
 void codeForExpBin(ndExpression *pExp, void *pShared) {
@@ -216,7 +222,6 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
 	pState->lastVarPadding = 0;
 
 	ASY_raw(".data\n");
-	ASY_raw("vars: .space 4000\n");
   TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }
