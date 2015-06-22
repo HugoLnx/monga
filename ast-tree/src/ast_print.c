@@ -145,10 +145,10 @@ void printExp(ndExpression *pExp, void *pShared) {
       printf("%sexp:%d,%lld\n", ident, pExp->expType, pExp->value.ival);
 			break;
     case(EXP_HEXADECIMAL):
-      printf("%sexp:%d,0x%x\n", ident, pExp->expType, pExp->value.ival);
+      printf("%sexp:%d,0x%llx\n", ident, pExp->expType, pExp->value.ival);
 			break;
     case(EXP_CHAR):
-      printf("%sexp:%d,%c\n", ident, pExp->expType, pExp->value.ival);
+      printf("%sexp:%d,%c\n", ident, pExp->expType, (char)pExp->value.ival);
 			break;
     case(EXP_FLOAT):
       printf("%sexp:%d,%.5f\n", ident, pExp->expType, pExp->value.fval);
