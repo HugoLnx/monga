@@ -1,0 +1,13 @@
+void main() {
+	int a,b,c;
+	a = 10;
+	b = 20;
+	c = a + b;
+	printf("c: %d\n", c);
+	printf("a+b: %d\n", a + b);
+	printf("a+b+c: %d\n", a + b + c);
+	printf("b-a: %d\n", b - a);
+	printf("b/a: %d\n", b / a);
+	printf("a*b: %d\n", a*b);
+	printf("a+b*c/a: %d\n", a+b*c/a);
+}
