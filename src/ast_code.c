@@ -12,6 +12,8 @@ typedef struct stState {
 	int lastVarPadding;
 } tpState;
 
+void codeForExp(ndExpression *pExp, void *pShared);
+
 void beforeEvent(char *evtName, void *pShared) {
 }
 
@@ -33,6 +35,14 @@ void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
 }
 
 void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
+}
+
+void codeForReturn(ndReturn *pReturn, void *pShared) {
+	if(pReturn->pExp == NULL) {
+		ASY_raw("movl $0, %%eax\n");
+	} else {
+		codeForExp(pReturn->pExp, pShared);
+	}
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
@@ -59,11 +69,11 @@ void codeForParameters(ndParameters *pParams, void *pShared) {
 }
 
 void codeForFunction(ndFunction *pFunc, void *pShared) {
-	STATE(pShared)->lastVarPadding = 0;
+	STATE(pShared)->lastVarPadding = -4;
 	ASY_raw(".text\n");
 	ASY_function(pFunc->name);
 	ASY_functionBeginning();
-	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize);
+	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
@@ -128,6 +138,43 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 	}
 }
 
+void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
+  int qntParams = 0;
+	tpList *pList;
+	ASY_functionCallHeader();
+
+	if(pCall->pExpList != NULL) {
+    pList = pCall->pExpList->pList;
+		resetList(pList);
+		while(goNext(pList)) {
+			ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+			codeForExp(pStat, pShared);
+			ASY_raw("pushl %%eax\n");
+			qntParams++;
+		}
+	}
+
+	ASY_functionCall(pCall->functionName, qntParams);
+}
+
+void codeForStatement(ndStatement *pStat, void *pShared) {
+	if(pStat->statType == STAT_FUNCTION_CALL) {
+		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
+	}
+}
+
+void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
+	//STATE(pShared)->lastVarPadding = 0;
+}
+
+void codeForAttribution(ndAttribution *pAttr, void *pShared) {
+	codeForVar(pAttr->pVar, pShared);
+	ASY_raw("pushl %%eax\n");
+	codeForExp(pAttr->pExp, pShared);
+	ASY_raw("popl %%ecx\n");
+	ASY_raw("movl %%eax, (%%ecx)\n");
+}
+
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label;
 	switch(pExp->expType) {
@@ -169,38 +216,10 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 		case(EXPND_BIN): 
 			codeForExpBin(pExp, pShared);
 			break;
+		case(EXPND_CALL): 
+			codeForFunctionCall((ndFunctionCall*) (pExp->value.pNode), pShared);
+			break;
 	}
-}
-
-void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
-  int qntParams = 0;
-	tpList *pList;
-	ASY_functionCallHeader();
-
-	if(pCall->pExpList != NULL) {
-    pList = pCall->pExpList->pList;
-		resetList(pList);
-		while(goNext(pList)) {
-			ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
-			codeForExp(pStat, pShared);
-			ASY_raw("pushl %%eax\n");
-			qntParams++;
-		}
-	}
-
-	ASY_functionCall(pCall->functionName, qntParams);
-}
-
-void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
-	//STATE(pShared)->lastVarPadding = 0;
-}
-
-void codeForAttribution(ndAttribution *pAttr, void *pShared) {
-	codeForVar(pAttr->pVar, pShared);
-	ASY_raw("pushl %%eax\n");
-	codeForExp(pAttr->pExp, pShared);
-	ASY_raw("popl %%ecx\n");
-	ASY_raw("movl %%eax, (%%ecx)\n");
 }
 
 void COD_codeForTree(ndDeclarations *pDeclarations) {
@@ -209,17 +228,17 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
   pEvents->onDeclarations = codeForHeader;
   pEvents->onVariable = codeForGlobalVariable;
   pEvents->onFunction = codeForFunction;
-  pEvents->onFunctionCall = codeForFunctionCall;
   pEvents->onVariable = codeForVarDeclaration;
 	pEvents->onVarDeclarations = initVarDeclarationsState;
 	pEvents->onAttribution = codeForAttribution;
 	pEvents->onParameters = codeForParameters;
+	pEvents->onReturn = codeForReturn;
+	pEvents->onStatement = codeForStatement;
 
   pEvents->onNewLevel = beforeEvent; 
   pEvents->onBackLevel = afterEvent; 
 
 	tpState *pState = NEW(tpState);
-	pState->lastVarPadding = 0;
 
 	ASY_raw(".data\n");
   TRA_execute(pDeclarations, pEvents, (void*)pState);

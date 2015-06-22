@@ -170,6 +170,9 @@ void printExp(ndExpression *pExp, void *pShared) {
       printf("%sexp:%d\n", ident, pExp->expType);
       printf("%sbinary:%d\n", ident, pExp->value.bin.expType);	
 			break;
+    case(EXPND_CALL): 
+      printf("%sexp:%d\n", ident, pExp->expType);
+			break;
   }
 }
 

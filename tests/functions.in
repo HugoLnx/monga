@@ -3,7 +3,15 @@ void func(int num, int num2) {
 	{printf("num2: %d\n", num2);}
 }
 
+int func2(int num) {
+	int num2;
+	num2 = 100;
+	return num + num2;
+}
+
 void main() {
 	func(15, 20);
 	func(25, 30);
+	printf("func2(90): %d\n", func2(90));
+	printf("func2(95): %d", func2(95));
 }
