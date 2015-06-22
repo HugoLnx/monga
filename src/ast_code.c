@@ -22,6 +22,11 @@ void afterEvent(char *evtName, void *pShared) {
 }
 
 int isIntExpression(ndExpression *pExp){
+	ndVar *ndVariable;
+	if (pExp->expType == EXPND_VAR){
+		ndVariable = (ndVar *) pExp->value.pNode;
+		return (ndVariable->varType == EXP_NUMBER) || (ndVariable->varType == EXP_HEXADECIMAL) || (ndVariable->varType == EXP_CHAR);
+	}
 	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
 }
 
