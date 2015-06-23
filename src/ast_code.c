@@ -93,36 +93,58 @@ void codeForVar(ndVar *pVar, void *pShared) {
 }
 
 void codeForExpBin(ndExpression *pExp, void *pShared) {
+	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
 	switch(pExp->value.bin.expType) {
 		case(EXPBIN_PLUS):
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("pushl %%eax\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("popl %%ecx\n");
-			ASY_raw("addl %%ecx, %%eax\n");
+			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("pushl %%eax\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("popl %%ecx\n");
+				ASY_raw("addl %%ecx, %%eax\n");
+			}
+			else {
+
+			}
 			break;
 		case(EXPBIN_SLASH):
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("pushl %%eax\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("movl %%eax, %%ecx\n");
-			ASY_raw("popl %%eax\n");
-			ASY_raw("movl $0,%%edx\n");
-			ASY_raw("divl %%ecx\n");
+			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("pushl %%eax\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				ASY_raw("popl %%eax\n");
+				ASY_raw("movl $0,%%edx\n");
+				ASY_raw("divl %%ecx\n");
+			}
+			else {
+
+			}
 			break;
 		case(EXPBIN_MINUS):
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("pushl %%eax\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("movl %%eax, %%ecx\n");
-			ASY_raw("popl %%eax\n");
-			ASY_raw("subl %%ecx, %%eax\n");
+			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("pushl %%eax\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("movl %%eax, %%ecx\n");
+				ASY_raw("popl %%eax\n");
+				ASY_raw("subl %%ecx, %%eax\n");
+			}
+			else {
+
+			}
 			break;
 		case(EXPBIN_ASTERISK):
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("movl %%eax, %%ecx\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("imull %%ecx, %%eax\n");
+			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("pushl %%eax\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("popl %%ecx\n");
+				ASY_raw("imull %%ecx, %%eax\n");
+			}
+			else {
+
+			}
 			break;
 		case(EXPBIN_AND):
 		break;
@@ -213,7 +235,9 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
 			break;
 		case(EXPND_MINUS):
-			// TODO
+			codeForExp((ndExpression*) pExp->value.pNode, pShared);
+			ASY_raw("imull $-1, %%eax\n");
+			// TODO IF FLOAT
 			break;
 		case(EXPND_EXCLAMATION): 
 			// TODO
