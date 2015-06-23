@@ -1,0 +1,14 @@
+void main() {
+	int[] hey;
+	hey = new int[5];
+	hey[0] = 10;
+	hey[1] = 15;
+	hey[2] = 20;
+	hey[3] = 25;
+	hey[4] = 30;
+	printf("array1: %d\n", hey[0]);
+	printf("array2: %d\n", hey[1]);
+	printf("array3: %d\n", hey[2]);
+	printf("array4: %d\n", hey[3]);
+	printf("array5: %d\n", hey[4]);
+}

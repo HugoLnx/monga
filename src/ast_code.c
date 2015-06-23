@@ -83,12 +83,22 @@ void codeForFunction(ndFunction *pFunc, void *pShared) {
 
 void codeForVar(ndVar *pVar, void *pShared) {
 	ndVariable *pDec = pVar->pBackDeclaration->pVarDec;
-	if(pDec->isGlobal) {
-		ASY_raw("movl $%s, %%eax\n", pDec->name);
+	if(pVar->varType == VAR_ID) {
+		if(pDec->isGlobal) {
+			ASY_raw("movl $%s, %%eax\n", pDec->name);
+		} else {
+			int padding = pDec->stackPadding;
+			ASY_raw("movl %%ebp, %%eax\n");
+			ASY_raw("addl $%d, %%eax\n", padding);
+		}
 	} else {
-		int padding = pDec->stackPadding;
-		ASY_raw("movl %%ebp, %%eax\n");
-		ASY_raw("addl $%d, %%eax\n", padding);
+		codeForExp(pVar->value.address.pPointerExp, pShared);
+		ASY_raw("pushl %%eax\n");
+		codeForExp(pVar->value.address.pInxExp, pShared);
+		ASY_raw("imull $4,%%eax\n");
+		ASY_raw("movl %%eax,%%ecx\n");
+		ASY_raw("popl %%eax\n");
+		ASY_raw("addl %%ecx,%%eax\n");
 	}
 }
 
@@ -262,13 +272,17 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label;
+  ndNew *pNew;
 	switch(pExp->expType) {
 		case(EXPND_VAR):
 			codeForVar(pExp->value.pNode, pShared);
 			ASY_raw("movl (%%eax), %%eax\n");
 			break;
 		case(EXPND_NEW): 
-			// TODO
+			pNew = (ndNew*) pExp->value.pNode;
+			codeForExp(pNew->pExp, pShared);
+			ASY_raw("imull $4,%%eax\n");
+			ASY_malloc("%eax");
 			break;
 		case(EXP_TEXT):
 			label = LBL_generate(LBL_next());

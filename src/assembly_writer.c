@@ -46,3 +46,15 @@ void ASY_functionEnding() {
 	ASY_raw("popl %%ebp\n");
 	ASY_raw("ret\n");
 }
+
+void ASY_malloc(char *param) {
+  ASY_functionCallHeader();
+	ASY_raw("pushl %s\n", param);
+	ASY_functionCall("malloc", 1);
+}
+
+void ASY_free(char *param) {
+  ASY_functionCallHeader();
+	ASY_raw("pushl %s\n", param);
+	ASY_functionCall("free", 1);
+}
