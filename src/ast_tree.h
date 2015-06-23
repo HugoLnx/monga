@@ -97,6 +97,7 @@ typedef struct stVarBackDeclaration {
 
 typedef struct stExpressionNode {
   enum enExpType expType;
+	tpType *pType;
   union {
     long long int ival;
     char *text;

@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "label_generator.h"
 #include "list.h"
+#include "y.tab.h"
 #include <string.h>
 
 #define STATE(varName) ((tpState*) varName)
@@ -23,17 +24,14 @@ void afterEvent(char *evtName, void *pShared) {
 	}
 }
 
-int isIntExpression(ndExpression *pExp){
-	ndVar *ndVariable;
-	if (pExp->expType == EXPND_VAR){
-		ndVariable = (ndVar *) pExp->value.pNode;
-		return (ndVariable->varType == EXP_NUMBER) || (ndVariable->varType == EXP_HEXADECIMAL) || (ndVariable->varType == EXP_CHAR);
-	}
-	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
+int isFloatExpression(ndExpression *pExp){
+	return pExp->pType != NULL
+		&& pExp->pType->token == TK_FLOAT
+		&& pExp->pType->depth == 0;
 }
 
-int isIntOperation(ndExpression *pExp1, ndExpression *pExp2){
-	return isIntExpression(pExp1) && isIntExpression(pExp2);
+int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
+	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
 }
 
 void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
@@ -106,7 +104,10 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 	char *labelEnd = LBL_generate(LBL_next());
 	char *labelTrue = LBL_generate(LBL_next());
 	char *labelFalse = LBL_generate(LBL_next());
-	if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+	if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+		// TODO: float treat
+	}
+	else {
 		codeForExp(pExp->value.bin.pExp1, pShared);
 		ASY_raw("pushl %%eax\n");
 		codeForExp(pExp->value.bin.pExp2, pShared);
@@ -118,9 +119,6 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 		ASY_raw("%s: movl $1, %%eax\n", labelTrue);
 		ASY_raw("jmp %s\n", labelEnd);
 	}
-	else {
-		// TODO floats
-	}
 	ASY_raw("%s:\n", labelEnd);
 }
 
@@ -128,19 +126,22 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
 	switch(pExp->value.bin.expType) {
 		case(EXPBIN_PLUS):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
 				ASY_raw("popl %%ecx\n");
 				ASY_raw("addl %%ecx, %%eax\n");
 			}
-			else {
-
-			}
 			break;
 		case(EXPBIN_SLASH):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -149,12 +150,12 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				ASY_raw("movl $0,%%edx\n");
 				ASY_raw("divl %%ecx\n");
 			}
-			else {
-
-			}
 			break;
 		case(EXPBIN_MINUS):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -162,20 +163,17 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				ASY_raw("popl %%eax\n");
 				ASY_raw("subl %%ecx, %%eax\n");
 			}
-			else {
-
-			}
 			break;
 		case(EXPBIN_ASTERISK):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
 				ASY_raw("popl %%ecx\n");
 				ASY_raw("imull %%ecx, %%eax\n");
-			}
-			else {
-
 			}
 			break;
 		case(EXPBIN_AND):

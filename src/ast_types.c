@@ -140,12 +140,16 @@ TYP_tpExpResume *resumeExp(ndExpression *pExp) {
 		case EXPND_NEW:
 			setTypeOfNew(pExp->value.pNode, pResume->pType);
 			break;
+		case EXPND_CALL:
+      pResume->pType = NULL;
+			break;
 		case EXPND_BIN:
 		case EXPND_EXCLAMATION:
 		case EXPND_MINUS:
 			pResume->pType->token = NUMBER;
 			break;
 	}
+  pExp->pType = pResume->pType;
 	return pResume;
 }
 
