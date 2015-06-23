@@ -161,15 +161,24 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			ASY_raw("jmp %s\n", labelEnd);
 			ASY_raw("%s: movl $0, %%eax\n", labelFalse);
 			ASY_raw("jmp %s\n", labelEnd);
-			// ASY_raw("cmp $1, %%ecx\n");
-			// ASY_raw("je %s\n", labelMiddle);
-			// ASY_raw("jmp %s\n", labelFalse);
-			// ASY_raw("%s: cmp $1, %%eax\n", labelMiddle);
-			// ASY_raw("je %s\n", labelTrue);
-			
 			ASY_raw("%s:\n", labelEnd);
 			break;
 		case(EXPBIN_OR):
+			labelTrue = LBL_generate(LBL_next());
+			labelEnd = LBL_generate(LBL_next());
+			codeForExp(pExp->value.bin.pExp1, pShared);
+			ASY_raw("pushl %%eax\n");
+			codeForExp(pExp->value.bin.pExp2, pShared);
+			ASY_raw("popl %%ecx\n");
+			ASY_raw("cmp $0, %%ecx\n");
+			ASY_raw("jne %s\n", labelTrue);
+			ASY_raw("cmp $0, %%eax\n");
+			ASY_raw("jne %s\n", labelTrue);
+			ASY_raw("movl $0, %%eax\n");
+			ASY_raw("jmp %s\n", labelEnd);
+			ASY_raw("%s: movl $1, %%eax\n", labelTrue);
+			ASY_raw("jmp %s\n", labelEnd);
+			ASY_raw("%s:\n", labelEnd);
 		break;
 		case(EXPBIN_DOUBLE_EQUAL):
 		break;
