@@ -13,39 +13,97 @@ typedef struct stState {
 	int lastVarPadding;
 } tpState;
 
+void codeForReturn(ndReturn *pReturn, void *pShared);
+void codeForVarDeclaration(ndVariable *pVar, void *pShared);
+void codeForParameters(ndParameters *pParams, void *pShared);
+void codeForFunction(ndFunction *pFunc, void *pShared);
+void codeForVar(ndVar *pVar, void *pShared);
+void codeForExpBin(ndExpression *pExp, void *pShared);
+void codeForFunctionCall(ndFunctionCall *pCall, void *pShared);
+void codeForStatement(ndStatement *pStat, void *pShared);
+void codeForAttribution(ndAttribution *pAttr, void *pShared);
 void codeForExp(ndExpression *pExp, void *pShared);
+void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared);
+void afterEvent(char *evtName, void *pShared);
 
-void beforeEvent(char *evtName, void *pShared) {
+void COD_codeForTree(ndDeclarations *pDeclarations) {
+	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+
+  pEvents->onFunction = codeForFunction;
+  pEvents->onVariable = codeForVarDeclaration;
+	pEvents->onAttribution = codeForAttribution;
+	pEvents->onParameters = codeForParameters;
+	pEvents->onReturn = codeForReturn;
+	pEvents->onStatement = codeForStatement;
+
+  pEvents->onBackLevel = afterEvent; 
+
+	tpState *pState = NEW(tpState);
+
+	ASY_raw(".data\n");
+  TRA_execute(pDeclarations, pEvents, (void*)pState);
+	ASY_raw(".end\n\n");
 }
 
-void afterEvent(char *evtName, void *pShared) {
-	if (strcmp(evtName, "onFunction") == 0) {
-		ASY_functionEnding();
+void codeForExp(ndExpression *pExp, void *pShared) {
+	char *label;
+  ndNew *pNew;
+	switch(pExp->expType) {
+		case(EXPND_VAR):
+			codeForVar(pExp->value.pNode, pShared);
+			ASY_raw("movl (%%eax), %%eax\n");
+			break;
+		case(EXPND_NEW): 
+			pNew = (ndNew*) pExp->value.pNode;
+			codeForExp(pNew->pExp, pShared);
+			ASY_raw("imull $4,%%eax\n");
+			ASY_malloc("%eax");
+			break;
+		case(EXP_TEXT):
+			label = LBL_generate(LBL_next());
+			ASY_raw(".data\n");
+			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
+			ASY_raw(".text\n");
+			ASY_raw("movl $%s, %%eax\n", label);
+			break;
+		case(EXP_FLOAT):
+			// TODO
+			label = LBL_generate(LBL_next());
+			ASY_raw(".data\n");
+			ASY_raw("%s: .float %f\n", label, pExp->value.fval);
+			ASY_raw(".text\n");
+			ASY_raw("flds %s\n", label);
+			ASY_raw("fstps (%%ecx)\n");
+			ASY_raw("movl %%ecx, %%eax\n", label);
+			break;
+		case(EXP_HEXADECIMAL):
+		case(EXP_NUMBER):
+		case(EXP_CHAR):
+			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
+			break;
+		case(EXPND_MINUS):
+			codeForExp((ndExpression*) pExp->value.pNode, pShared);
+			ASY_raw("imull $-1, %%eax\n");
+			// TODO IF FLOAT
+			break;
+		case(EXPND_EXCLAMATION): 
+			// TODO
+			break;
+		case(EXPND_BIN): 
+			codeForExpBin(pExp, pShared);
+			break;
+		case(EXPND_CALL): 
+			codeForFunctionCall((ndFunctionCall*) (pExp->value.pNode), pShared);
+			break;
 	}
 }
 
-int isFloatExpression(ndExpression *pExp){
-	return pExp->pType != NULL
-		&& pExp->pType->token == TK_FLOAT
-		&& pExp->pType->depth == 0;
-}
-
-int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
-	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
-}
-
-void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
-}
-
-void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
-}
-
-void codeForReturn(ndReturn *pReturn, void *pShared) {
-	if(pReturn->pExp == NULL) {
-		ASY_raw("movl $0, %%eax\n");
-	} else {
-		codeForExp(pReturn->pExp, pShared);
-	}
+void codeForFunction(ndFunction *pFunc, void *pShared) {
+	STATE(pShared)->lastVarPadding = -4;
+	ASY_raw(".text\n");
+	ASY_function(pFunc->name);
+	ASY_functionBeginning();
+	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
@@ -71,12 +129,12 @@ void codeForParameters(ndParameters *pParams, void *pShared) {
   }
 }
 
-void codeForFunction(ndFunction *pFunc, void *pShared) {
-	STATE(pShared)->lastVarPadding = -4;
-	ASY_raw(".text\n");
-	ASY_function(pFunc->name);
-	ASY_functionBeginning();
-	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
+void codeForReturn(ndReturn *pReturn, void *pShared) {
+	if(pReturn->pExp == NULL) {
+		ASY_raw("movl $0, %%eax\n");
+	} else {
+		codeForExp(pReturn->pExp, pShared);
+	}
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
@@ -231,6 +289,12 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 	}
 }
 
+void codeForStatement(ndStatement *pStat, void *pShared) {
+	if(pStat->statType == STAT_FUNCTION_CALL) {
+		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
+	}
+}
+
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
   int qntParams = 0;
 	tpList *pList;
@@ -250,16 +314,6 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	ASY_functionCall(pCall->functionName, qntParams);
 }
 
-void codeForStatement(ndStatement *pStat, void *pShared) {
-	if(pStat->statType == STAT_FUNCTION_CALL) {
-		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
-	}
-}
-
-void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
-	//STATE(pShared)->lastVarPadding = 0;
-}
-
 void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	codeForVar(pAttr->pVar, pShared);
 	ASY_raw("pushl %%eax\n");
@@ -268,78 +322,18 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	ASY_raw("movl %%eax, (%%ecx)\n");
 }
 
-void codeForExp(ndExpression *pExp, void *pShared) {
-	char *label;
-  ndNew *pNew;
-	switch(pExp->expType) {
-		case(EXPND_VAR):
-			codeForVar(pExp->value.pNode, pShared);
-			ASY_raw("movl (%%eax), %%eax\n");
-			break;
-		case(EXPND_NEW): 
-			pNew = (ndNew*) pExp->value.pNode;
-			codeForExp(pNew->pExp, pShared);
-			ASY_raw("imull $4,%%eax\n");
-			ASY_malloc("%eax");
-			break;
-		case(EXP_TEXT):
-			label = LBL_generate(LBL_next());
-			ASY_raw(".data\n");
-			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
-			ASY_raw(".text\n");
-			ASY_raw("movl $%s, %%eax\n", label);
-			break;
-		case(EXP_FLOAT):
-			// TODO
-			label = LBL_generate(LBL_next());
-			ASY_raw(".data\n");
-			ASY_raw("%s: .float %f\n", label, pExp->value.fval);
-			ASY_raw(".text\n");
-			ASY_raw("flds %s\n", label);
-			ASY_raw("fstps (%%ecx)\n");
-			ASY_raw("movl %%ecx, %%eax\n", label);
-			break;
-		case(EXP_HEXADECIMAL):
-		case(EXP_NUMBER):
-		case(EXP_CHAR):
-			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
-			break;
-		case(EXPND_MINUS):
-			codeForExp((ndExpression*) pExp->value.pNode, pShared);
-			ASY_raw("imull $-1, %%eax\n");
-			// TODO IF FLOAT
-			break;
-		case(EXPND_EXCLAMATION): 
-			// TODO
-			break;
-		case(EXPND_BIN): 
-			codeForExpBin(pExp, pShared);
-			break;
-		case(EXPND_CALL): 
-			codeForFunctionCall((ndFunctionCall*) (pExp->value.pNode), pShared);
-			break;
-	}
+int isFloatExpression(ndExpression *pExp){
+	return pExp->pType != NULL
+		&& pExp->pType->token == TK_FLOAT
+		&& pExp->pType->depth == 0;
 }
 
-void COD_codeForTree(ndDeclarations *pDeclarations) {
-	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
+	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
+}
 
-  pEvents->onDeclarations = codeForHeader;
-  pEvents->onVariable = codeForGlobalVariable;
-  pEvents->onFunction = codeForFunction;
-  pEvents->onVariable = codeForVarDeclaration;
-	pEvents->onVarDeclarations = initVarDeclarationsState;
-	pEvents->onAttribution = codeForAttribution;
-	pEvents->onParameters = codeForParameters;
-	pEvents->onReturn = codeForReturn;
-	pEvents->onStatement = codeForStatement;
-
-  pEvents->onNewLevel = beforeEvent; 
-  pEvents->onBackLevel = afterEvent; 
-
-	tpState *pState = NEW(tpState);
-
-	ASY_raw(".data\n");
-  TRA_execute(pDeclarations, pEvents, (void*)pState);
-	ASY_raw(".end\n\n");
+void afterEvent(char *evtName, void *pShared) {
+	if (strcmp(evtName, "onFunction") == 0) {
+		ASY_functionEnding();
+	}
 }
