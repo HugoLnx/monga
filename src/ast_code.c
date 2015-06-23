@@ -32,7 +32,7 @@ int isIntExpression(ndExpression *pExp){
 	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
 }
 
-int isIntResult(ndExpression *pExp1, ndExpression *pExp2){
+int isIntOperation(ndExpression *pExp1, ndExpression *pExp2){
 	return isIntExpression(pExp1) && isIntExpression(pExp2);
 }
 
@@ -92,11 +92,33 @@ void codeForVar(ndVar *pVar, void *pShared) {
 	}
 }
 
+void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
+	char *labelEnd = LBL_generate(LBL_next());
+	char *labelTrue = LBL_generate(LBL_next());
+	char *labelFalse = LBL_generate(LBL_next());
+	if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+		codeForExp(pExp->value.bin.pExp1, pShared);
+		ASY_raw("pushl %%eax\n");
+		codeForExp(pExp->value.bin.pExp2, pShared);
+		ASY_raw("popl %%ecx\n");
+		ASY_raw("cmp %%eax, %%ecx\n");
+		ASY_raw("%s %s\n", command, labelTrue);
+		ASY_raw("movl $0, %%eax\n");
+		ASY_raw("jmp %s\n", labelEnd);
+		ASY_raw("%s: movl $1, %%eax\n", labelTrue);
+		ASY_raw("jmp %s\n", labelEnd);
+	}
+	else {
+		// TODO floats
+	}
+	ASY_raw("%s:\n", labelEnd);
+}
+
 void codeForExpBin(ndExpression *pExp, void *pShared) {
 	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
 	switch(pExp->value.bin.expType) {
 		case(EXPBIN_PLUS):
-			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -108,7 +130,7 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			}
 			break;
 		case(EXPBIN_SLASH):
-			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -122,7 +144,7 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			}
 			break;
 		case(EXPBIN_MINUS):
-			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -135,7 +157,7 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			}
 			break;
 		case(EXPBIN_ASTERISK):
-			if (isIntResult(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -179,19 +201,25 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			ASY_raw("%s: movl $1, %%eax\n", labelTrue);
 			ASY_raw("jmp %s\n", labelEnd);
 			ASY_raw("%s:\n", labelEnd);
-		break;
+			break;
 		case(EXPBIN_DOUBLE_EQUAL):
-		break;
+			generateNumbersExpBin("je", pExp, pShared);
+			break;
 		case(EXPBIN_BANG_EQUAL):
-		break;
+			generateNumbersExpBin("jne", pExp, pShared);
+			break;
 		case(EXPBIN_LESS_EQUAL):
-		break;
+			generateNumbersExpBin("jle", pExp, pShared);
+			break;
 		case(EXPBIN_GREATER_EQUAL):
-		break;
+			generateNumbersExpBin("jge", pExp, pShared);
+			break;
 		case(EXPBIN_LESS):
-		break;
+			generateNumbersExpBin("jl", pExp, pShared);
+			break;
 		case(EXPBIN_GREATER):
-		break;
+			generateNumbersExpBin("jg", pExp, pShared);
+			break;
 	}
 }
 
