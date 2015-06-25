@@ -101,7 +101,8 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			// TODO IF FLOAT
 			break;
 		case(EXPND_EXCLAMATION): 
-			// TODO
+			codeForExp((ndExpression*) pExp->value.pNode, pShared);
+			ASY_raw("notl %%eax\n");
 			break;
 		case(EXPND_BIN): 
 			codeForExpBin(pExp, pShared);
@@ -175,7 +176,6 @@ void codeForVar(ndVar *pVar, void *pShared) {
 void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 	char *labelEnd = LBL_generate(LBL_next());
 	char *labelTrue = LBL_generate(LBL_next());
-	char *labelFalse = LBL_generate(LBL_next());
 	if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 		// TODO: float treat
 	}
@@ -188,10 +188,10 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 		ASY_raw("%s %s\n", command, labelTrue);
 		ASY_raw("movl $0, %%eax\n");
 		ASY_raw("jmp %s\n", labelEnd);
-		ASY_raw("%s: movl $1, %%eax\n", labelTrue);
-		ASY_raw("jmp %s\n", labelEnd);
+		ASY_label(labelTrue);
+		ASY_raw("movl $1, %%eax\n");
 	}
-	ASY_raw("%s:\n", labelEnd);
+	ASY_label(labelEnd);
 }
 
 void codeForExpBin(ndExpression *pExp, void *pShared) {
@@ -261,9 +261,9 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			ASY_raw("je %s\n", labelFalse);
 			ASY_raw("movl $1, %%eax\n");
 			ASY_raw("jmp %s\n", labelEnd);
-			ASY_raw("%s: movl $0, %%eax\n", labelFalse);
-			ASY_raw("jmp %s\n", labelEnd);
-			ASY_raw("%s:\n", labelEnd);
+			ASY_label(labelFalse);
+			ASY_raw("movl $0, %%eax\n");
+			ASY_label(labelEnd);
 			break;
 		case(EXPBIN_OR):
 			labelTrue = LBL_generate(LBL_next());
@@ -278,9 +278,9 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 			ASY_raw("jne %s\n", labelTrue);
 			ASY_raw("movl $0, %%eax\n");
 			ASY_raw("jmp %s\n", labelEnd);
-			ASY_raw("%s: movl $1, %%eax\n", labelTrue);
-			ASY_raw("jmp %s\n", labelEnd);
-			ASY_raw("%s:\n", labelEnd);
+			ASY_label(labelTrue);
+			ASY_raw("movl $1, %%eax\n");
+			ASY_label(labelEnd);
 			break;
 		case(EXPBIN_DOUBLE_EQUAL):
 			generateNumbersExpBin("je", pExp, pShared);
