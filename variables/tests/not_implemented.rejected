@@ -1,0 +1,5 @@
+int[][] xpto() {}
+int main() {
+	int x;
+	x = xpto()[0][5];
+}

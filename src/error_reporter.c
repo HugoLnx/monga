@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "error_reporter.h"
 #include "ast_tree.h"
+#include "utils.h"
+
+char *expBestName(ndExpression *pExp);
 
 int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
   switch(pReport->tag) {
@@ -31,11 +34,32 @@ int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
       pReport->pExp->pType->token, pReport->pExp->pType->depth);
     break;
 	case TYP_VOID_FUNCTION_AS_EXP:
-		pCall = (ndFunctionCall*) pReport->pExp->value.pNode;
     printf("Error: Void function call as expression %s\n",
-				pCall->functionName);
+				expBestName(pReport->pExp));
+    break;
+	case TYP_NO_POINTER:
+    printf("Error: Type invalid for an array pointer %s\n",
+				expBestName(pReport->pExp));
+    break;
+	case TYP_TODO_FUNCTION_CALL_AS_POINTER:
+		pCall = (ndFunctionCall*) pReport->pExp->value.pNode;
+		char *name;
+		if (pCall == NULL) name = "";
+		else name = pCall->functionName;
+    printf("Error: (TODO) function call can't be used as array pointer %s\n", name);
     break;
   }
 
   return pReport->tag != TYP_WELL_TYPED;
+}
+
+char *expBestName(ndExpression *pExp) {
+	switch(pExp->expTag) {
+		case EXPND_CALL:
+			return ((ndFunctionCall*) pExp->value.pNode)->functionName;
+		case EXPND_VAR:
+			return ((ndVar*) pExp->value.pNode)->pBase->value.name;
+		default:
+			return strDup("raw value");
+	}
 }

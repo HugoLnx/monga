@@ -26,6 +26,7 @@ void setTypeFromFunctionCall(ndFunctionCall *pCall, tpType *pType);
 
 void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared);
 void setArrayVarType(ndVar *pVar);
+void checkVarPointer(ndVar *pVar, TYP_tpReport *pReport);
 void checkVarInx(ndVar *pVar, TYP_tpReport *pReport);
 int isValidInxType(tpType *pType);
 
@@ -220,16 +221,31 @@ void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared) {
   if(REPORT(pShared)->tag != TYP_RUNNING) return;
   if(pVar->varTag == VAR_ARRAY) {
 		setArrayVarType(pVar);
+		checkVarPointer(pVar, REPORT(pShared));
 		checkVarInx(pVar, REPORT(pShared));
   }
 }
 
 void setArrayVarType(ndVar *pVar) {
-	ndVar *pChildVar = (ndVar*) (pVar->value.address.pPointerExp->value.pNode);
-	pVar->pBase = pChildVar->pBase;
-	pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
-	pVar->pBackDeclaration->pVarDec = pChildVar->pBackDeclaration->pVarDec;
-	pVar->pBackDeclaration->usedDepth = pChildVar->pBackDeclaration->usedDepth - 1;
+	ndExpression *pExp = pVar->value.address.pPointerExp;
+	if (pExp->expTag == EXPND_VAR) {
+		ndVar *pChildVar = (ndVar*) (pExp->value.pNode);
+		pVar->pBase = pChildVar->pBase;
+		pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
+		pVar->pBackDeclaration->pVarDec = pChildVar->pBackDeclaration->pVarDec;
+		pVar->pBackDeclaration->usedDepth = pChildVar->pBackDeclaration->usedDepth - 1;
+	}
+}
+
+void checkVarPointer(ndVar *pVar, TYP_tpReport *pReport) {
+	ndExpression *pExp = pVar->value.address.pPointerExp;
+	if (pExp->expTag == EXPND_CALL) {
+		pReport->tag = TYP_TODO_FUNCTION_CALL_AS_POINTER;
+		pReport->pExp = pExp;
+	} else if (pExp->pType->depth == 0) {
+		pReport->tag = TYP_NO_POINTER;
+		pReport->pExp = pExp;
+	}
 }
 
 void checkVarInx(ndVar *pVar, TYP_tpReport *pReport) {

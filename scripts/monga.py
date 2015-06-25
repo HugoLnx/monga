@@ -161,7 +161,7 @@ def execute_normal_test(test_path):
     return "Failing test: " + test_path + "\n" + msg
 
 def is_rejected(output):
-  matching = re.search(r'^[eE]rror:', output)
+  matching = re.search(r'^([eE]rror:|Segment)', output)
   return matching
 
 def is_not_rejected(output):
