@@ -131,7 +131,7 @@ void printAttribution(ndAttribution *pAttribution, void *pShared) {
 
 void printVar(ndVar *pVar, void *pShared) {
 	char *ident = *(char**) pShared;
-  if(pVar->varTag == VAR_ID) {
+  if(pVar->varTag == IDS_ID) {
     printf("%svar:%s\n", ident, pVar->value.name);
   } else {
     printf("%svar:\n", ident);

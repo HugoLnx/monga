@@ -174,7 +174,7 @@ static void goAttribution(ndAttribution *pAttribution, POSTTRA_tpEvents *pEvents
 
 static void goVar(ndVar *pVar, POSTTRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onVar);
-  if(pVar->varTag == VAR_ARRAY) {
+  if(pVar->varTag == IDS_ARRAY) {
     goExp(pVar->value.address.pPointerExp, pEvents, pShared);
     goExp(pVar->value.address.pInxExp, pEvents, pShared);
   }

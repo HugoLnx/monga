@@ -5,23 +5,23 @@
 
 char *expBestName(ndExpression *pExp);
 
-int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
+int ERR_printErrorsOnVarReport(IDS_tpReport *pReport) {
   switch(pReport->tag) {
-  case VAR_UNDEFINED:
+  case IDS_UNDEFINED:
     printf("Error: Undefined variable '%s'\n", pReport->errorSource.pVar->pBase->value.name);
 		break;
-  case VAR_UNDEFINED_FUNCTION:
+  case IDS_UNDEFINED_FUNCTION:
     printf("Error: Undefined function '%s'\n", pReport->errorSource.pFunctionCall->functionName);
 		break;
-  case VAR_FUNCTION_OVERRIDING:
+  case IDS_FUNCTION_OVERRIDING:
     printf("Error: Function '%s' was overrided\n", pReport->errorSource.pFunction->name);
 		break;
-  case VAR_SCOPE_VARIABLE_OVERRIDING:
+  case IDS_SCOPE_VARIABLE_OVERRIDING:
     printf("Error: Variable '%s' was overrided in scope\n", pReport->errorSource.pVarDec->name);
 		break;
   }
 
-	return pReport->tag != VAR_ALL_REFERENCED;
+	return pReport->tag != IDS_ALL_REFERENCED;
 }
 
 int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {

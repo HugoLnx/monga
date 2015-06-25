@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "ast_tree.h"
-#include "ast_variables.h"
+#include "ast_ids.h"
 #include "ast_types.h"
 #include "error_reporter.h"
 
@@ -9,7 +9,7 @@ extern ndDeclarations *pDeclarations;
 int main()
 {
 	yyparse();
-  VAR_tpReport *pVarReport = VAR_checkVariablesScopes(pDeclarations);
+  IDS_tpReport *pVarReport = IDS_checkVariablesScopes(pDeclarations);
 	if (ERR_printErrorsOnVarReport(pVarReport) == 0) {
 		TYP_tpReport *pTypReport = TYP_checkMatchingTypes(pDeclarations);
 		if (ERR_printErrorsOnTypesReport(pTypReport) == 0) {

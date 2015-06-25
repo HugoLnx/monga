@@ -12,16 +12,16 @@ total = len(sys.argv)
 cmdargs = sys.argv
 
 ROOT = os.path.abspath('.')
-VARS_ROOT = os.path.join(ROOT, "variables")
+IDS_ROOT = os.path.join(ROOT, "ids-and-types")
 
-BUILD = os.path.join(VARS_ROOT, "build")
-TMP = os.path.join(VARS_ROOT, "tmp")
+BUILD = os.path.join(IDS_ROOT, "build")
+TMP = os.path.join(IDS_ROOT, "tmp")
 DIST = os.path.join(BUILD, "dist")
 
 SRC = os.path.join(ROOT, "src")
-VARS_SRC = os.path.join(VARS_ROOT, "src")
+IDS_SRC = os.path.join(IDS_ROOT, "src")
 TREE_SRC = os.path.join(ROOT, "ast-tree", "src")
-TESTS = os.path.join(VARS_ROOT, "tests")
+TESTS = os.path.join(IDS_ROOT, "tests")
 
 def clear():
   os.system("rm -rf " + BUILD)
@@ -69,8 +69,8 @@ def compile():
   clear()
   os.system("cp " + os.path.join(SRC, "monga.lex") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "monga.yacc") + " " + BUILD)
-  os.system("cp " + os.path.join(VARS_SRC, "main.c") + " " + BUILD)
-  os.system("cp " + os.path.join(VARS_SRC, "main.h") + " " + BUILD)
+  os.system("cp " + os.path.join(IDS_SRC, "main.c") + " " + BUILD)
+  os.system("cp " + os.path.join(IDS_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_tree.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "list.h") + " " + BUILD)
@@ -83,8 +83,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_post_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(TREE_SRC, "ast_print.h") + " " + BUILD)
   os.system("cp " + os.path.join(TREE_SRC, "ast_print.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_variables.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_variables.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_ids.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_ids.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_types.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_types.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
@@ -97,7 +97,7 @@ def compile():
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_print", "ast_variables", "ast_types", "error_reporter"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_print", "ast_ids", "ast_types", "error_reporter"])
   return
 
 def compile_main(artefacts):

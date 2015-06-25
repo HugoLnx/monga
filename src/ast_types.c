@@ -230,7 +230,7 @@ void setTypeFromFunctionCall(ndFunctionCall *pCall, tpType *pType) {
 
 void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared) {
   if(REPORT(pShared)->tag != TYP_RUNNING) return;
-  if(pVar->varTag == VAR_ARRAY) {
+  if(pVar->varTag == IDS_ARRAY) {
 		setArrayVarType(pVar);
 		checkVarPointer(pVar, REPORT(pShared));
 		checkVarInx(pVar, REPORT(pShared));

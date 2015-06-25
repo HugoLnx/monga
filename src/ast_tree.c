@@ -169,7 +169,7 @@ ndAttribution *createAttributionNode(ndVar *pVar, ndExpression *pExp) {
 ndVar *createVarNode(char *name) {
   ndVar *pVar = NEW(ndVar);
   pVar->value.name = name;
-  pVar->varTag = VAR_ID;
+  pVar->varTag = IDS_ID;
   return pVar;
 }
 
@@ -177,7 +177,7 @@ ndVar *createArrayVarNode(ndExpression *pPointerExp, ndExpression *pInxExp) {
   ndVar *pVar = NEW(ndVar);
   pVar->value.address.pPointerExp = pPointerExp;
   pVar->value.address.pInxExp = pInxExp;
-  pVar->varTag = VAR_ARRAY;
+  pVar->varTag = IDS_ARRAY;
   return pVar;
 }
 

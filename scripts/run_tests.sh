@@ -11,8 +11,8 @@ echo "Running ast-tree Tests"
 python scripts/ast-tree.py test_all
 
 echo
-echo "Running variables and types Tests"
-python scripts/variables.py test_all
+echo "Running ids and types Tests"
+python scripts/ids-and-types.py test_all
 
 echo
 echo "Running monga Tests"

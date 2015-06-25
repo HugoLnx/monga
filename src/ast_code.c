@@ -151,7 +151,7 @@ void codeForReturn(ndReturn *pReturn, void *pShared) {
 
 void codeForVar(ndVar *pVar, void *pShared) {
 	ndVariable *pDec = pVar->pBackDeclaration->pVarDec;
-	if(pVar->varTag == VAR_ID) {
+	if(pVar->varTag == IDS_ID) {
 		if(pDec->isGlobal) {
 			ASY_raw("movl $%s, %%eax\n", pDec->name);
 		} else {
