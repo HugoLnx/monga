@@ -7,3 +7,7 @@ int xpto;
 float xpto;
 int main() {
 }
+-----
+int main(int xpto) {
+	char xpto;
+}

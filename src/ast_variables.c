@@ -10,6 +10,7 @@
 #define STACK(varName) ((struct stState*) varName)->pStackVariables 
 #define LFUNC(varName) ((struct stState*) varName)->pLastFunc 
 #define FUNCS(varName) ((struct stState*) varName)->pFunctions 
+#define IGNBLOCK(varName) ((struct stState*) varName)->ignoreNextBlockOpening
 
 void pushVariable(ndVariable *pVar, void *pShared);
 void checkVarName(ndVar *pVar, void *pShared);
@@ -24,6 +25,7 @@ struct stState {
   VAR_tpReport *pReport;
 	ndFunction *pLastFunc;
 	tpList *pFunctions;
+	int ignoreNextBlockOpening;
 };
 
 VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
@@ -33,6 +35,7 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
   pState->pReport = NEW(VAR_tpReport);
   pState->pFunctions = createList();
   pState->pReport->tag = VAR_RUNNING;
+	pState->ignoreNextBlockOpening = 0;
 
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
@@ -85,15 +88,24 @@ void checkVarName(ndVar *pVar, void *pShared) {
 }
 
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {
+	int isBlock = strcmp(evtName, "onBlock") == 0;
+	int isFunction = strcmp(evtName, "onFunction") == 0;
   if(REPORT(pShared)->tag != VAR_RUNNING) return;
-	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
+	if (isBlock && IGNBLOCK(pShared) == 1) {
+		IGNBLOCK(pShared) = 0;
+	}
+	else if (isBlock) {
+		STK_pushNewScope(STACK(pShared));
+	}
+	else if (isFunction) {
+		IGNBLOCK(pShared) = 1;
 		STK_pushNewScope(STACK(pShared));
 	}
 }
 
 void popScopeVariablesIfBlock(char *evtName, void *pShared) {
   if(REPORT(pShared)->tag != VAR_RUNNING) return;
-	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
+	if (strcmp(evtName, "onBlock") == 0) {
 		STK_popScope(STACK(pShared));
 	}
 }
