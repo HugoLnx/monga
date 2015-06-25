@@ -1,5 +1,5 @@
 int main() {
   int x; 
   x = 0x542;
-  x = x + 3.0;
+  x = x + 3;
 }

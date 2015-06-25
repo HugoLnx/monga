@@ -1,0 +1,16 @@
+void main() {
+	int[][] array;
+	array = new int[][2];
+	array[0] = new int[2];
+	array[1] = new int[3];
+  array[0][0] = 10;
+  array[0][1] = 15;
+  array[1][0] = 20;
+  array[1][1] = 25;
+  array[1][2] = 30;
+	printf("array[0][0]: %d\n", array[0][0]);
+	printf("array[0][1]: %d\n", array[0][1]);
+	printf("array[1][0]: %d\n", array[1][0]);
+	printf("array[1][1]: %d\n", array[1][1]);
+	printf("array[1][2]: %d\n", array[1][2]);
+}

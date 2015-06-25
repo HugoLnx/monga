@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "label_generator.h"
 #include "list.h"
+#include "y.tab.h"
 #include <string.h>
 
 #define STATE(varName) ((tpState*) varName)
@@ -15,12 +16,20 @@ typedef struct stState {
 	int jmpEndWhileLabel;
 } tpState;
 
+void codeForReturn(ndReturn *pReturn, void *pShared);
+void codeForVarDeclaration(ndVariable *pVar, void *pShared);
+void codeForParameters(ndParameters *pParams, void *pShared);
+void codeForFunction(ndFunction *pFunc, void *pShared);
+void codeForVar(ndVar *pVar, void *pShared);
+void codeForExpBin(ndExpression *pExp, void *pShared);
+void codeForFunctionCall(ndFunctionCall *pCall, void *pShared);
+void codeForStatement(ndStatement *pStat, void *pShared);
+void codeForAttribution(ndAttribution *pAttr, void *pShared);
 void codeForExp(ndExpression *pExp, void *pShared);
 void codeForIfElse(ndIfElse *pNode, void *pShared);
-void codeForStatement(ndStatement *pStat, void *pShared);
+void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared);
+void afterEvent(char *evtName, void *pShared);
 
-void beforeEvent(char *evtName, void *pShared) {
-}
 
 void afterEvent(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onFunction") == 0) {
@@ -48,22 +57,65 @@ int isIntExpression(ndExpression *pExp){
 	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
 }
 
-int isIntOperation(ndExpression *pExp1, ndExpression *pExp2){
-	return isIntExpression(pExp1) && isIntExpression(pExp2);
-}
-
-void codeForHeader(ndDeclarations *pDeclarations, void *pShared) {
-}
-
-void codeForGlobalVariable(ndVariable *pVar, void *pShared) {
-}
-
-void codeForReturn(ndReturn *pReturn, void *pShared) {
-	if(pReturn->pExp == NULL) {
-		ASY_raw("movl $0, %%eax\n");
-	} else {
-		codeForExp(pReturn->pExp, pShared);
+void codeForExp(ndExpression *pExp, void *pShared) {
+	char *label;
+  ndNew *pNew;
+	switch(pExp->expType) {
+		case(EXPND_VAR):
+			codeForVar(pExp->value.pNode, pShared);
+			ASY_raw("movl (%%eax), %%eax\n");
+			break;
+		case(EXPND_NEW): 
+			pNew = (ndNew*) pExp->value.pNode;
+			codeForExp(pNew->pExp, pShared);
+			ASY_raw("imull $4,%%eax\n");
+			ASY_malloc("%eax");
+			break;
+		case(EXP_TEXT):
+			label = LBL_generate(LBL_next());
+			ASY_raw(".data\n");
+			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
+			ASY_raw(".text\n");
+			ASY_raw("movl $%s, %%eax\n", label);
+			break;
+		case(EXP_FLOAT):
+			// TODO
+			label = LBL_generate(LBL_next());
+			ASY_raw(".data\n");
+			ASY_raw("%s: .float %f\n", label, pExp->value.fval);
+			ASY_raw(".text\n");
+			ASY_raw("flds %s\n", label);
+			ASY_raw("fstps (%%ecx)\n");
+			ASY_raw("movl %%ecx, %%eax\n", label);
+			break;
+		case(EXP_HEXADECIMAL):
+		case(EXP_NUMBER):
+		case(EXP_CHAR):
+			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
+			break;
+		case(EXPND_MINUS):
+			codeForExp((ndExpression*) pExp->value.pNode, pShared);
+			ASY_raw("imull $-1, %%eax\n");
+			// TODO IF FLOAT
+			break;
+		case(EXPND_EXCLAMATION): 
+			// TODO
+			break;
+		case(EXPND_BIN): 
+			codeForExpBin(pExp, pShared);
+			break;
+		case(EXPND_CALL): 
+			codeForFunctionCall((ndFunctionCall*) (pExp->value.pNode), pShared);
+			break;
 	}
+}
+
+void codeForFunction(ndFunction *pFunc, void *pShared) {
+	STATE(pShared)->lastVarPadding = -4;
+	ASY_raw(".text\n");
+	ASY_function(pFunc->name);
+	ASY_functionBeginning();
+	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
@@ -89,22 +141,32 @@ void codeForParameters(ndParameters *pParams, void *pShared) {
   }
 }
 
-void codeForFunction(ndFunction *pFunc, void *pShared) {
-	STATE(pShared)->lastVarPadding = -4;
-	ASY_raw(".text\n");
-	ASY_function(pFunc->name);
-	ASY_functionBeginning();
-	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
+void codeForReturn(ndReturn *pReturn, void *pShared) {
+	if(pReturn->pExp == NULL) {
+		ASY_raw("movl $0, %%eax\n");
+	} else {
+		codeForExp(pReturn->pExp, pShared);
+	}
 }
 
 void codeForVar(ndVar *pVar, void *pShared) {
 	ndVariable *pDec = pVar->pBackDeclaration->pVarDec;
-	if(pDec->isGlobal) {
-		ASY_raw("movl $%s, %%eax\n", pDec->name);
+	if(pVar->varType == VAR_ID) {
+		if(pDec->isGlobal) {
+			ASY_raw("movl $%s, %%eax\n", pDec->name);
+		} else {
+			int padding = pDec->stackPadding;
+			ASY_raw("movl %%ebp, %%eax\n");
+			ASY_raw("addl $%d, %%eax\n", padding);
+		}
 	} else {
-		int padding = pDec->stackPadding;
-		ASY_raw("movl %%ebp, %%eax\n");
-		ASY_raw("addl $%d, %%eax\n", padding);
+		codeForExp(pVar->value.address.pPointerExp, pShared);
+		ASY_raw("pushl %%eax\n");
+		codeForExp(pVar->value.address.pInxExp, pShared);
+		ASY_raw("imull $4,%%eax\n");
+		ASY_raw("movl %%eax,%%ecx\n");
+		ASY_raw("popl %%eax\n");
+		ASY_raw("addl %%ecx,%%eax\n");
 	}
 }
 
@@ -112,7 +174,10 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 	char *labelEnd = LBL_generate(LBL_next());
 	char *labelTrue = LBL_generate(LBL_next());
 	char *labelFalse = LBL_generate(LBL_next());
-	if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+	if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+		// TODO: float treat
+	}
+	else {
 		codeForExp(pExp->value.bin.pExp1, pShared);
 		ASY_raw("pushl %%eax\n");
 		codeForExp(pExp->value.bin.pExp2, pShared);
@@ -124,9 +189,6 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 		ASY_raw("%s: movl $1, %%eax\n", labelTrue);
 		ASY_raw("jmp %s\n", labelEnd);
 	}
-	else {
-		// TODO floats
-	}
 	ASY_raw("%s:\n", labelEnd);
 }
 
@@ -134,34 +196,22 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
 	switch(pExp->value.bin.expType) {
 		case(EXPBIN_PLUS):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
-				codeForExp(pExp->value.bin.pExp1, pShared);
-				ASY_raw("pushl %%eax\n");
-				codeForExp(pExp->value.bin.pExp2, pShared);
-				ASY_raw("popl %%ecx\n");
-				ASY_raw("addl %%ecx, %%eax\n");
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
 			}
 			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
 				ASY_raw("popl %%ecx\n");
-				
-				if(isIntExpression(pExp->value.bin.pExp1))
-					ASY_raw("filds %%ecx\n");
-				else
-					ASY_raw("flds %%ecx\n");
-
-				if(isIntExpression(pExp->value.bin.pExp2))
-					ASY_raw("filds %%eax\n");
-				else
-					ASY_raw("flds %%eax\n");
-
-				ASY_raw("ftsps %%eax\n"); 
+				ASY_raw("addl %%ecx, %%eax\n");
 			}
 			break;
 		case(EXPBIN_SLASH):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -170,12 +220,12 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				ASY_raw("movl $0,%%edx\n");
 				ASY_raw("divl %%ecx\n");
 			}
-			else {
-
-			}
 			break;
 		case(EXPBIN_MINUS):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
@@ -183,20 +233,17 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				ASY_raw("popl %%eax\n");
 				ASY_raw("subl %%ecx, %%eax\n");
 			}
-			else {
-
-			}
 			break;
 		case(EXPBIN_ASTERISK):
-			if (isIntOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
+				// TODO: float treat
+			}
+			else {
 				codeForExp(pExp->value.bin.pExp1, pShared);
 				ASY_raw("pushl %%eax\n");
 				codeForExp(pExp->value.bin.pExp2, pShared);
 				ASY_raw("popl %%ecx\n");
 				ASY_raw("imull %%ecx, %%eax\n");
-			}
-			else {
-
 			}
 			break;
 		case(EXPBIN_AND):
@@ -267,6 +314,7 @@ void codeForWhile(ndWhile *pWhile, void *pShared) {
 
 	((tpState*) pShared)->jmpLoopWhileLabel = loopInt;
 	((tpState*) pShared)->jmpEndWhileLabel = endInt;
+
 }
 
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
@@ -292,9 +340,6 @@ void codeForStatement(ndStatement *pStat, void *pShared) {
 	if(pStat->statType == STAT_FUNCTION_CALL) {
 		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
 	}
-	// else if(pStat->statType == STAT_WHILE) {
-	// 	codeForWhile((ndWhile*) pStat->pNode, pShared);
-	// }
 }
 
 void codeForIfElse(ndIfElse *pNode, void *pShared) {
@@ -331,63 +376,9 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	ASY_raw("movl %%eax, (%%ecx)\n");
 }
 
-void codeForExp(ndExpression *pExp, void *pShared) {
-	char *label;
-	switch(pExp->expType) {
-		case(EXPND_VAR):
-			codeForVar(pExp->value.pNode, pShared);
-			ASY_raw("movl (%%eax), %%eax\n");
-			break;
-		case(EXPND_NEW): 
-			// TODO
-			break;
-		case(EXP_TEXT):
-			label = LBL_generate(LBL_next());
-			ASY_raw(".data\n");
-			ASY_raw("%s: .string \"%s\"\n", label, pExp->value.text);
-			ASY_raw(".text\n");
-			ASY_raw("movl $%s, %%eax\n", label);
-			break;
-		case(EXP_FLOAT):
-			// TODO
-			// ASY_raw("movl 0x%x, %%eax\n", *((unsigned int*) &(pExp->value.fval)));
-			// ASY_raw("flds (%%eax)\n");
-			// ASY_raw("flds %%eax\n", *((unsigned long int*) &(pExp->value.fval)) );
-			// ASY_raw("fstps (%%ecx)\n");
-			// ASY_raw("movl %%ecx, %%eax\n");
-			break;
-		case(EXP_HEXADECIMAL):
-		case(EXP_NUMBER):
-		case(EXP_CHAR):
-			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
-			break;
-		case(EXPND_MINUS):
-			if(isIntExpression((ndExpression*) pExp->value.pNode)){
-				codeForExp((ndExpression*) pExp->value.pNode, pShared);
-				ASY_raw("imull $-1, %%eax\n");
-			}
-			else{
-
-			}
-			// TODO IF FLOAT
-			break;
-		case(EXPND_EXCLAMATION): 
-			// TODO
-			break;
-		case(EXPND_BIN): 
-			codeForExpBin(pExp, pShared);
-			break;
-		case(EXPND_CALL): 
-			codeForFunctionCall((ndFunctionCall*) (pExp->value.pNode), pShared);
-			break;
-	}
-}
-
 void COD_codeForTree(ndDeclarations *pDeclarations) {
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
 
-	pEvents->onDeclarations = codeForHeader;
-	pEvents->onVariable = codeForGlobalVariable;
 	pEvents->onFunction = codeForFunction;
 	pEvents->onVariable = codeForVarDeclaration;
 	pEvents->onVarDeclarations = initVarDeclarationsState;
@@ -398,7 +389,6 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
 	pEvents->onIf = codeForIfElse;
 	pEvents->onWhile = codeForWhile;
 
-	pEvents->onNewLevel = beforeEvent; 
 	pEvents->onBackLevel = afterEvent;
 
 	tpState *pState = NEW(tpState);
@@ -406,4 +396,14 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
 	ASY_raw(".data\n");
 	TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
+}
+
+int isFloatExpression(ndExpression *pExp){
+	return pExp->pType != NULL
+		&& pExp->pType->token == TK_FLOAT
+		&& pExp->pType->depth == 0;
+}
+
+int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
+	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
 }

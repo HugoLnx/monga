@@ -79,6 +79,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_traversing.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_post_traversing.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_post_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(TREE_SRC, "ast_print.h") + " " + BUILD)
   os.system("cp " + os.path.join(TREE_SRC, "ast_print.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_variables.h") + " " + BUILD)
@@ -87,13 +89,15 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_types.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "error_reporter.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "error_reporter.h") + " " + BUILD)
   critical_sys("lex -o " + os.path.join(BUILD, "lex.yy.c") + " " + os.path.join(BUILD, "monga.lex"))
   current_dir = os.getcwd()
   os.chdir(BUILD)
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_print", "ast_variables", "ast_types"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_print", "ast_variables", "ast_types", "error_reporter"])
   return
 
 def compile_main(artefacts):
@@ -165,7 +169,7 @@ def execute_multiline_case(test_path, rejection_condition, middle_msg):
     content = content.strip()
     test_output = execute_content(content)
     if rejection_condition(test_output):
-      msgs.append(">>>\n" + content + "\n" + middle_msg + "\n" + test_output + "\n<<<\n")
+      msgs.append("Failing test: " + test_path + "\n>>>\n" + content + "\n" + middle_msg + "\n" + test_output + "\n<<<\n")
   if len(msgs) == 0:
     return None
   else:
