@@ -5,10 +5,14 @@ void orOperations() {
 	c = 2;
 	if (a > c || c < b) {
 		printf("a > c || c < b\n");
+	} else {
+		printf("! a > c || c < b\n");
 	}
 
 	if (c > a) {
 		printf("c > a\n");
+	} else {
+		printf("! c > a\n");
 	}
 }
 
@@ -18,12 +22,18 @@ void andOperations() {
 	}
 	if (3 < 2 && 7 >= 7) {
 		printf("3 > 2 && 7 >= 7\n");
+	} else {
+		printf("! 3 < 2 && 7 >= 7\n");
 	}
 	if ((3 - 2) > 5 && 5 >= 5){
 		printf("(3 - 2) > 5 && 5 >= 5\n");
+	} else {
+		printf("! (3 - 2) > 5 && 5 >= 5\n");
 	}
 	if (3 > 2 && 5 <= 7) {
 		printf("3 > 2 && 5 <= 7\n");
+	} else {
+		printf("! 3 > 2 && 5 <= 7\n");
 	}
 }
 
@@ -31,4 +41,3 @@ int main() {
 	orOperations();
 	andOperations();
 }
-

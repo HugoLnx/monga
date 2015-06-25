@@ -11,7 +11,8 @@
 
 typedef struct stState {
 	int lastVarPadding;
-	int endIfLabel;
+	char *ifEndLabel;
+	char *elseLabel;
 	int jmpLoopWhileLabel;
 	int jmpEndWhileLabel;
 } tpState;
@@ -26,7 +27,8 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared);
 void codeForStatement(ndStatement *pStat, void *pShared);
 void codeForAttribution(ndAttribution *pAttr, void *pShared);
 void codeForExp(ndExpression *pExp, void *pShared);
-void codeForIfElse(ndIfElse *pNode, void *pShared);
+void codeForIf(ndIfElse *pNode, void *pShared);
+void codeForElse(ndIfElse *pNode, void *pShared);
 void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared);
 void afterEvent(char *evtName, void *pShared);
 
@@ -36,7 +38,7 @@ void afterEvent(char *evtName, void *pShared) {
 		ASY_functionEnding();
 	}
 	else if (strcmp(evtName, "onIf") == 0) {
-		ASY_raw("%s: \n", LBL_generate(((tpState*) pShared)->endIfLabel));
+		ASY_label(STATE(pShared)->ifEndLabel);
 	}
 	else if (strcmp(evtName, "onWhile") == 0) {
 		ASY_raw("jmp %s\n", LBL_generate(((tpState*) pShared)->jmpLoopWhileLabel));
@@ -341,26 +343,26 @@ void codeForStatement(ndStatement *pStat, void *pShared) {
 	}
 }
 
-void codeForIfElse(ndIfElse *pNode, void *pShared) {
+void codeForIf(ndIfElse *pNode, void *pShared) {
 	char *labelElse = LBL_generate(LBL_next());
-	int numLabelEnd = LBL_next();
-	char *labelEnd = LBL_generate(numLabelEnd);
+	char *labelEnd = LBL_generate(LBL_next());
 	codeForExp(pNode->nExpIf, pShared);
 	ASY_raw("cmp $0, %%eax\n");
 	
-	if (pNode->nStatementElse == NULL){
+	if (pNode->nStatementElse == NULL) {
 		ASY_raw("je %s\n", labelEnd);
-		codeForStatement(pNode->nStatementIf, pShared);
 	}
-	else{
+	else {
 		ASY_raw("je %s\n", labelElse);
-		codeForStatement(pNode->nStatementIf, pShared);
-		ASY_raw("jmp %s\n", labelEnd);
-		ASY_raw("%s: \n", labelElse);
-		codeForStatement(pNode->nStatementElse, pShared);
 	}
 
-	((tpState*) pShared)->endIfLabel = numLabelEnd;
+	STATE(pShared)->ifEndLabel = labelEnd;
+	STATE(pShared)->elseLabel = labelElse;
+}
+
+void codeForElse(ndIfElse *pNode, void *pShared) {
+	ASY_raw("jmp %s\n", STATE(pShared)->ifEndLabel);
+	ASY_label(STATE(pShared)->elseLabel);
 }
 
 void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
@@ -385,7 +387,8 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
 	pEvents->onParameters = codeForParameters;
 	pEvents->onReturn = codeForReturn;
 	pEvents->onStatement = codeForStatement;
-	pEvents->onIf = codeForIfElse;
+	pEvents->onIf = codeForIf;
+	pEvents->onElse = codeForElse;
 	pEvents->onWhile = codeForWhile;
 
 	pEvents->onBackLevel = afterEvent;
