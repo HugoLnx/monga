@@ -1,0 +1,14 @@
+int main() {
+	char a;
+	a = 'a';
+	
+	while (a > 0) {
+		if (a >= '!') {
+			printf("char: %c\n", a);
+		}
+		else {
+			printf("int: %d\n", a);
+		}
+		a = a - 1;
+	}
+}
