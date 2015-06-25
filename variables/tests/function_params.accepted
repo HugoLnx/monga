@@ -1,0 +1,27 @@
+void xpto(int a, char b, float c) {}
+int main() {
+  xpto(1, 'a', 1.1);
+}
+-----
+void xpto(int a, char b, float c) {}
+int main() {
+  xpto('c', 30, 1.1);
+}
+-----
+void xpto(int a, char b, float c) {}
+int main() {
+  int x,p;
+  float k;
+  xpto(x, p, k);
+}
+-----
+int hey() {}
+void xpto(int a, char b, float c) {}
+int main() {
+  float k;
+  xpto(hey(), hey(), k);
+}
+-----
+int main() {
+	printf("%d\n", 1, 3);
+}

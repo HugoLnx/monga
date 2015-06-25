@@ -11,7 +11,8 @@
 enum enTokenGroup { GR_NUMBER, GR_FLOAT };
 
 void checkAttribution(ndAttribution *pAttr, void *pShared);
-int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
+int attributionIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
+int typeIsCompatibleForAssignment(tpType *pDestType, tpType *pValueType);
 enum enTokenGroup tokenGroup(int tk);
 
 void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared);
@@ -31,6 +32,7 @@ void checkVarInx(ndVar *pVar, TYP_tpReport *pReport);
 int isValidInxType(tpType *pType);
 
 void checkNewInx(ndNew *pNew, void *pShared);
+void checkParamsFunctionCall(ndFunctionCall *pCall, void *pShared);
 
 TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 	POSTTRA_tpEvents *pEvents = NEW(POSTTRA_tpEvents);
@@ -41,6 +43,7 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
   pEvents->onExp = setExpressionTypeAndVerify;
   pEvents->onVar = setArrayVarTypeAndCheckInxExpression;
   pEvents->onNew = checkNewInx;
+  pEvents->onFunctionCall = checkParamsFunctionCall;
 
   POSTTRA_execute(pDeclarations, pEvents, (void*) pReport);
   if (pReport->tag == TYP_RUNNING) {
@@ -57,17 +60,24 @@ void checkAttribution(ndAttribution *pAttr, void *pShared) {
   if(REPORT(pShared)->tag != TYP_RUNNING) return;
   tpVarBackDeclaration *pVarBack = pAttr->pVar->pBackDeclaration;
 
-	if (!typeIsCompatible(pVarBack, pAttr->pExp->pType)) {
+	if (!attributionIsCompatible(pVarBack, pAttr->pExp->pType)) {
 		REPORT(pShared)->tag = TYP_UNMATCH;
 		REPORT(pShared)->pExp = pAttr->pExp;
 		REPORT(pShared)->pVarBack = pVarBack;
 	}
 }
 
-int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
-  tpType *pVarType = pVarBack->pVarDec->pType;
-	return (pVarBack->usedDepth == pExpType->depth) && 
-    tokenGroup(pVarType->token) == tokenGroup(pExpType->token);
+int attributionIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
+  tpType *pVarDecType = pVarBack->pVarDec->pType;
+	tpType *pVarType = NEW(tpType);
+	pVarType->depth = pVarBack->usedDepth;
+	pVarType->token = pVarDecType->token;
+	return typeIsCompatibleForAssignment(pVarType, pExpType);
+}
+
+int typeIsCompatibleForAssignment(tpType *pDestType, tpType *pValueType) {
+  return (pDestType->depth == pValueType->depth) && 
+    tokenGroup(pDestType->token) == tokenGroup(pValueType->token);
 }
 
 enum enTokenGroup tokenGroup(int tk) {
@@ -147,6 +157,7 @@ void setExpressionType(ndExpression *pExp) {
 }
 
 void checkVoidFunctionCall(ndExpression *pExp, TYP_tpReport *pReport) {
+  if(pReport->tag != TYP_RUNNING) return;
   if (pExp->expTag == EXPND_CALL) {
 		ndFunctionCall *pCall = (ndFunctionCall*) pExp->value.pNode;
 		if (strcmp(pCall->functionName, "printf") == 0
@@ -277,3 +288,47 @@ void checkNewInx(ndNew *pNew, void *pShared) {
   }
 }
 /* END NEW ARRAY TYPING */
+
+
+
+
+
+/* CHECK PARAMS FUNCTION
+ * TODO: doc
+ */
+
+void checkParamsFunctionCall(ndFunctionCall *pCall, void *pShared) {
+	int argsCount=0, paramsCount=0;
+	tpList *pArgs, *pParams;
+	
+  if(REPORT(pShared)->tag != TYP_RUNNING || strcmp(pCall->functionName, "printf") == 0) return;
+	if (pCall->pExpList != NULL)  {
+		pArgs = pCall->pExpList->pList;
+		argsCount = getListSize(pArgs);
+	}
+	if (pCall->pDeclaration->pParameters != NULL) {
+		pParams = pCall->pDeclaration->pParameters->pList;
+		paramsCount = getListSize(pParams);
+	}
+
+	if (argsCount == 0 && paramsCount == 0) return;
+	if (argsCount != paramsCount) {
+		REPORT(pShared)->tag = TYP_WRONG_PARAMETERS;
+		REPORT(pShared)->errorSource.pCall = pCall;
+		return;
+	}
+
+	resetList(pArgs);
+	resetList(pParams);
+	while(goNext(pArgs) && goNext(pParams)) {
+		ndVariable *pParam = (ndVariable*) getCurrentValue(pParams);
+		ndExpression *pArg = (ndExpression*) getCurrentValue(pArgs);
+		
+		if(!typeIsCompatibleForAssignment(pParam->pType, pArg->pType)) {
+			REPORT(pShared)->tag = TYP_WRONG_PARAMETERS;
+			REPORT(pShared)->errorSource.pCall = pCall;
+			return;
+		}
+	}
+}
+/* END CHECK PARAMS FUNCTION */

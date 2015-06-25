@@ -8,3 +8,4 @@ int goNext(tpList *pList);
 int goPrevious(tpList *pList);
 void *getCurrentValue(tpList *pList);
 void resetList(tpList *pList);
+int getListSize(tpList *pList);

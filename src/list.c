@@ -6,6 +6,7 @@ struct stNodeList {
   struct stNode *pHead;
   struct stNode *pLast;
   struct stNode *pCurrent;
+  int count;
 };
 
 typedef struct stNode {
@@ -19,6 +20,7 @@ tpList *createList() {
   pList->pHead = NULL;
   pList->pLast = NULL;
   pList->pCurrent = NULL;
+  pList->count = 0;
   return pList;
 }
 
@@ -36,6 +38,7 @@ void addLast(tpList *pList, void *val) {
   } else {
     pOldLast->pNext = pNewNode;
   }
+  pList->count++;
 }
 
 int goNext(tpList *pList){
@@ -70,4 +73,8 @@ void *getCurrentValue(tpList *pList){
 
 void resetList(tpList *pList) {
   pList->pCurrent = NULL;
+}
+
+int getListSize(tpList *pList) {
+  return pList->count;
 }

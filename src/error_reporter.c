@@ -41,6 +41,10 @@ int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
     printf("Error: Type invalid for an array pointer %s\n",
 				expBestName(pReport->pExp));
     break;
+	case TYP_WRONG_PARAMETERS:
+    printf("Error: Function call have wrong parameters %s\n",
+				pReport->errorSource.pCall->functionName);
+    break;
 	case TYP_TODO_FUNCTION_CALL_AS_POINTER:
 		pCall = (ndFunctionCall*) pReport->pExp->value.pNode;
 		char *name;
