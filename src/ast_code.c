@@ -10,9 +10,14 @@
 
 typedef struct stState {
 	int lastVarPadding;
+	int endIfLabel;
+	int jmpLoopWhileLabel;
+	int jmpEndWhileLabel;
 } tpState;
 
 void codeForExp(ndExpression *pExp, void *pShared);
+void codeForIfElse(ndIfElse *pNode, void *pShared);
+void codeForStatement(ndStatement *pStat, void *pShared);
 
 void beforeEvent(char *evtName, void *pShared) {
 }
@@ -21,10 +26,21 @@ void afterEvent(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onFunction") == 0) {
 		ASY_functionEnding();
 	}
+	else if (strcmp(evtName, "onIf") == 0) {
+		ASY_raw("%s: \n", LBL_generate(((tpState*) pShared)->endIfLabel));
+	}
+	else if (strcmp(evtName, "onWhile") == 0) {
+		ASY_raw("jmp %s\n", LBL_generate(((tpState*) pShared)->jmpLoopWhileLabel));
+		ASY_raw("%s:\n", LBL_generate(((tpState*) pShared)->jmpEndWhileLabel));	
+	}
+
 }
 
 int isIntExpression(ndExpression *pExp){
 	ndVar *ndVariable;
+	if (pExp->expType == EXPND_MINUS){
+		return isIntExpression((ndExpression*) pExp->value.pNode);
+	}
 	if (pExp->expType == EXPND_VAR){
 		ndVariable = (ndVar *) pExp->value.pNode;
 		return (ndVariable->varType == EXP_NUMBER) || (ndVariable->varType == EXP_HEXADECIMAL) || (ndVariable->varType == EXP_CHAR);
@@ -126,7 +142,22 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				ASY_raw("addl %%ecx, %%eax\n");
 			}
 			else {
+				codeForExp(pExp->value.bin.pExp1, pShared);
+				ASY_raw("pushl %%eax\n");
+				codeForExp(pExp->value.bin.pExp2, pShared);
+				ASY_raw("popl %%ecx\n");
+				
+				if(isIntExpression(pExp->value.bin.pExp1))
+					ASY_raw("filds %%ecx\n");
+				else
+					ASY_raw("flds %%ecx\n");
 
+				if(isIntExpression(pExp->value.bin.pExp2))
+					ASY_raw("filds %%eax\n");
+				else
+					ASY_raw("flds %%eax\n");
+
+				ASY_raw("ftsps %%eax\n"); 
 			}
 			break;
 		case(EXPBIN_SLASH):
@@ -223,8 +254,23 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 	}
 }
 
+void codeForWhile(ndWhile *pWhile, void *pShared) {
+	int endInt = LBL_next();
+	int loopInt = LBL_next();
+	char *endLabel = LBL_generate(endInt);
+	char *loopLabel = LBL_generate(loopInt);
+	ASY_raw("%s:\n", loopLabel);
+	codeForExp(pWhile->pExp, pShared);
+	ASY_raw("cmp $0, %%eax\n");
+	ASY_raw("je %s\n", endLabel);
+	codeForStatement(pWhile->pStat, pShared);
+
+	((tpState*) pShared)->jmpLoopWhileLabel = loopInt;
+	((tpState*) pShared)->jmpEndWhileLabel = endInt;
+}
+
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
-  int qntParams = 0;
+	int qntParams = 0;
 	tpList *pList;
 	ASY_functionCallHeader();
 
@@ -246,6 +292,31 @@ void codeForStatement(ndStatement *pStat, void *pShared) {
 	if(pStat->statType == STAT_FUNCTION_CALL) {
 		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
 	}
+	// else if(pStat->statType == STAT_WHILE) {
+	// 	codeForWhile((ndWhile*) pStat->pNode, pShared);
+	// }
+}
+
+void codeForIfElse(ndIfElse *pNode, void *pShared) {
+	char *labelElse = LBL_generate(LBL_next());
+	int numLabelEnd = LBL_next();
+	char *labelEnd = LBL_generate(numLabelEnd);
+	codeForExp(pNode->nExpIf, pShared);
+	ASY_raw("cmp $0, %%eax\n");
+	
+	if (pNode->nStatementElse == NULL){
+		ASY_raw("je %s\n", labelEnd);
+		codeForStatement(pNode->nStatementIf, pShared);
+	}
+	else{
+		ASY_raw("je %s\n", labelElse);
+		codeForStatement(pNode->nStatementIf, pShared);
+		ASY_raw("jmp %s\n", labelEnd);
+		ASY_raw("%s: \n", labelElse);
+		codeForStatement(pNode->nStatementElse, pShared);
+	}
+
+	((tpState*) pShared)->endIfLabel = numLabelEnd;
 }
 
 void initVarDeclarationsState(ndVarDeclarations *pVars, void *pShared) {
@@ -279,13 +350,11 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			break;
 		case(EXP_FLOAT):
 			// TODO
-			label = LBL_generate(LBL_next());
-			ASY_raw(".data\n");
-			ASY_raw("%s: .float %f\n", label, pExp->value.fval);
-			ASY_raw(".text\n");
-			ASY_raw("flds %s\n", label);
-			ASY_raw("fstps (%%ecx)\n");
-			ASY_raw("movl %%ecx, %%eax\n", label);
+			// ASY_raw("movl 0x%x, %%eax\n", *((unsigned int*) &(pExp->value.fval)));
+			// ASY_raw("flds (%%eax)\n");
+			// ASY_raw("flds %%eax\n", *((unsigned long int*) &(pExp->value.fval)) );
+			// ASY_raw("fstps (%%ecx)\n");
+			// ASY_raw("movl %%ecx, %%eax\n");
 			break;
 		case(EXP_HEXADECIMAL):
 		case(EXP_NUMBER):
@@ -293,8 +362,13 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
 			break;
 		case(EXPND_MINUS):
-			codeForExp((ndExpression*) pExp->value.pNode, pShared);
-			ASY_raw("imull $-1, %%eax\n");
+			if(isIntExpression((ndExpression*) pExp->value.pNode)){
+				codeForExp((ndExpression*) pExp->value.pNode, pShared);
+				ASY_raw("imull $-1, %%eax\n");
+			}
+			else{
+
+			}
 			// TODO IF FLOAT
 			break;
 		case(EXPND_EXCLAMATION): 
@@ -312,22 +386,24 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 void COD_codeForTree(ndDeclarations *pDeclarations) {
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
 
-  pEvents->onDeclarations = codeForHeader;
-  pEvents->onVariable = codeForGlobalVariable;
-  pEvents->onFunction = codeForFunction;
-  pEvents->onVariable = codeForVarDeclaration;
+	pEvents->onDeclarations = codeForHeader;
+	pEvents->onVariable = codeForGlobalVariable;
+	pEvents->onFunction = codeForFunction;
+	pEvents->onVariable = codeForVarDeclaration;
 	pEvents->onVarDeclarations = initVarDeclarationsState;
 	pEvents->onAttribution = codeForAttribution;
 	pEvents->onParameters = codeForParameters;
 	pEvents->onReturn = codeForReturn;
 	pEvents->onStatement = codeForStatement;
+	pEvents->onIf = codeForIfElse;
+	pEvents->onWhile = codeForWhile;
 
-  pEvents->onNewLevel = beforeEvent; 
-  pEvents->onBackLevel = afterEvent; 
+	pEvents->onNewLevel = beforeEvent; 
+	pEvents->onBackLevel = afterEvent;
 
 	tpState *pState = NEW(tpState);
 
 	ASY_raw(".data\n");
-  TRA_execute(pDeclarations, pEvents, (void*)pState);
+	TRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }
