@@ -8,3 +8,4 @@ void STK_pushNewScope(STK_tpScopeStack *pStack);
 void STK_popScope(STK_tpScopeStack *pStack);
 void STK_addToCurrentScope(STK_tpScopeStack *pStack, ndVariable *pVar);
 ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name);
+ndVariable *STK_getReferenceInCurrentScope(STK_tpScopeStack *pStack, char *name);

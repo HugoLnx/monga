@@ -1,0 +1,9 @@
+int main() {
+	int xpto;
+	char xpto;
+}
+-----
+int xpto;
+float xpto;
+int main() {
+}

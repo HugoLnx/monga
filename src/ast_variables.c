@@ -52,6 +52,13 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 
 void pushVariable(ndVariable *pVar, void *pShared) {
   if(REPORT(pShared)->tag != VAR_RUNNING) return;
+	ndVariable *pFoundVar = STK_getReferenceInCurrentScope(STACK(pShared), pVar->name);
+	if(pFoundVar != NULL) {
+		REPORT(pShared)->tag = VAR_SCOPE_VARIABLE_OVERRIDING;
+		REPORT(pShared)->errorSource.pVarDec = pFoundVar;
+		return;
+	}
+
 	STK_addToCurrentScope(STACK(pShared), pVar);
 	if(LFUNC(pShared) == NULL) {
 		pVar->isGlobal = 1;

@@ -14,7 +14,10 @@ int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
     printf("Error: Undefined function '%s'\n", pReport->errorSource.pFunctionCall->functionName);
 		break;
   case VAR_FUNCTION_OVERRIDING:
-    printf("Error: Function was overrided '%s'\n", pReport->errorSource.pFunction->name);
+    printf("Error: Function '%s' was overrided\n", pReport->errorSource.pFunction->name);
+		break;
+  case VAR_SCOPE_VARIABLE_OVERRIDING:
+    printf("Error: Variable '%s' was overrided in scope\n", pReport->errorSource.pVarDec->name);
 		break;
   }
 

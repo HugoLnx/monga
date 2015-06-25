@@ -118,3 +118,21 @@ ndVariable *STK_getCurrentReferenceTo(STK_tpScopeStack *pStack, char *name){
 
   return NULL;
 }
+
+ndVariable *STK_getReferenceInCurrentScope(STK_tpScopeStack *pStack, char *name) {
+	if (pStack->pStackCountVariables == NULL || pStack->pStackVariables == NULL) {
+		return NULL;
+	} else {
+		int totalVariablesInScope = *(int*) pStack->pStackCountVariables->pValue;
+		tpNode *pNode = pStack->pStackVariables;
+
+		while(pNode != NULL && totalVariablesInScope-- > 0) {
+			ndVariable *pVar = (ndVariable*) pNode->pValue;
+			if (strcmp(pVar->name, name) == 0) {
+				return pVar;
+			}
+			pNode = pNode->pPrevious;
+		}
+		return NULL;
+	}
+}
