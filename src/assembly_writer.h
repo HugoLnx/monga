@@ -1,5 +1,5 @@
 #include <stdio.h>
-void ASY_globalVar(char *varName, char *varType, char *varValue);
+void ASY_globalVar(char *varName, char *varTag, char *varValue);
 void ASY_function(char *funcName);
 void ASY_label(char *labelName);
 void ASY_functionBeginning();

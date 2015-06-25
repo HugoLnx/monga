@@ -2,7 +2,7 @@
 #include "error_reporter.h"
 
 int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
-  if (pReport->type == VAR_ALL_REFERENCED) {
+  if (pReport->tag == VAR_ALL_REFERENCED) {
     return 0;
   } else {
     printf("Error: Undefined variable '%s'\n", pReport->pVar->pBase->value.name);
@@ -11,7 +11,7 @@ int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
 }
 
 int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
-  switch(pReport->type) {
+  switch(pReport->tag) {
   case TYP_UNMATCH:
     printf("Error: Unmatching type in attribution of '%s' to type '%d'\n",
       pReport->pVarBack->pVarDec->name, pReport->pExp->pType->token);
@@ -26,7 +26,7 @@ int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
     break;
   }
 
-  if(pReport->type == TYP_WELL_TYPED) {
+  if(pReport->tag == TYP_WELL_TYPED) {
     return 0;
   } else {
     return 1;

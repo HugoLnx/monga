@@ -47,7 +47,7 @@ static void goDeclarations(ndDeclarations *pDeclarations ,TRA_tpEvents *pEvents,
 static void goDeclaration(ndDeclaration *pDec, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onDeclaration);
 	CALL_EVENT(onDeclaration, pDec);
-	if(pDec->decType == DEC_FUNCTION) {
+	if(pDec->decTag == DEC_FUNCTION) {
 		goFunction((ndFunction*) pDec->pNode, pEvents, pShared);
 	} else {
 		goVariables((ndVariables*) pDec->pNode, pEvents, pShared);
@@ -145,7 +145,7 @@ static void goStatements(ndStatements *pStats, TRA_tpEvents *pEvents, void *pSha
 static void goStatement(ndStatement *pStat, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onStatement);
 	CALL_EVENT(onStatement, pStat);
-  switch(pStat->statType){
+  switch(pStat->statTag){
     case(STAT_BLOCK): goBlock((ndBlock*) pStat->pNode, pEvents, pShared); break;
     case(STAT_ATTRIBUTION): goAttribution((ndAttribution*) pStat->pNode, pEvents, pShared);break;
     case(STAT_RETURN_CALL): goReturn((ndReturn*) pStat->pNode, pEvents, pShared);break;
@@ -175,7 +175,7 @@ static void goAttribution(ndAttribution *pAttribution, TRA_tpEvents *pEvents, vo
 static void goVar(ndVar *pVar, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onVar);
 	CALL_EVENT(onVar, pVar);
-  if(pVar->varType == VAR_ARRAY) {
+  if(pVar->varTag == VAR_ARRAY) {
     goExp(pVar->value.address.pPointerExp, pEvents, pShared);
     goExp(pVar->value.address.pInxExp, pEvents, pShared);
   }
@@ -185,7 +185,7 @@ static void goVar(ndVar *pVar, TRA_tpEvents *pEvents, void *pShared) {
 static void goExp(ndExpression *pExp, TRA_tpEvents *pEvents, void *pShared) {
 	CALL_LEVEL_EVENT(onNewLevel,onExp);
 	CALL_EVENT(onExp, pExp);
-  switch(pExp->expType) {
+  switch(pExp->expTag) {
 		case(EXPND_VAR):
 			goVar((ndVar*) (pExp->value.pNode), pEvents, pShared);
 			break;

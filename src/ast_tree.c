@@ -27,7 +27,7 @@ void addTypeToVars(tpType *pType, ndVariables *pVars) {
 }
 
 ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec) {
-	if (pDec->decType == DEC_FUNCTION) {
+	if (pDec->decTag == DEC_FUNCTION) {
 		ndFunction *pFunc = (ndFunction*) pDec->pNode;
 		pFunc->pReturnType = pType;
 	} else {
@@ -72,9 +72,9 @@ tpType *newType(int token, int depth) {
 	return pType;
 }
 
-ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType) {
+ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decTag) {
 	ndDeclaration *pDec = NEW(ndDeclaration);
-	pDec->decType = decType;
+	pDec->decTag = decTag;
 	pDec->pNode = node;
 	return pDec;
 }
@@ -146,10 +146,10 @@ void addStatement(ndStatements *pStats, ndStatement *pStat) {
   addLast(pStats->pList, (void*) pStat);
 }
 
-ndStatement *createStatement(void *pNode, enum enStatType statType) {
+ndStatement *createStatement(void *pNode, enum enStatTag statTag) {
   ndStatement *pStat = NEW(ndStatement);
   pStat->pNode = pNode;
-  pStat->statType = statType;
+  pStat->statTag = statTag;
   return pStat;
 }
 
@@ -169,7 +169,7 @@ ndAttribution *createAttributionNode(ndVar *pVar, ndExpression *pExp) {
 ndVar *createVarNode(char *name) {
   ndVar *pVar = NEW(ndVar);
   pVar->value.name = name;
-  pVar->varType = VAR_ID;
+  pVar->varTag = VAR_ID;
   return pVar;
 }
 
@@ -177,44 +177,44 @@ ndVar *createArrayVarNode(ndExpression *pPointerExp, ndExpression *pInxExp) {
   ndVar *pVar = NEW(ndVar);
   pVar->value.address.pPointerExp = pPointerExp;
   pVar->value.address.pInxExp = pInxExp;
-  pVar->varType = VAR_ARRAY;
+  pVar->varTag = VAR_ARRAY;
   return pVar;
 }
 
-ndExpression *createExpressionIntegerNode(int val, enum enExpType expType) {
+ndExpression *createExpressionIntegerNode(int val, enum enExpTag expTag) {
   ndExpression *pExp = NEW(ndExpression);
   pExp->value.ival = val;
-  pExp->expType = expType;
+  pExp->expTag = expTag;
   return pExp;
 }
 
 ndExpression *createExpressionFloatNode(double val) {
   ndExpression *pExp = NEW(ndExpression);
   pExp->value.fval = val;
-  pExp->expType = EXP_FLOAT;
+  pExp->expTag = EXP_FLOAT;
   return pExp;
 }
 
 ndExpression *createExpressionTextNode(char *val) {
   ndExpression *pExp = NEW(ndExpression);
   pExp->value.text = noQuotes(val);
-  pExp->expType = EXP_TEXT;
+  pExp->expTag = EXP_TEXT;
   return pExp;
 }
 
-ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType) {
+ndExpression *createExpressionGenericNode(void *pNode, enum enExpTag expTag) {
   ndExpression *pExp = NEW(ndExpression);
   pExp->value.pNode = pNode;
-  pExp->expType = expType;
+  pExp->expTag = expTag;
   return pExp;
 }
 
-ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expBinType) {
+ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinTag expBinTag) {
   ndExpression *pExp = NEW(ndExpression);
   pExp->value.bin.pExp1 = pExp1;
   pExp->value.bin.pExp2 = pExp2;
-  pExp->value.bin.expType = expBinType;
-  pExp->expType = EXPND_BIN;
+  pExp->value.bin.expTag = expBinTag;
+  pExp->expTag = EXPND_BIN;
   return pExp;
 }
 

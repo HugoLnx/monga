@@ -131,7 +131,7 @@ void printAttribution(ndAttribution *pAttribution, void *pShared) {
 
 void printVar(ndVar *pVar, void *pShared) {
 	char *ident = *(char**) pShared;
-  if(pVar->varType == VAR_ID) {
+  if(pVar->varTag == VAR_ID) {
     printf("%svar:%s\n", ident, pVar->value.name);
   } else {
     printf("%svar:\n", ident);
@@ -140,38 +140,38 @@ void printVar(ndVar *pVar, void *pShared) {
 
 void printExp(ndExpression *pExp, void *pShared) {
 	char *ident = *(char**) pShared;
-  switch(pExp->expType) {
+  switch(pExp->expTag) {
     case(EXP_NUMBER):
-      printf("%sexp:%d,%lld\n", ident, pExp->expType, pExp->value.ival);
+      printf("%sexp:%d,%lld\n", ident, pExp->expTag, pExp->value.ival);
 			break;
     case(EXP_HEXADECIMAL):
-      printf("%sexp:%d,0x%llx\n", ident, pExp->expType, pExp->value.ival);
+      printf("%sexp:%d,0x%llx\n", ident, pExp->expTag, pExp->value.ival);
 			break;
     case(EXP_CHAR):
-      printf("%sexp:%d,%c\n", ident, pExp->expType, (char)pExp->value.ival);
+      printf("%sexp:%d,%c\n", ident, pExp->expTag, (char)pExp->value.ival);
 			break;
     case(EXP_FLOAT):
-      printf("%sexp:%d,%.5f\n", ident, pExp->expType, pExp->value.fval);
+      printf("%sexp:%d,%.5f\n", ident, pExp->expTag, pExp->value.fval);
 			break;
     case(EXP_TEXT):
-      printf("%sexp:%d,\"%s\"\n", ident, pExp->expType, pExp->value.text);
+      printf("%sexp:%d,\"%s\"\n", ident, pExp->expTag, pExp->value.text);
 			break;
 		case(EXPND_VAR):
-      printf("%sexp:%d\n", ident, pExp->expType);
+      printf("%sexp:%d\n", ident, pExp->expTag);
 			break;
     case(EXPND_NEW): 
-      printf("%sexp:%d\n", ident, pExp->expType);
+      printf("%sexp:%d\n", ident, pExp->expTag);
 			break;
 		case(EXPND_MINUS):
 		case(EXPND_EXCLAMATION): 
-      printf("%sexp:%d\n", ident, pExp->expType);
+      printf("%sexp:%d\n", ident, pExp->expTag);
 			break;
     case(EXPND_BIN): 
-      printf("%sexp:%d\n", ident, pExp->expType);
-      printf("%sbinary:%d\n", ident, pExp->value.bin.expType);	
+      printf("%sexp:%d\n", ident, pExp->expTag);
+      printf("%sbinary:%d\n", ident, pExp->value.bin.expTag);	
 			break;
     case(EXPND_CALL): 
-      printf("%sexp:%d\n", ident, pExp->expType);
+      printf("%sexp:%d\n", ident, pExp->expTag);
 			break;
   }
 }

@@ -47,20 +47,20 @@ void afterEvent(char *evtName, void *pShared) {
 
 int isIntExpression(ndExpression *pExp){
 	ndVar *ndVariable;
-	if (pExp->expType == EXPND_MINUS){
+	if (pExp->expTag == EXPND_MINUS){
 		return isIntExpression((ndExpression*) pExp->value.pNode);
 	}
-	if (pExp->expType == EXPND_VAR){
+	if (pExp->expTag == EXPND_VAR){
 		ndVariable = (ndVar *) pExp->value.pNode;
-		return (ndVariable->varType == EXP_NUMBER) || (ndVariable->varType == EXP_HEXADECIMAL) || (ndVariable->varType == EXP_CHAR);
+		return (ndVariable->varTag == EXP_NUMBER) || (ndVariable->varTag == EXP_HEXADECIMAL) || (ndVariable->varTag == EXP_CHAR);
 	}
-	return (pExp->expType == EXP_NUMBER) || (pExp->expType == EXP_HEXADECIMAL) || (pExp->expType == EXP_CHAR);
+	return (pExp->expTag == EXP_NUMBER) || (pExp->expTag == EXP_HEXADECIMAL) || (pExp->expTag == EXP_CHAR);
 }
 
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label;
   ndNew *pNew;
-	switch(pExp->expType) {
+	switch(pExp->expTag) {
 		case(EXPND_VAR):
 			codeForVar(pExp->value.pNode, pShared);
 			ASY_raw("movl (%%eax), %%eax\n");
@@ -151,7 +151,7 @@ void codeForReturn(ndReturn *pReturn, void *pShared) {
 
 void codeForVar(ndVar *pVar, void *pShared) {
 	ndVariable *pDec = pVar->pBackDeclaration->pVarDec;
-	if(pVar->varType == VAR_ID) {
+	if(pVar->varTag == VAR_ID) {
 		if(pDec->isGlobal) {
 			ASY_raw("movl $%s, %%eax\n", pDec->name);
 		} else {
@@ -194,7 +194,7 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 
 void codeForExpBin(ndExpression *pExp, void *pShared) {
 	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
-	switch(pExp->value.bin.expType) {
+	switch(pExp->value.bin.expTag) {
 		case(EXPBIN_PLUS):
 			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				// TODO: float treat
@@ -336,7 +336,7 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 }
 
 void codeForStatement(ndStatement *pStat, void *pShared) {
-	if(pStat->statType == STAT_FUNCTION_CALL) {
+	if(pStat->statTag == STAT_FUNCTION_CALL) {
 		codeForFunctionCall((ndFunctionCall*) pStat->pNode, pShared);
 	}
 }

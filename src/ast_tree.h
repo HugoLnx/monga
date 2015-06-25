@@ -2,13 +2,13 @@
 #define AST_TREE_H
 #include "list.h"
 enum enDeclaration { DEC_FUNCTION, DEC_VARIABLE };
-enum enStatType { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
+enum enStatTag { STAT_BLOCK, STAT_ATTRIBUTION, STAT_FUNCTION_CALL, STAT_RETURN_CALL, STAT_WHILE, STAT_IF };
 
-enum enExpType { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT, EXPND_VAR, EXPND_NEW, EXPND_BIN, EXPND_EXCLAMATION, EXPND_MINUS, EXPND_CALL};
+enum enExpTag { EXP_NUMBER, EXP_HEXADECIMAL, EXP_CHAR, EXP_FLOAT, EXP_TEXT, EXPND_VAR, EXPND_NEW, EXPND_BIN, EXPND_EXCLAMATION, EXPND_MINUS, EXPND_CALL};
 
-enum enExpBinType { EXPBIN_PLUS, EXPBIN_MINUS, EXPBIN_ASTERISK, EXPBIN_SLASH, EXPBIN_AND, EXPBIN_DOUBLE_EQUAL, EXPBIN_BANG_EQUAL, EXPBIN_LESS_EQUAL, EXPBIN_GREATER_EQUAL, EXPBIN_LESS, EXPBIN_GREATER, EXPBIN_OR };
+enum enExpBinTag { EXPBIN_PLUS, EXPBIN_MINUS, EXPBIN_ASTERISK, EXPBIN_SLASH, EXPBIN_AND, EXPBIN_DOUBLE_EQUAL, EXPBIN_BANG_EQUAL, EXPBIN_LESS_EQUAL, EXPBIN_GREATER_EQUAL, EXPBIN_LESS, EXPBIN_GREATER, EXPBIN_OR };
 
-enum enVarType { VAR_ID, VAR_ARRAY };
+enum enVarTag { VAR_ID, VAR_ARRAY };
 
 typedef struct stDeclaration ndDeclaration;
 typedef struct stDeclarations ndDeclarations;
@@ -32,7 +32,7 @@ typedef struct stIfElseNode ndIfElse;
 typedef struct stWhileNode ndWhile;
 
 typedef struct stDeclaration {
-	enum enDeclaration decType;
+	enum enDeclaration decTag;
 	void *pNode;
 } ndDeclaration;
 
@@ -83,7 +83,7 @@ typedef struct stStatementsNode {
 
 typedef struct stStatementNode {
 	void *pNode;
-  enum enStatType statType;
+  enum enStatTag statTag;
 } ndStatement;
 
 typedef struct stReturnNode {
@@ -96,7 +96,7 @@ typedef struct stVarBackDeclaration {
 } tpVarBackDeclaration;
 
 typedef struct stExpressionNode {
-  enum enExpType expType;
+  enum enExpTag expTag;
 	tpType *pType;
   union {
     long long int ival;
@@ -106,13 +106,13 @@ typedef struct stExpressionNode {
     struct {
       ndExpression *pExp1;
       ndExpression *pExp2;
-      enum enExpBinType expType;
+      enum enExpBinTag expTag;
     } bin;
   } value;
 } ndExpression;
 
 typedef struct stVarNode {
-  enum enVarType varType;
+  enum enVarTag varTag;
 	tpVarBackDeclaration *pBackDeclaration;
 	struct stVarNode *pBase;
   union {
@@ -160,7 +160,7 @@ ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec);
 ndFunction *createFunctionNode(char *name, ndParameters *pParams, ndBlock *pBlock);
 ndBlock *createBlockNode(ndVarDeclarations *pVarDecs, ndStatements *pStats);
 tpType *newType(int token, int depth);
-ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decType);
+ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decTag);
 ndParameters* createParametersNode(ndVariable* pParam);
 ndVariable* createParameterNode(tpType *pType, char *name);
 void addParam(ndParameters *pParams, ndVariable *pParam);
@@ -175,17 +175,17 @@ ndVarDeclarations *createVarDeclarations(tpType *pType, ndVariables *pVars);
 void addVarDeclaration(ndVarDeclarations *pVarDecs, tpType *pType, ndVariables *pVars);
 ndStatements *createStatements(ndStatement *pStat);
 void addStatement(ndStatements *pStats, ndStatement *pStat);
-ndStatement *createStatement(void *pNode, enum enStatType);
+ndStatement *createStatement(void *pNode, enum enStatTag);
 
 ndReturn *createReturnNode(ndExpression *pExp);
 ndAttribution *createAttributionNode(ndVar *pVar, ndExpression *pExp);
 ndVar *createVarNode(char *name);
 ndVar *createArrayVarNode(ndExpression *ndExp, ndExpression *ndInxExp);
-ndExpression *createExpressionIntegerNode(int val, enum enExpType expType);
+ndExpression *createExpressionIntegerNode(int val, enum enExpTag expTag);
 ndExpression *createExpressionFloatNode(double val);
 ndExpression *createExpressionTextNode(char *val);
-ndExpression *createExpressionGenericNode(void *pNode, enum enExpType expType);
-ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinType expType);
+ndExpression *createExpressionGenericNode(void *pNode, enum enExpTag expTag);
+ndExpression *createExpressionBinaryNode(ndExpression *pExp1, ndExpression *pExp2, enum enExpBinTag expTag);
 ndNew *createNewNode(tpType *pType, ndExpression *pExp);
 ndFunctionCall *createFunctionCall(char *functionName, ndExpList *pExpList);
 ndIfElse *createIfElseNode(ndExpression *nExpIf, ndStatement *nStatementIf);

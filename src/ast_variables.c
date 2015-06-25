@@ -27,7 +27,7 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
   struct stState *pState = NEW(struct stState);
 	pState->pStackVariables = STK_create();
   pState->pReport = NEW(VAR_tpReport);
-  pState->pReport->type = VAR_RUNNING;
+  pState->pReport->tag = VAR_RUNNING;
 
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
@@ -38,14 +38,14 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
   pEvents->onBackLevel = popScopeVariablesIfBlock; 
 
   TRA_execute(pDeclarations, pEvents, (void*) pState);
-  if (pState->pReport->type == VAR_RUNNING) {
-    pState->pReport->type = VAR_ALL_REFERENCED;
+  if (pState->pReport->tag == VAR_RUNNING) {
+    pState->pReport->tag = VAR_ALL_REFERENCED;
   }
   return pState->pReport;
 }
 
 void pushVariable(ndVariable *pVar, void *pShared) {
-  if(REPORT(pShared)->type != VAR_RUNNING) return;
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
 	STK_addToCurrentScope(STACK(pShared), pVar);
 	if(LFUNC(pShared) == NULL) {
 		pVar->isGlobal = 1;
@@ -56,12 +56,12 @@ void pushVariable(ndVariable *pVar, void *pShared) {
 }
 
 void checkVarName(ndVar *pVar, void *pShared) {
-  if(REPORT(pShared)->type != VAR_RUNNING) return;
-	if (pVar->varType == VAR_ID) {
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
+	if (pVar->varTag == VAR_ID) {
 		pVar->pBase = pVar;
 		ndVariable *pVarDec = (ndVariable*) STK_getCurrentReferenceTo(STACK(pShared), pVar->value.name);
 		if (pVarDec == NULL){
-			REPORT(pShared)->type = VAR_UNDEFINED;
+			REPORT(pShared)->tag = VAR_UNDEFINED;
 			REPORT(pShared)->pVar = pVar;
 		} else {
 			pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
@@ -72,14 +72,14 @@ void checkVarName(ndVar *pVar, void *pShared) {
 }
 
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {
-  if(REPORT(pShared)->type != VAR_RUNNING) return;
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
 	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
 		STK_pushNewScope(STACK(pShared));
 	}
 }
 
 void popScopeVariablesIfBlock(char *evtName, void *pShared) {
-  if(REPORT(pShared)->type != VAR_RUNNING) return;
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
 	if (strcmp(evtName, "onBlock") == 0 || strcmp(evtName, "onFunction") == 0) {
 		STK_popScope(STACK(pShared));
 	}

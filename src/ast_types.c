@@ -32,7 +32,7 @@ void checkNewInx(ndNew *pNew, void *pShared);
 TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 	POSTTRA_tpEvents *pEvents = NEW(POSTTRA_tpEvents);
   TYP_tpReport *pReport = NEW(TYP_tpReport);
-  pReport->type = TYP_RUNNING;
+  pReport->tag = TYP_RUNNING;
 
   pEvents->onAttribution = checkAttribution;
   pEvents->onExp = setExpressionTypeAndVerify;
@@ -40,8 +40,8 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
   pEvents->onNew = checkNewInx;
 
   POSTTRA_execute(pDeclarations, pEvents, (void*) pReport);
-  if (pReport->type == TYP_RUNNING) {
-    pReport->type = TYP_WELL_TYPED;
+  if (pReport->tag == TYP_RUNNING) {
+    pReport->tag = TYP_WELL_TYPED;
   }
   return pReport;
 }
@@ -51,11 +51,11 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
  */
 
 void checkAttribution(ndAttribution *pAttr, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(REPORT(pShared)->tag != TYP_RUNNING) return;
   tpVarBackDeclaration *pVarBack = pAttr->pVar->pBackDeclaration;
 
 	if (!typeIsCompatible(pVarBack, pAttr->pExp->pType)) {
-		REPORT(pShared)->type = TYP_UNMATCH;
+		REPORT(pShared)->tag = TYP_UNMATCH;
 		REPORT(pShared)->pExp = pAttr->pExp;
 		REPORT(pShared)->pVarBack = pVarBack;
 	}
@@ -91,8 +91,8 @@ enum enTokenGroup tokenGroup(int tk) {
  */
 
 void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
-  if(pExp->expType == EXPND_BIN) {
+  if(REPORT(pShared)->tag != TYP_RUNNING) return;
+  if(pExp->expTag == EXPND_BIN) {
     checkBinExpression(pExp, REPORT(pShared));
   }
 	setExpressionType(pExp);
@@ -101,7 +101,7 @@ void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
 void setExpressionType(ndExpression *pExp) {
 	tpType *pType = NEW(tpType);
 	pType->depth = 0;
-	switch(pExp->expType) {
+	switch(pExp->expTag) {
 		case EXP_NUMBER:
 			pType->token = NUMBER;
 			break;
@@ -141,7 +141,7 @@ void setExpressionType(ndExpression *pExp) {
 }
 
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport) {
-  switch(pExp->value.bin.expType) {
+  switch(pExp->value.bin.expTag) {
     case EXPBIN_PLUS:
     case EXPBIN_MINUS:
     case EXPBIN_ASTERISK:
@@ -168,9 +168,9 @@ int tokenFromBinOperation(tpType *pType1, tpType *pType2) {
 }
 
 void checkArithmeticExp(ndExpression *pExp, TYP_tpReport *pReport) {
-  if(pReport->type != TYP_RUNNING) return;
+  if(pReport->tag != TYP_RUNNING) return;
   if (pExp->pType->depth > 0) {
-    pReport->type = TYP_NO_ARITHMETIC_TYPE;
+    pReport->tag = TYP_NO_ARITHMETIC_TYPE;
     pReport->pExp = pExp;
   }
 }
@@ -195,8 +195,8 @@ void setTypeFromNew(ndNew* pNew, tpType *pType) {
  */
 
 void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
-  if(pVar->varType == VAR_ARRAY) {
+  if(REPORT(pShared)->tag != TYP_RUNNING) return;
+  if(pVar->varTag == VAR_ARRAY) {
 		setArrayVarType(pVar);
 		checkVarInx(pVar, REPORT(pShared));
   }
@@ -213,7 +213,7 @@ void setArrayVarType(ndVar *pVar) {
 void checkVarInx(ndVar *pVar, TYP_tpReport *pReport) {
 	ndExpression *pExp = pVar->value.address.pInxExp;
 	if(!isValidInxType(pExp->pType)) {
-		pReport->type = TYP_NO_VALID_ARRAY_INDEX;
+		pReport->tag = TYP_NO_VALID_ARRAY_INDEX;
 		pReport->pExp = pExp;
 	}
 }
@@ -232,9 +232,9 @@ int isValidInxType(tpType *pType) {
  */
 
 void checkNewInx(ndNew *pNew, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(REPORT(pShared)->tag != TYP_RUNNING) return;
   if(!isValidInxType(pNew->pExp->pType)) {
-    REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
+    REPORT(pShared)->tag = TYP_NO_VALID_ARRAY_INDEX;
     REPORT(pShared)->pExp = pNew->pExp;
   }
 }

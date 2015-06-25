@@ -9,8 +9,8 @@ void ASY_raw(char *fmt, ...) {
 	va_end(args);
 }
 
-void ASY_globalVar(char *varName, char *varType, char *varValue) {
-	ASY_raw("%s: .%s %s\n", varName, varType, varValue);
+void ASY_globalVar(char *varName, char *varTag, char *varValue) {
+	ASY_raw("%s: .%s %s\n", varName, varTag, varValue);
 }
 
 void ASY_function(char *funcName) {
