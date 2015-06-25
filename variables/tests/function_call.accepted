@@ -1,0 +1,12 @@
+int xpto() {}
+int main() {
+	int x;
+	x = xpto();
+}
+-----
+int xpto() {}
+int main() {
+	int[] x;
+	int y;
+	y = x[xpto()];
+}

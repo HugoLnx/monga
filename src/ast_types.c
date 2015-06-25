@@ -16,11 +16,13 @@ enum enTokenGroup tokenGroup(int tk);
 
 void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared);
 void setExpressionType(ndExpression *pExp);
+void checkVoidFunctionCall(ndExpression *pExp, TYP_tpReport *pReport);
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport);
 int tokenFromBinOperation(tpType *pType1, tpType *pType2);
 void checkArithmeticExp(ndExpression *pExp, TYP_tpReport *pReport);
 void setTypeFromVar(ndVar* pVar, tpType *pType);
 void setTypeFromNew(ndNew* pNew, tpType *pType);
+void setTypeFromFunctionCall(ndFunctionCall *pCall, tpType *pType);
 
 void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared);
 void setArrayVarType(ndVar *pVar);
@@ -95,6 +97,9 @@ void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
   if(pExp->expTag == EXPND_BIN) {
     checkBinExpression(pExp, REPORT(pShared));
   }
+	checkVoidFunctionCall(pExp, REPORT(pShared));
+
+	if(REPORT(pShared)->tag != TYP_RUNNING) return;
 	setExpressionType(pExp);
 }
 
@@ -125,7 +130,7 @@ void setExpressionType(ndExpression *pExp) {
 			setTypeFromNew(pExp->value.pNode, pType);
 			break;
 		case EXPND_CALL:
-      pType->token = NUMBER;
+      setTypeFromFunctionCall((ndFunctionCall*)pExp->value.pNode, pType);
 			break;
 		case EXPND_BIN:
 			pType->token = tokenFromBinOperation(
@@ -138,6 +143,17 @@ void setExpressionType(ndExpression *pExp) {
 			break;
 	}
   pExp->pType = pType;
+}
+
+void checkVoidFunctionCall(ndExpression *pExp, TYP_tpReport *pReport) {
+  if (pExp->expTag == EXPND_CALL) {
+		ndFunctionCall *pCall = (ndFunctionCall*) pExp->value.pNode;
+		if (strcmp(pCall->functionName, "printf") == 0
+				|| pCall->pDeclaration->pReturnType->token == TK_VOID) {
+			pReport->tag = TYP_VOID_FUNCTION_AS_EXP;
+			pReport->pExp = pExp;
+		}
+	}
 }
 
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport) {
@@ -183,6 +199,12 @@ void setTypeFromVar(ndVar* pVar, tpType *pType) {
 void setTypeFromNew(ndNew* pNew, tpType *pType) {
 	pType->token = pNew->pType->token;
 	pType->depth = pNew->pType->depth + 1;
+}
+
+void setTypeFromFunctionCall(ndFunctionCall *pCall, tpType *pType) {
+	ndFunction *pFunc = pCall->pDeclaration;
+	pType->token = pFunc->pReturnType->token;
+	pType->depth = pFunc->pReturnType->depth;
 }
 
 

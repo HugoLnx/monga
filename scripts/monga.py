@@ -161,11 +161,12 @@ def execute_normal_test(test_path):
     return "Failing test: " + test_path + "\n" + msg
 
 def is_rejected(output):
-  matching = re.search(r'^Error:', output)
+  matching = re.search(r'^[eE]rror:', output)
   return matching
 
 def is_not_rejected(output):
-  return not is_rejected(output)
+  matching = re.search(r'^Error:', output)
+  return not matching
 
 def execute_reject_test(test_path):
   return execute_multiline_case(test_path, is_not_rejected, "should be rejected but the output was")

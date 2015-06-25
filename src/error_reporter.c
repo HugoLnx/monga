@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "error_reporter.h"
+#include "ast_tree.h"
 
 int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
   switch(pReport->tag) {
@@ -15,6 +16,7 @@ int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
 }
 
 int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
+	ndFunctionCall *pCall;
   switch(pReport->tag) {
   case TYP_UNMATCH:
     printf("Error: Unmatching type in attribution of '%s' to type '%d'\n",
@@ -27,6 +29,11 @@ int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
   case TYP_NO_VALID_ARRAY_INDEX:
     printf("Error: Expression as array index have invalid type %d,%d\n",
       pReport->pExp->pType->token, pReport->pExp->pType->depth);
+    break;
+	case TYP_VOID_FUNCTION_AS_EXP:
+		pCall = (ndFunctionCall*) pReport->pExp->value.pNode;
+    printf("Error: Void function call as expression %s\n",
+				pCall->functionName);
     break;
   }
 

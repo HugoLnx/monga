@@ -2,3 +2,16 @@ int main() { xpto(); }
 -----
 int main() { xpto(); }
 void xpto() {}
+-----
+void xpto() {}
+int main() {
+	int x;
+	x = xpto();
+}
+-----
+float xpto() {}
+int main() {
+	int[] x;
+	int y;
+	y = x[xpto()];
+}
