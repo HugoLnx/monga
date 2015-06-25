@@ -11,7 +11,7 @@
 #define LFUNC(varName) ((struct stState*) varName)->pLastFunc 
 
 void pushVariable(ndVariable *pVar, void *pShared);
-void checkVar(ndVar *pVar, void *pShared);
+void checkVarName(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
 void updateLastFunction(ndFunction *pFunc, void *pShared);
@@ -22,9 +22,7 @@ struct stState {
 	ndFunction *pLastFunc;
 };
 
-VAR_tpVarResume *resumeVar(ndVar *pVar);
 VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
-
 	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
   struct stState *pState = NEW(struct stState);
 	pState->pStackVariables = STK_create();
@@ -33,7 +31,7 @@ VAR_tpReport *VAR_checkVariablesScopes(ndDeclarations *pDeclarations) {
 
   pEvents->onParameter = pushVariable;
   pEvents->onVariable = pushVariable; 
-  pEvents->onVar = checkVar;
+  pEvents->onVar = checkVarName;
 	pEvents->onFunction = updateLastFunction;
 
   pEvents->onNewLevel = pushNewScopeVariablesIfBlock; 
@@ -57,30 +55,20 @@ void pushVariable(ndVariable *pVar, void *pShared) {
 	}
 }
 
-void checkVar(ndVar *pVar, void *pShared) {
+void checkVarName(ndVar *pVar, void *pShared) {
   if(REPORT(pShared)->type != VAR_RUNNING) return;
-  VAR_tpVarResume *pVarResume = resumeVar(pVar);
-  ndVariable *pVarDec = (ndVariable*) STK_getCurrentReferenceTo(STACK(pShared), pVarResume->name);
-	if (pVarDec == NULL){
-    REPORT(pShared)->type = VAR_UNDEFINED;
-    REPORT(pShared)->pVarResume = pVarResume;
-	} else {
-		pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
-		pVar->pBackDeclaration->pVarDec = pVarDec;
-		pVar->pBackDeclaration->usedDepth = pVarDec->pType->depth - pVarResume->depth;
+	if (pVar->varType == VAR_ID) {
+		pVar->pBase = pVar;
+		ndVariable *pVarDec = (ndVariable*) STK_getCurrentReferenceTo(STACK(pShared), pVar->value.name);
+		if (pVarDec == NULL){
+			REPORT(pShared)->type = VAR_UNDEFINED;
+			REPORT(pShared)->pVar = pVar;
+		} else {
+			pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
+			pVar->pBackDeclaration->pVarDec = pVarDec;
+			pVar->pBackDeclaration->usedDepth = pVarDec->pType->depth;
+		}
 	}
-}
-
-VAR_tpVarResume *resumeVar(ndVar *pVar) {
-  VAR_tpVarResume *pResume = NEW(VAR_tpVarResume);
-  pResume->pVarTop = pVar;
-  pResume->depth = 0;
-  while(pVar->varType == VAR_ARRAY) {
-    pResume->depth++;
-    pVar = (ndVar*) (pVar->value.address.pPointerExp->value.pNode);
-  }
-  pResume->name = pVar->value.name;
-  return pResume;
 }
 
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared) {

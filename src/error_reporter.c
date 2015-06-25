@@ -5,7 +5,7 @@ int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
   if (pReport->type == VAR_ALL_REFERENCED) {
     return 0;
   } else {
-    printf("Error: Undefined variable '%s'\n", pReport->pVarResume->name);
+    printf("Error: Undefined variable '%s'\n", pReport->pVar->pBase->value.name);
     return 1;
   }
 }

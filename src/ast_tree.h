@@ -114,6 +114,7 @@ typedef struct stExpressionNode {
 typedef struct stVarNode {
   enum enVarType varType;
 	tpVarBackDeclaration *pBackDeclaration;
+	struct stVarNode *pBase;
   union {
     char *name;
     struct {

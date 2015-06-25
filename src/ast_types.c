@@ -11,17 +11,23 @@
 enum enTokenGroup { GR_NUMBER, GR_FLOAT };
 
 void checkAttribution(ndAttribution *pAttr, void *pShared);
+int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
+enum enTokenGroup tokenGroup(int tk);
+
 void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared);
 void setExpressionType(ndExpression *pExp);
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport);
+int tokenFromBinOperation(tpType *pType1, tpType *pType2);
 void checkArithmeticExp(ndExpression *pExp, TYP_tpReport *pReport);
-void checkVarInx(ndVar *pVar, void *pShared);
-void checkNewInx(ndNew *pNew, void *pShared);
-int isValidInxType(tpType *pType);
-int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType);
-enum enTokenGroup tokenGroup(int tk);
 void setTypeFromVar(ndVar* pVar, tpType *pType);
 void setTypeFromNew(ndNew* pNew, tpType *pType);
+
+void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared);
+void setArrayVarType(ndVar *pVar);
+void checkVarInx(ndVar *pVar, TYP_tpReport *pReport);
+int isValidInxType(tpType *pType);
+
+void checkNewInx(ndNew *pNew, void *pShared);
 
 TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 	POSTTRA_tpEvents *pEvents = NEW(POSTTRA_tpEvents);
@@ -30,7 +36,7 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
 
   pEvents->onAttribution = checkAttribution;
   pEvents->onExp = setExpressionTypeAndVerify;
-  pEvents->onVar = checkVarInx;
+  pEvents->onVar = setArrayVarTypeAndCheckInxExpression;
   pEvents->onNew = checkNewInx;
 
   POSTTRA_execute(pDeclarations, pEvents, (void*) pReport);
@@ -39,6 +45,10 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
   }
   return pReport;
 }
+
+/* ATTRIBUTION CHECK
+ * TODO: doc
+ */
 
 void checkAttribution(ndAttribution *pAttr, void *pShared) {
   if(REPORT(pShared)->type != TYP_RUNNING) return;
@@ -51,14 +61,41 @@ void checkAttribution(ndAttribution *pAttr, void *pShared) {
 	}
 }
 
-int tokenFromBinOperation(tpType *pType1, tpType *pType2) {
-	if(pType1->token == TK_FLOAT || pType2->token == TK_FLOAT) {
-		return TK_FLOAT;
+int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
+  tpType *pVarType = pVarBack->pVarDec->pType;
+	return (pVarBack->usedDepth == pExpType->depth) && 
+    tokenGroup(pVarType->token) == tokenGroup(pExpType->token);
+}
+
+enum enTokenGroup tokenGroup(int tk) {
+	switch(tk) {
+		case TK_INT:
+		case NUMBER:
+		case HEXADECIMAL:
+		case TK_CHAR:
+		case CHAR:
+			return GR_NUMBER;
+		case TK_FLOAT:
+		case FLOAT:
+			return GR_FLOAT;
 	}
-	if(pType1->token == NUMBER || pType2->token == NUMBER) {
-		return NUMBER;
-	}
-	return CHAR;
+}
+
+/* END ATTRIBUTION CHECK */
+
+
+
+
+/* EXPRESSION TYPING
+ * TODO: doc
+ */
+
+void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(pExp->expType == EXPND_BIN) {
+    checkBinExpression(pExp, REPORT(pShared));
+  }
+	setExpressionType(pExp);
 }
 
 void setExpressionType(ndExpression *pExp) {
@@ -103,14 +140,6 @@ void setExpressionType(ndExpression *pExp) {
   pExp->pType = pType;
 }
 
-void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
-  if(pExp->expType == EXPND_BIN) {
-    checkBinExpression(pExp, REPORT(pShared));
-  }
-	setExpressionType(pExp);
-}
-
 void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport) {
   switch(pExp->value.bin.expType) {
     case EXPBIN_PLUS:
@@ -128,56 +157,22 @@ void checkBinExpression(ndExpression *pExp, TYP_tpReport *pReport) {
   }
 }
 
+int tokenFromBinOperation(tpType *pType1, tpType *pType2) {
+	if(pType1->token == TK_FLOAT || pType2->token == TK_FLOAT) {
+		return TK_FLOAT;
+	}
+	if(pType1->token == NUMBER || pType2->token == NUMBER) {
+		return NUMBER;
+	}
+	return CHAR;
+}
+
 void checkArithmeticExp(ndExpression *pExp, TYP_tpReport *pReport) {
   if(pReport->type != TYP_RUNNING) return;
   if (pExp->pType->depth > 0) {
     pReport->type = TYP_NO_ARITHMETIC_TYPE;
     pReport->pExp = pExp;
   }
-}
-
-void checkVarInx(ndVar *pVar, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
-  if(pVar->varType == VAR_ARRAY) {
-    ndExpression *pExp = pVar->value.address.pInxExp;
-    if(!isValidInxType(pExp->pType)) {
-      REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
-      REPORT(pShared)->pExp = pExp;
-    }
-  }
-}
-
-void checkNewInx(ndNew *pNew, void *pShared) {
-  if(REPORT(pShared)->type != TYP_RUNNING) return;
-  if(!isValidInxType(pNew->pExp->pType)) {
-    REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
-    REPORT(pShared)->pExp = pNew->pExp;
-  }
-}
-
-int isValidInxType(tpType *pType) {
-  return pType->depth == 0
-    && tokenGroup(pType->token) != GR_FLOAT;
-}
-
-int typeIsCompatible(tpVarBackDeclaration *pVarBack, tpType *pExpType) {
-  tpType *pVarType = pVarBack->pVarDec->pType;
-	return (pVarBack->usedDepth == pExpType->depth) && 
-    tokenGroup(pVarType->token) == tokenGroup(pExpType->token);
-}
-
-enum enTokenGroup tokenGroup(int tk) {
-	switch(tk) {
-		case TK_INT:
-		case NUMBER:
-		case HEXADECIMAL:
-		case TK_CHAR:
-		case CHAR:
-			return GR_NUMBER;
-		case TK_FLOAT:
-		case FLOAT:
-			return GR_FLOAT;
-	}
 }
 
 void setTypeFromVar(ndVar* pVar, tpType *pType) {
@@ -189,3 +184,58 @@ void setTypeFromNew(ndNew* pNew, tpType *pType) {
 	pType->token = pNew->pType->token;
 	pType->depth = pNew->pType->depth + 1;
 }
+
+
+/* END EXPRESSION TYPING */
+
+
+
+/* ARRAY VAR TYPING
+ * TODO: doc
+ */
+
+void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(pVar->varType == VAR_ARRAY) {
+		setArrayVarType(pVar);
+		checkVarInx(pVar, REPORT(pShared));
+  }
+}
+
+void setArrayVarType(ndVar *pVar) {
+	ndVar *pChildVar = (ndVar*) (pVar->value.address.pPointerExp->value.pNode);
+	pVar->pBase = pChildVar->pBase;
+	pVar->pBackDeclaration = NEW(tpVarBackDeclaration);
+	pVar->pBackDeclaration->pVarDec = pChildVar->pBackDeclaration->pVarDec;
+	pVar->pBackDeclaration->usedDepth = pChildVar->pBackDeclaration->usedDepth - 1;
+}
+
+void checkVarInx(ndVar *pVar, TYP_tpReport *pReport) {
+	ndExpression *pExp = pVar->value.address.pInxExp;
+	if(!isValidInxType(pExp->pType)) {
+		pReport->type = TYP_NO_VALID_ARRAY_INDEX;
+		pReport->pExp = pExp;
+	}
+}
+
+int isValidInxType(tpType *pType) {
+  return pType->depth == 0
+    && tokenGroup(pType->token) != GR_FLOAT;
+}
+
+/* END ARRAY VAR TYPING */
+
+
+
+/* NEW ARRAY TYPING
+ * TODO: doc
+ */
+
+void checkNewInx(ndNew *pNew, void *pShared) {
+  if(REPORT(pShared)->type != TYP_RUNNING) return;
+  if(!isValidInxType(pNew->pExp->pType)) {
+    REPORT(pShared)->type = TYP_NO_VALID_ARRAY_INDEX;
+    REPORT(pShared)->pExp = pNew->pExp;
+  }
+}
+/* END NEW ARRAY TYPING */
