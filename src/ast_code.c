@@ -61,7 +61,7 @@ int isIntExpression(ndExpression *pExp){
 
 void codeForExp(ndExpression *pExp, void *pShared) {
 	char *label;
-  ndNew *pNew;
+	ndNew *pNew;
 	switch(pExp->expTag) {
 		case(EXPND_VAR):
 			codeForVar(pExp->value.pNode, pShared);
@@ -92,13 +92,14 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			break;
 		case(EXP_HEXADECIMAL):
 		case(EXP_NUMBER):
-		case(EXP_CHAR):
 			ASY_raw("movl $%lld, %%eax\n", pExp->value.ival);
+			break;
+		case(EXP_CHAR):
+			ASY_raw("movb $%d, %%al\n", pExp->value.ival);
 			break;
 		case(EXPND_MINUS):
 			codeForExp((ndExpression*) pExp->value.pNode, pShared);
 			ASY_raw("imull $-1, %%eax\n");
-			// TODO IF FLOAT
 			break;
 		case(EXPND_EXCLAMATION): 
 			codeForExp((ndExpression*) pExp->value.pNode, pShared);
@@ -126,7 +127,12 @@ void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
 		ASY_globalVar(pVar->name, "int", "0");
 	} else {
 		pVar->stackPadding = STATE(pShared)->lastVarPadding;
-		STATE(pShared)->lastVarPadding -= 4;
+		if (pVar->pType->token == TK_CHAR) {
+			STATE(pShared)->lastVarPadding -= 1;
+		}
+		else {
+			STATE(pShared)->lastVarPadding -= 4;
+		}
 	}
 }
 
@@ -314,8 +320,8 @@ void codeForWhile(ndWhile *pWhile, void *pShared) {
 	ASY_raw("je %s\n", endLabel);
 	codeForStatement(pWhile->pStat, pShared);
 
-	((tpState*) pShared)->jmpLoopWhileLabel = loopInt;
-	((tpState*) pShared)->jmpEndWhileLabel = endInt;
+	STATE(pShared)->jmpLoopWhileLabel = loopInt;
+	STATE(pShared)->jmpEndWhileLabel = endInt;
 
 }
 
@@ -329,7 +335,13 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 		while(LIS_goNext(pList)) {
 			ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
 			codeForExp(pStat, pShared);
-			ASY_raw("pushl %%eax\n");
+			// TODO não testei
+			if (isCharExpression(pStat)) {
+				ASY_raw("pushb %%al\n");
+			}
+			else {
+				ASY_raw("pushl %%eax\n");
+			}
 			qntParams++;
 		}
 	}
@@ -373,8 +385,13 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	codeForVar(pAttr->pVar, pShared);
 	ASY_raw("pushl %%eax\n");
 	codeForExp(pAttr->pExp, pShared);
-	ASY_raw("popl %%ecx\n");
-	ASY_raw("movl %%eax, (%%ecx)\n");
+	ASY_raw("popl %%ecx\n");	
+	if (pAttr->pVar->pBackDeclaration->pVarDec->pType->token == TK_CHAR) {
+		ASY_raw("movb %%al, (%%ecx)\n");
+	}
+	else {
+		ASY_raw("movl %%eax, (%%ecx)\n");
+	}
 }
 
 void COD_codeForTree(ndDeclarations *pDeclarations) {
@@ -408,4 +425,15 @@ int isFloatExpression(ndExpression *pExp){
 
 int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
 	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
+}
+
+int isCharExpression(ndExpression *pExp) {
+	ndVar *ndVariable;
+	if (pExp->expTag == EXPND_VAR){
+		ndVariable = (ndVar *) pExp->value.pNode;
+		return ndVariable->varTag == EXP_CHAR;
+	}
+	else if (pExp->expTag == EXPND_MINUS)
+		return isCharExpression((ndExpression*) pExp->value.pNode);
+	return pExp->expTag == EXP_CHAR;
 }
