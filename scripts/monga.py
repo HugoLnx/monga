@@ -84,6 +84,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "ast_types.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "stack.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "error_reporter.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "error_reporter.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "label_generator.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "label_generator.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "assembly_writer.c") + " " + BUILD)
@@ -96,7 +98,7 @@ def compile():
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_variables", "ast_types", "label_generator", "assembly_writer", "ast_code"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_variables", "ast_types", "label_generator", "assembly_writer", "ast_code", "error_reporter"])
   return
 
 def critical_sys(cmd):
@@ -172,11 +174,14 @@ def failing_msg(output, expected):
   if expected:
     expected_lines = expected.split("\n")[:-2]
     for index,line in enumerate(expected_lines):
-      if index >= len(outlines): return "Differents:\
+      if index >= len(outlines):
+        return "Failing test: " + test_path + "\
+          \nDifference:\
           \n  Expected: \n===\n" + expected + "\n===\n\
           \n  Output: \n===\n" + output + "\n==="
       if line.strip() != outlines[index].strip():
-        return "Difference on line " + str(index+1) + ": \
+        return "Failing test: " + test_path + "\
+          \nDifference on line " + str(index+1) + ": \
           \n  Expected: " + (line.strip() if line else "<no-line>") + "\
           \n  Output: " + str(outlines[index].strip())
     return None

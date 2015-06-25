@@ -16,6 +16,6 @@ int main() {
 -----
 int main(){
   int[] a;
-  char[] b;
+  float[] b;
   b[0] = a[0];
 }

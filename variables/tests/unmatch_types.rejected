@@ -1,15 +1,15 @@
 int main() {
 	char a;
-	a = 10;
+	a = 10.0;
 }
 -----
-int a;
+float a;
 int main() {
 	char a;
-	a = 10;
+	a = 10.0;
 }
 -----
-int a;
+float a;
 int main(char a) {
-	a = 10;
+	a = 10.0;
 }

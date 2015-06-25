@@ -17,4 +17,4 @@ declarations:
               binary:0
                 exp:5
                   var:x
-                exp:3,3.00000
+                exp:0,3
