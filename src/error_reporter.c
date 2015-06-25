@@ -13,6 +13,9 @@ int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
   case VAR_UNDEFINED_FUNCTION:
     printf("Error: Undefined function '%s'\n", pReport->errorSource.pFunctionCall->functionName);
 		break;
+  case VAR_FUNCTION_OVERRIDING:
+    printf("Error: Function was overrided '%s'\n", pReport->errorSource.pFunction->name);
+		break;
   }
 
 	return pReport->tag != VAR_ALL_REFERENCED;

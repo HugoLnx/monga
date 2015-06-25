@@ -16,6 +16,7 @@ void checkVarName(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
 void pushFunctionDeclaration(ndFunction *pFunc, void *pShared);
+void checkFunctionAlreadyExist(ndFunction *pFunc, void *pShared);
 void referenceFunctionBackToDeclaration(ndFunctionCall *pCall, void *pShared);
 
 struct stState {
@@ -91,9 +92,28 @@ void popScopeVariablesIfBlock(char *evtName, void *pShared) {
 }
 
 void pushFunctionDeclaration(ndFunction *pFunc, void *pShared) {
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
+
+	checkFunctionAlreadyExist(pFunc, pShared);
+
+  if(REPORT(pShared)->tag != VAR_RUNNING) return;
+
 	pFunc->varsStackSize = 0;
 	LFUNC(pShared) = pFunc;
 	addLast(FUNCS(pShared), (void*) pFunc);
+}
+
+void checkFunctionAlreadyExist(ndFunction *pFunc, void *pShared) {
+	resetList(FUNCS(pShared));
+	while(goNext(FUNCS(pShared))) {
+		ndFunction *pTmpFunc;
+		pTmpFunc = (ndFunction*) getCurrentValue(FUNCS(pShared));
+		if (strcmp(pTmpFunc->name, pFunc->name) == 0) {
+			REPORT(pShared)->tag = VAR_FUNCTION_OVERRIDING;
+			REPORT(pShared)->errorSource.pFunction = pFunc;
+			break;
+		}
+	}
 }
 
 void referenceFunctionBackToDeclaration(ndFunctionCall *pCall, void *pShared) {
