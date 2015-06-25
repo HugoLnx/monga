@@ -8,4 +8,3 @@ void ASY_functionCall(char *funcName, int qntParams);
 void ASY_functionEnding();
 void ASY_raw(char *fmt, ...);
 void ASY_malloc(char *param);
-void ASY_free(char *param);

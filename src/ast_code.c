@@ -320,7 +320,6 @@ void codeForWhile(ndWhile *pWhile, void *pShared) {
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	int qntParams = 0;
 	tpList *pList;
-	ASY_functionCallHeader();
 
 	if(pCall->pExpList != NULL) {
     pList = pCall->pExpList->pList;
