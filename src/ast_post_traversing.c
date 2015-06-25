@@ -30,14 +30,14 @@ void POSTTRA_execute(ndDeclarations* pDeclarations, POSTTRA_tpEvents *pEvents, v
 }
 
 static void goDeclarations(ndDeclarations *pDeclarations, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pDeclarations == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onDeclarations);
   pList = pDeclarations->pList;
-  resetList(pList);
+  LIS_reset(pList);
 
-  while(goPrevious(pList)) {
-    ndDeclaration *pDec = (ndDeclaration*) getCurrentValue(pList);
+  while(LIS_goPrevious(pList)) {
+    ndDeclaration *pDec = (ndDeclaration*) LIS_getCurrentValue(pList);
     goDeclaration(pDec, pEvents, pShared);
   }
 	CALL_EVENT(onDeclarations, pDeclarations);
@@ -65,14 +65,14 @@ static void goFunction(ndFunction* pFunc, POSTTRA_tpEvents *pEvents, void *pShar
 }
 
 static void goParameters(ndParameters *pParameters, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pParameters == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onParameters);
   pList = pParameters->pList;
 
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
     goParameter(pVar, pEvents, pShared);
   }
 	CALL_EVENT(onParameters, pParameters);
@@ -86,12 +86,12 @@ static void goParameter(ndVariable *pVar, POSTTRA_tpEvents *pEvents, void *pShar
 }
 
 static void goVariables(ndVariables *pVariables, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList = pVariables->pList;
+  LIS_tpList *pList = pVariables->pList;
 	CALL_LEVEL_EVENT(onNewLevel,onVariables);
 
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
     goVariable(pVar, pEvents, pShared);
   }
 	CALL_EVENT(onVariables, pVariables);
@@ -113,14 +113,14 @@ static void goBlock(ndBlock *pBlock, POSTTRA_tpEvents *pEvents, void *pShared) {
 }
 
 static void goVarDeclarations(ndVarDeclarations *pVarDecs, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pVarDecs == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onVarDeclarations);
 
   pList = pVarDecs->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariables *pVars = (ndVariables*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariables *pVars = (ndVariables*) LIS_getCurrentValue(pList);
     goVariables(pVars, pEvents, pShared);
   }
 	CALL_EVENT(onVarDeclarations, pVarDecs);
@@ -128,14 +128,14 @@ static void goVarDeclarations(ndVarDeclarations *pVarDecs, POSTTRA_tpEvents *pEv
 }
 
 static void goStatements(ndStatements *pStats, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pStats == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onStatements);
 
   pList = pStats->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndStatement *pStat = (ndStatement*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndStatement *pStat = (ndStatement*) LIS_getCurrentValue(pList);
     goStatement(pStat, pEvents, pShared);
   }
 	CALL_EVENT(onStatements, pStats);
@@ -222,14 +222,14 @@ static void goFunctionCallNode(ndFunctionCall *pFunctionCall, POSTTRA_tpEvents *
 }
 
 static void goExpListNode(ndExpList *pExpList, POSTTRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pExpList == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onExpList);
 
   pList = pExpList->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
     goExp(pStat, pEvents, pShared);
   }
 	CALL_EVENT(onExpList, pExpList);

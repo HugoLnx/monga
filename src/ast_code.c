@@ -128,14 +128,14 @@ void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
 }
 
 void codeForParameters(ndParameters *pParams, void *pShared) {
-	tpList *pList;
+	LIS_tpList *pList;
 	int paramPadding = 8;
 	if (pParams == NULL) return;
 
   pList = pParams->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
 		pVar->stackPadding = paramPadding;
 		paramPadding += 4;
   }
@@ -319,13 +319,13 @@ void codeForWhile(ndWhile *pWhile, void *pShared) {
 
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	int qntParams = 0;
-	tpList *pList;
+	LIS_tpList *pList;
 
 	if(pCall->pExpList != NULL) {
     pList = pCall->pExpList->pList;
-		resetList(pList);
-		while(goNext(pList)) {
-			ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+		LIS_reset(pList);
+		while(LIS_goNext(pList)) {
+			ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
 			codeForExp(pStat, pShared);
 			ASY_raw("pushl %%eax\n");
 			qntParams++;

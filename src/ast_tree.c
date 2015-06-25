@@ -18,10 +18,10 @@ void incrDepth(tpType *pType) {
 }
 
 void addTypeToVars(tpType *pType, ndVariables *pVars) {
-	tpList *pList = pVars->pList;	
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+	LIS_tpList *pList = pVars->pList;	
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
 		pVar->pType = pType;
   }
 }
@@ -40,13 +40,13 @@ ndDeclaration *finishDeclaration(tpType *pType, ndDeclaration *pDec) {
 
 ndDeclarations *createFullDeclarationsNode(ndDeclaration *pDec) {
 	pDeclarations = NEW(ndDeclarations);
-	pDeclarations->pList = createList();
+	pDeclarations->pList = LIS_create();
 	addFullDeclaration(pDeclarations, pDec);
 	return pDeclarations;
 }
 
 ndDeclarations *addFullDeclaration(ndDeclarations *pDecs, ndDeclaration *pDec) {
-	addLast(pDecs->pList, (void*)pDec);
+	LIS_addLast(pDecs->pList, (void*)pDec);
 	return pDecs;
 }
 
@@ -81,7 +81,7 @@ ndDeclaration *createDeclarationNode(void *node, enum enDeclaration decTag) {
 
 ndParameters* createParametersNode(ndVariable* pVar) {
 	ndParameters *pParams = NEW(ndParameters);
-	pParams->pList = createList();
+	pParams->pList = LIS_create();
 	addParam(pParams, pVar);
 	return pParams;
 }
@@ -94,24 +94,24 @@ ndVariable* createParameterNode(tpType *pType, char *name) {
 }
 
 void addParam(ndParameters *pParams, ndVariable *pVar) {
-	addLast(pParams->pList, (void*)pVar);
+	LIS_addLast(pParams->pList, (void*)pVar);
 }
 
 ndExpList* createExpListNode(ndExpression *pExp) {
   ndExpList *pExpList = NEW(ndExpList);
-  pExpList->pList =  createList();
+  pExpList->pList =  LIS_create();
   addExpListNode(pExpList, pExp);
   return pExpList;
 }
 
 void addExpListNode(ndExpList *pExpList, ndExpression *pExp) {
-  addLast(pExpList->pList, (void*)pExp);
+  LIS_addLast(pExpList->pList, (void*)pExp);
 }
 
 
 ndVariables *createVariablesNode(char *name) {
   ndVariables *pVars = NEW(ndVariables);
-  pVars->pList = createList();
+  pVars->pList = LIS_create();
   addVariable(pVars, name);
   return pVars;
 }
@@ -119,31 +119,31 @@ ndVariables *createVariablesNode(char *name) {
 void addVariable(ndVariables *pVars, char *name) {
   ndVariable *pVar = NEW(ndVariable);
   pVar->name = name;
-  addLast(pVars->pList, pVar);
+  LIS_addLast(pVars->pList, pVar);
 }
 
 ndVarDeclarations *createVarDeclarations(tpType *pType, ndVariables *pVars) {
   ndVarDeclarations *pVarDecs = NEW(ndVarDeclarations);
-  pVarDecs->pList = createList();
+  pVarDecs->pList = LIS_create();
   addVarDeclaration(pVarDecs, pType, pVars);
   return pVarDecs;
 }
 
 void addVarDeclaration(ndVarDeclarations *pVarDecs, tpType *pType, ndVariables *pVars) {
 	addTypeToVars(pType, pVars);
-  tpList *pList = pVarDecs->pList;
-  addLast(pList, (void*)pVars);
+  LIS_tpList *pList = pVarDecs->pList;
+  LIS_addLast(pList, (void*)pVars);
 }
 
 ndStatements *createStatements(ndStatement *pStat) {
   ndStatements *pStats = NEW(ndStatements);
-  pStats->pList = createList();
+  pStats->pList = LIS_create();
   addStatement(pStats, pStat);
   return pStats;
 }
 
 void addStatement(ndStatements *pStats, ndStatement *pStat) {
-  addLast(pStats->pList, (void*) pStat);
+  LIS_addLast(pStats->pList, (void*) pStat);
 }
 
 ndStatement *createStatement(void *pNode, enum enStatTag statTag) {

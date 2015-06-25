@@ -37,7 +37,7 @@ typedef struct stDeclaration {
 } ndDeclaration;
 
 typedef struct stDeclarations {
-	tpList *pList;
+	LIS_tpList *pList;
 } ndDeclarations;
 
 typedef struct stType {
@@ -59,11 +59,11 @@ typedef struct stFunctionNode {
 } ndFunction;
 
 typedef struct stParametersNode {
-	tpList *pList;
+	LIS_tpList *pList;
 } ndParameters;
 
 typedef struct stVariablesNode {
-	tpList *pList;
+	LIS_tpList *pList;
 } ndVariables;
 
 typedef struct stVariableNode {
@@ -74,11 +74,11 @@ typedef struct stVariableNode {
 } ndVariable;
 
 typedef struct stVarDeclarationsNode {
-	tpList *pList;
+	LIS_tpList *pList;
 } ndVarDeclarations;
 
 typedef struct stStatementsNode {
-	tpList *pList;
+	LIS_tpList *pList;
 } ndStatements;
 
 typedef struct stStatementNode {
@@ -141,7 +141,7 @@ typedef struct stFunctionCallNode {
 } ndFunctionCall;
 
 typedef struct stExpListNode {
-  tpList *pList;
+  LIS_tpList *pList;
 } ndExpList;
 
 typedef struct stIfElseNode {

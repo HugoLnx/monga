@@ -30,15 +30,15 @@ void TRA_execute(ndDeclarations* pDeclarations, TRA_tpEvents *pEvents, void *pSh
 }
 
 static void goDeclarations(ndDeclarations *pDeclarations ,TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pDeclarations == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onDeclarations);
 	CALL_EVENT(onDeclarations, pDeclarations);
   pList = pDeclarations->pList;
-  resetList(pList);
+  LIS_reset(pList);
 
-  while(goPrevious(pList)) {
-    ndDeclaration *pDec = (ndDeclaration*) getCurrentValue(pList);
+  while(LIS_goPrevious(pList)) {
+    ndDeclaration *pDec = (ndDeclaration*) LIS_getCurrentValue(pList);
     goDeclaration(pDec, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onDeclarations);
@@ -65,15 +65,15 @@ static void goFunction(ndFunction* pFunc, TRA_tpEvents *pEvents, void *pShared) 
 }
 
 static void goParameters(ndParameters *pParameters, TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pParameters == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onParameters);
 	CALL_EVENT(onParameters, pParameters);
   pList = pParameters->pList;
 
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
     goParameter(pVar, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onParameters);
@@ -86,13 +86,13 @@ static void goParameter(ndVariable *pVar, TRA_tpEvents *pEvents, void *pShared) 
 }
 
 static void goVariables(ndVariables *pVariables, TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList = pVariables->pList;
+  LIS_tpList *pList = pVariables->pList;
 	CALL_LEVEL_EVENT(onNewLevel,onVariables);
 	CALL_EVENT(onVariables, pVariables);
 
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariable *pVar = (ndVariable*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariable *pVar = (ndVariable*) LIS_getCurrentValue(pList);
     goVariable(pVar, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onVariables);
@@ -113,30 +113,30 @@ static void goBlock(ndBlock *pBlock ,TRA_tpEvents *pEvents, void *pShared) {
 }
 
 static void goVarDeclarations(ndVarDeclarations *pVarDecs, TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pVarDecs == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onVarDeclarations);
 	CALL_EVENT(onVarDeclarations, pVarDecs);
 
   pList = pVarDecs->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndVariables *pVars = (ndVariables*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndVariables *pVars = (ndVariables*) LIS_getCurrentValue(pList);
     goVariables(pVars, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onVarDeclarations);
 }
 
 static void goStatements(ndStatements *pStats, TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pStats == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onStatements);
 	CALL_EVENT(onStatements, pStats);
 
   pList = pStats->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndStatement *pStat = (ndStatement*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndStatement *pStat = (ndStatement*) LIS_getCurrentValue(pList);
     goStatement(pStat, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onStatements);
@@ -222,15 +222,15 @@ static void goFunctionCallNode(ndFunctionCall *pFunctionCall, TRA_tpEvents *pEve
 }
 
 static void goExpListNode(ndExpList *pExpList, TRA_tpEvents *pEvents, void *pShared) {
-  tpList *pList;
+  LIS_tpList *pList;
   if(pExpList == NULL) return;
 	CALL_LEVEL_EVENT(onNewLevel,onExpList);
 	CALL_EVENT(onExpList, pExpList);
 
   pList = pExpList->pList;
-  resetList(pList);
-  while(goPrevious(pList)) {
-    ndExpression *pStat = (ndExpression*) getCurrentValue(pList);
+  LIS_reset(pList);
+  while(LIS_goPrevious(pList)) {
+    ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
     goExp(pStat, pEvents, pShared);
   }
 	CALL_LEVEL_EVENT(onBackLevel,onExpList);

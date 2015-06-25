@@ -2,7 +2,7 @@
 #include "list.h"
 #include <stdlib.h>
 
-struct stNodeList {
+struct LIS_stList {
   struct stNode *pHead;
   struct stNode *pLast;
   struct stNode *pCurrent;
@@ -15,8 +15,8 @@ typedef struct stNode {
   struct stNode *pPrevious;
 } tpNode;
 
-tpList *createList() {
-	tpList *pList = (tpList*) malloc(sizeof(tpList));
+LIS_tpList *LIS_create() {
+	LIS_tpList *pList = (LIS_tpList*) malloc(sizeof(LIS_tpList));
   pList->pHead = NULL;
   pList->pLast = NULL;
   pList->pCurrent = NULL;
@@ -24,7 +24,7 @@ tpList *createList() {
   return pList;
 }
 
-void addLast(tpList *pList, void *val) {
+void LIS_addLast(LIS_tpList *pList, void *val) {
   tpNode *pOldLast = pList->pLast;
 
   tpNode *pNewNode = (tpNode*) malloc(sizeof(tpNode));
@@ -41,7 +41,7 @@ void addLast(tpList *pList, void *val) {
   pList->count++;
 }
 
-int goNext(tpList *pList){
+int LIS_goNext(LIS_tpList *pList){
   if(pList->pCurrent == NULL) {
     pList->pCurrent = pList->pHead;
   } else {
@@ -54,7 +54,7 @@ int goNext(tpList *pList){
   }
 }
 
-int goPrevious(tpList *pList){
+int LIS_goPrevious(LIS_tpList *pList){
   if(pList->pCurrent == NULL) {
     pList->pCurrent = pList->pLast;
   } else {
@@ -67,14 +67,14 @@ int goPrevious(tpList *pList){
   }
 }
 
-void *getCurrentValue(tpList *pList){
+void *LIS_getCurrentValue(LIS_tpList *pList){
   return pList->pCurrent->pValue;
 }
 
-void resetList(tpList *pList) {
+void LIS_reset(LIS_tpList *pList) {
   pList->pCurrent = NULL;
 }
 
-int getListSize(tpList *pList) {
+int LIS_getCount(LIS_tpList *pList) {
   return pList->count;
 }

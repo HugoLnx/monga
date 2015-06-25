@@ -299,16 +299,16 @@ void checkNewInx(ndNew *pNew, void *pShared) {
 
 void checkParamsFunctionCall(ndFunctionCall *pCall, void *pShared) {
 	int argsCount=0, paramsCount=0;
-	tpList *pArgs, *pParams;
+	LIS_tpList *pArgs, *pParams;
 	
   if(REPORT(pShared)->tag != TYP_RUNNING || strcmp(pCall->functionName, "printf") == 0) return;
 	if (pCall->pExpList != NULL)  {
 		pArgs = pCall->pExpList->pList;
-		argsCount = getListSize(pArgs);
+		argsCount = LIS_getCount(pArgs);
 	}
 	if (pCall->pDeclaration->pParameters != NULL) {
 		pParams = pCall->pDeclaration->pParameters->pList;
-		paramsCount = getListSize(pParams);
+		paramsCount = LIS_getCount(pParams);
 	}
 
 	if (argsCount == 0 && paramsCount == 0) return;
@@ -318,11 +318,11 @@ void checkParamsFunctionCall(ndFunctionCall *pCall, void *pShared) {
 		return;
 	}
 
-	resetList(pArgs);
-	resetList(pParams);
-	while(goNext(pArgs) && goNext(pParams)) {
-		ndVariable *pParam = (ndVariable*) getCurrentValue(pParams);
-		ndExpression *pArg = (ndExpression*) getCurrentValue(pArgs);
+	LIS_reset(pArgs);
+	LIS_reset(pParams);
+	while(LIS_goNext(pArgs) && LIS_goNext(pParams)) {
+		ndVariable *pParam = (ndVariable*) LIS_getCurrentValue(pParams);
+		ndExpression *pArg = (ndExpression*) LIS_getCurrentValue(pArgs);
 		
 		if(!typeIsCompatibleForAssignment(pParam->pType, pArg->pType)) {
 			REPORT(pShared)->tag = TYP_WRONG_PARAMETERS;

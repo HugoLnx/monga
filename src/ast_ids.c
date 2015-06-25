@@ -24,7 +24,7 @@ struct stState {
   STK_tpScopeStack *pStackVariables;
   IDS_tpReport *pReport;
 	ndFunction *pLastFunc;
-	tpList *pFunctions;
+	LIS_tpList *pFunctions;
 	int ignoreNextBlockOpening;
 };
 
@@ -33,7 +33,7 @@ IDS_tpReport *IDS_checkVariablesScopes(ndDeclarations *pDeclarations) {
   struct stState *pState = NEW(struct stState);
 	pState->pStackVariables = STK_create();
   pState->pReport = NEW(IDS_tpReport);
-  pState->pFunctions = createList();
+  pState->pFunctions = LIS_create();
   pState->pReport->tag = IDS_RUNNING;
 	pState->ignoreNextBlockOpening = 0;
 
@@ -119,14 +119,14 @@ void pushFunctionDeclaration(ndFunction *pFunc, void *pShared) {
 
 	pFunc->varsStackSize = 0;
 	LFUNC(pShared) = pFunc;
-	addLast(FUNCS(pShared), (void*) pFunc);
+	LIS_addLast(FUNCS(pShared), (void*) pFunc);
 }
 
 void checkFunctionAlreadyExist(ndFunction *pFunc, void *pShared) {
-	resetList(FUNCS(pShared));
-	while(goNext(FUNCS(pShared))) {
+	LIS_reset(FUNCS(pShared));
+	while(LIS_goNext(FUNCS(pShared))) {
 		ndFunction *pTmpFunc;
-		pTmpFunc = (ndFunction*) getCurrentValue(FUNCS(pShared));
+		pTmpFunc = (ndFunction*) LIS_getCurrentValue(FUNCS(pShared));
 		if (strcmp(pTmpFunc->name, pFunc->name) == 0) {
 			REPORT(pShared)->tag = IDS_FUNCTION_OVERRIDING;
 			REPORT(pShared)->errorSource.pFunction = pFunc;
@@ -138,10 +138,10 @@ void checkFunctionAlreadyExist(ndFunction *pFunc, void *pShared) {
 void referenceFunctionBackToDeclaration(ndFunctionCall *pCall, void *pShared) {
 	ndFunction *pFunc = NULL;
 
-	resetList(FUNCS(pShared));
-	while(goNext(FUNCS(pShared))) {
+	LIS_reset(FUNCS(pShared));
+	while(LIS_goNext(FUNCS(pShared))) {
 		ndFunction *pTmpFunc;
-		pTmpFunc = (ndFunction*) getCurrentValue(FUNCS(pShared));
+		pTmpFunc = (ndFunction*) LIS_getCurrentValue(FUNCS(pShared));
 		if (strcmp(pTmpFunc->name, pCall->functionName) == 0) {
 			pFunc = pTmpFunc;
 			break;
