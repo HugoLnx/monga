@@ -154,7 +154,11 @@ def execute_normal_test(test_path):
   test_output = execute_assembly(test_path)
   expected_path = test_path[:-3] + ".expected"
   expected = (open(expected_path, 'r').read() if os.path.exists(expected_path) else None)
-  return failing_msg(test_output, expected)
+  msg = failing_msg(test_output, expected)
+  if msg is None:
+    return None
+  else:
+    return "Failing test: " + test_path + "\n" + msg
 
 def is_rejected(output):
   matching = re.search(r'^Error:', output)
@@ -175,13 +179,11 @@ def failing_msg(output, expected):
     expected_lines = expected.split("\n")[:-2]
     for index,line in enumerate(expected_lines):
       if index >= len(outlines):
-        return "Failing test: " + test_path + "\
-          \nDifference:\
+        return "Difference:\
           \n  Expected: \n===\n" + expected + "\n===\n\
           \n  Output: \n===\n" + output + "\n==="
       if line.strip() != outlines[index].strip():
-        return "Failing test: " + test_path + "\
-          \nDifference on line " + str(index+1) + ": \
+        return "Difference on line " + str(index+1) + ": \
           \n  Expected: " + (line.strip() if line else "<no-line>") + "\
           \n  Output: " + str(outlines[index].strip())
     return None

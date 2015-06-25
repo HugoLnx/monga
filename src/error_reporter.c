@@ -2,12 +2,16 @@
 #include "error_reporter.h"
 
 int ERR_printErrorsOnVarReport(VAR_tpReport *pReport) {
-  if (pReport->tag == VAR_ALL_REFERENCED) {
-    return 0;
-  } else {
-    printf("Error: Undefined variable '%s'\n", pReport->pVar->pBase->value.name);
-    return 1;
+  switch(pReport->tag) {
+  case VAR_UNDEFINED:
+    printf("Error: Undefined variable '%s'\n", pReport->errorSource.pVar->pBase->value.name);
+		break;
+  case VAR_UNDEFINED_FUNCTION:
+    printf("Error: Undefined function '%s'\n", pReport->errorSource.pFunctionCall->functionName);
+		break;
   }
+
+	return pReport->tag != VAR_ALL_REFERENCED;
 }
 
 int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
@@ -26,9 +30,5 @@ int ERR_printErrorsOnTypesReport(TYP_tpReport *pReport) {
     break;
   }
 
-  if(pReport->tag == TYP_WELL_TYPED) {
-    return 0;
-  } else {
-    return 1;
-  }
+  return pReport->tag != TYP_WELL_TYPED;
 }

@@ -137,6 +137,7 @@ typedef struct stNewNode {
 typedef struct stFunctionCallNode {
   char *functionName;
   ndExpList *pExpList;
+	ndFunction *pDeclaration;
 } ndFunctionCall;
 
 typedef struct stExpListNode {
