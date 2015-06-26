@@ -1,11 +1,11 @@
 void main() {
 	int[] hey;
 	hey = new int[5];
-	hey[0] = 10;
-	hey[1] = 15;
-	hey[2] = 20;
-	hey[3] = 25;
-	hey[4] = 30;
+	hey[0] = 310;
+	hey[1] = 315;
+	hey[2] = 320;
+	hey[3] = 325;
+	hey[4] = 330;
 	printf("array1: %d\n", hey[0]);
 	printf("array2: %d\n", hey[1]);
 	printf("array3: %d\n", hey[2]);

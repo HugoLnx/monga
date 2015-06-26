@@ -32,6 +32,9 @@ void codeForElse(ndIfElse *pNode, void *pShared);
 void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared);
 void afterEvent(char *evtName, void *pShared);
 
+int isCharType(tpType *pType) {
+	return pType->token == TK_CHAR && pType->depth == 0;
+}
 
 void afterEvent(char *evtName, void *pShared) {
 	if (strcmp(evtName, "onFunction") == 0) {
@@ -65,12 +68,19 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 	switch(pExp->expTag) {
 		case(EXPND_VAR):
 			codeForVar(pExp->value.pNode, pShared);
-			ASY_raw("movl (%%eax), %%eax\n");
+			if (isCharType(pExp->pType)) {
+				ASY_raw("movl (%%eax), %%ecx\n");
+				ASY_raw("movb %%cl, %%al\n");
+			} else {
+				ASY_raw("movl (%%eax), %%eax\n");
+			}
 			break;
 		case(EXPND_NEW): 
 			pNew = (ndNew*) pExp->value.pNode;
 			codeForExp(pNew->pExp, pShared);
-			ASY_raw("imull $4,%%eax\n");
+			if(!isCharType(pNew->pType)) {
+			  ASY_raw("imull $4,%%eax\n");
+			}
 			ASY_malloc("%eax");
 			break;
 		case(EXP_TEXT):
@@ -127,7 +137,7 @@ void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
 		ASY_globalVar(pVar->name, "int", "0");
 	} else {
 		pVar->stackPadding = STATE(pShared)->lastVarPadding;
-		if (pVar->pType->token == TK_CHAR) {
+		if (isCharType(pVar->pType)) {
 			STATE(pShared)->lastVarPadding -= 1;
 		}
 		else {
@@ -172,7 +182,9 @@ void codeForVar(ndVar *pVar, void *pShared) {
 		codeForExp(pVar->value.address.pPointerExp, pShared);
 		ASY_raw("pushl %%eax\n");
 		codeForExp(pVar->value.address.pInxExp, pShared);
-		ASY_raw("imull $4,%%eax\n");
+		if (!isCharType(pVar->pBackDeclaration->pVarDec->pType)) {
+			ASY_raw("imull $4,%%eax\n");
+	  }
 		ASY_raw("movl %%eax,%%ecx\n");
 		ASY_raw("popl %%eax\n");
 		ASY_raw("addl %%ecx,%%eax\n");
@@ -335,7 +347,13 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 		while(LIS_goNext(pList)) {
 			ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
 			codeForExp(pStat, pShared);
-			ASY_raw("pushl %%eax\n");
+			if (isCharType(pStat->pType)) {
+				ASY_raw("movzbl %%al, %%eax\n");
+				ASY_raw("pushl %%eax\n");
+			}
+			else {
+				ASY_raw("pushl %%eax\n");
+			}
 			paramsStackSize += 4;
 		}
 	}
@@ -380,8 +398,8 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	ASY_raw("pushl %%eax\n");
 	codeForExp(pAttr->pExp, pShared);
 	ASY_raw("popl %%ecx\n");	
-	if (pAttr->pVar->pBackDeclaration->pVarDec->pType->token == TK_CHAR) {
-		ASY_raw("movb %%al, (%%ecx)\n");
+	if (isCharType(pAttr->pVar->pBackDeclaration->pVarDec->pType)) {
+		ASY_raw("movl %%eax, (%%ecx)\n");
 	}
 	else {
 		ASY_raw("movl %%eax, (%%ecx)\n");

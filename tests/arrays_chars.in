@@ -1,0 +1,14 @@
+void main() {
+	char[] hey;
+	hey = new char[5];
+	hey[0] = 'A';
+	hey[1] = 'B';
+	hey[4] = 'E';
+	hey[2] = 'C';
+	hey[3] = 'D';
+	printf("array1: %c\n", hey[0]);
+	printf("array2: %c\n", hey[1]);
+	printf("array3: %c\n", hey[2]);
+	printf("array4: %c\n", hey[3]);
+	printf("array5: %c\n", hey[4]);
+}

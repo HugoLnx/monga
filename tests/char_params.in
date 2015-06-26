@@ -1,0 +1,9 @@
+int xpto(char a, int b, char c) {
+	printf("a: %c\n", a);
+	printf("b: %d\n", b);
+	printf("c: %c\n", c);
+}
+
+int main() {
+	xpto('A', 99, 'C');
+}

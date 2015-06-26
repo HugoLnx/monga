@@ -1,13 +1,13 @@
 void main() {
-	int[][] array;
-	array = new int[][2];
-	array[0] = new int[2];
-	array[1] = new int[3];
-  array[0][0] = 310;
-  array[0][1] = 315;
-  array[1][0] = 320;
-  array[1][1] = 325;
-  array[1][2] = 330;
+	char[][] array;
+	array = new char[][2];
+	array[0] = new char[2];
+	array[1] = new char[3];
+  array[0][0] = 256;
+  array[0][1] = 65;
+  array[1][0] = 66;
+  array[1][1] = 67;
+  array[1][2] = 68;
 	printf("array[0][0]: %d\n", array[0][0]);
 	printf("array[0][1]: %d\n", array[0][1]);
 	printf("array[1][0]: %d\n", array[1][0]);

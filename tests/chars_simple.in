@@ -1,0 +1,9 @@
+int main() {
+	char a, b, c;
+	a = 'A';
+	b = 'B';
+	c = 'C';
+	printf("a: %c\n", a);
+	printf("b: %c\n", b);
+	printf("c: %c\n", c);
+}
