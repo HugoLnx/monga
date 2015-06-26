@@ -125,11 +125,12 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 }
 
 void codeForFunction(ndFunction *pFunc, void *pShared) {
-	STATE(pShared)->lastVarPadding = -4;
+	int totalSpace = pFunc->varsStackSize;
+	STATE(pShared)->lastVarPadding = -totalSpace;
 	ASY_raw(".text\n");
 	ASY_function(pFunc->name);
 	ASY_functionBeginning();
-	ASY_raw("subl $%d, %%esp\n", pFunc->varsStackSize+4);
+	ASY_raw("subl $%d, %%esp\n", totalSpace);
 }
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
@@ -138,10 +139,10 @@ void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
 	} else {
 		pVar->stackPadding = STATE(pShared)->lastVarPadding;
 		if (isCharType(pVar->pType)) {
-			STATE(pShared)->lastVarPadding -= 1;
+			STATE(pShared)->lastVarPadding += 1;
 		}
 		else {
-			STATE(pShared)->lastVarPadding -= 4;
+			STATE(pShared)->lastVarPadding += 4;
 		}
 	}
 }
@@ -399,7 +400,7 @@ void codeForAttribution(ndAttribution *pAttr, void *pShared) {
 	codeForExp(pAttr->pExp, pShared);
 	ASY_raw("popl %%ecx\n");	
 	if (isCharType(pAttr->pVar->pBackDeclaration->pVarDec->pType)) {
-		ASY_raw("movl %%eax, (%%ecx)\n");
+		ASY_raw("movb %%al, (%%ecx)\n");
 	}
 	else {
 		ASY_raw("movl %%eax, (%%ecx)\n");

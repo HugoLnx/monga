@@ -1,9 +1,15 @@
 int main() {
+	int num;
 	char a, b, c;
+	int num2;
+	num = 300;
 	a = 'A';
 	b = 'B';
 	c = 'C';
+	num2 = 350;
+	printf("num1: %d\n", num);
 	printf("a: %c\n", a);
 	printf("b: %c\n", b);
 	printf("c: %c\n", c);
+	printf("num2: %d\n", num2);
 }
