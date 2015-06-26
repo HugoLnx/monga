@@ -6,6 +6,8 @@ Final Delivery: Code generator
   Tests Runner
 		The script "scripts/run_tests.sh" execute all five test suites. (lexical, syntax, ast-tree, ids-and-types, monga).
 
+
+
 	Runner
 	  The script "scripts/monga.py" have the following commands:
 			* run: Generate the assembly code to a monga code.
@@ -18,8 +20,10 @@ Final Delivery: Code generator
 		  * ./scripts/monga.py exec tests/simple.in
 		  * ./scripts/monga.py test_all
 		  * ./scripts/monga.py test tests/simple.in
+
+
 	
-	Overview
+	Project Overview
 	  Abstract Syntax Tree creation
 		  The module ast_tree have all the structures to the tree and also the functions to create it,
 			that functions are used by yacc to generate the AST.
@@ -48,7 +52,48 @@ Final Delivery: Code generator
 			we traverse the AST in pre-order generating the assembly code.
 
 	
-	Changelog:
+
+	Modules overview
+    * assembly_writer:
+				Encapsulates the assembly writing, and tries to hide some assembly details, like
+		    function call and declaration.
+
+    * ast_code:
+				Generates the assembly code, based on the AST.
+
+    * ast_ids:
+				Bind variables and functions to its declarations.
+
+    * ast_types:
+				Resolve the types of expressions and vars.
+
+    * ast_post_traversing:
+				Traverse the tree in post-order and trigger events when visiting each node.
+
+    * ast_pre_traversing:
+				Traverse the tree in pre-order and trigger events when visiting each node.
+
+    * ast_tree:
+				Encapsulates all the domain structures and unions of the AST.
+
+    * error_reporter:
+				Print the error reported by ast_ids or ast_types.
+
+    * label_generator:
+				Generate labels to be used in assembly code generation.
+
+    * list:
+				Handle linked lists.
+
+    * stack:
+				Handle stacks of variables and scopes.
+
+    * utils:
+				Utilitary functions and macros.
+
+	
+
+	Changelog
 		* Module created: ast_post_traversing - Encapsulates the logic of traversing the AST in post-order.
 		* Feature: Linking function to its declaration.
 		* Feature: Validating if two variables have the same name in the same context.
@@ -56,6 +101,8 @@ Final Delivery: Code generator
 		* Feature: Validating function parameters.
 		* Feature: Expression type are defined based on its children.
 		* Feature: Assembly code generation.
+
+
 
 	Tests
 	There are three types of test:
@@ -66,9 +113,13 @@ Final Delivery: Code generator
 		* Files named as "testname.rejected":
 		  Each block between "-----" represents a test case that should be rejected.
 
+
+
 	Could not implement in time:
 	  * Code generation support for floats.
 	  * Function call expression as pointer to array.
+
+
 
 
 
