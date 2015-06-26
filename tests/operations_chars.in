@@ -1,0 +1,24 @@
+void main() {
+	char a,b,c,e;
+	int d;
+	a = 10;
+	b = 20;
+	c = a + b;
+	d = 10;
+	e = d + b;
+	printf("c: %d\n", c);
+	printf("a+b: %d\n", a + b);
+	printf("a+b+c: %d\n", a + b + c);
+	printf("b-a: %d\n", b - a);
+	printf("b/a: %d\n", b / a);
+	printf("a*b: %d\n", a*b);
+	printf("a+b*c/a: %d\n", a+b*c/a);
+
+	printf("e: %d\n", e);
+	printf("d+b: %d\n", a + b);
+	printf("d+b+c: %d\n", d + b + c);
+	printf("b-d: %d\n", b - d);
+	printf("b/d: %d\n", b / d);
+	printf("d*b: %d\n", d*b);
+	printf("d+b*c/d: %d\n", d+b*c/d);
+}

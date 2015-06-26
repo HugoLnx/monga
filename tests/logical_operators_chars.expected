@@ -1,11 +1,6 @@
 ! a > c || c < b
 c > a
-a == a || b == b
-a != a || b == b
-!(a != a || b != b)
 c > b && c >= c
 ! c < b && c >= c
 ! (c - a) > c && c >= c
 c > b && a <= c
-a == a && b == b
-!(a != a && b == b)

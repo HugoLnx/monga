@@ -199,10 +199,6 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 		// TODO: float treat
 	}
 	else {
-		codeForExp(pExp->value.bin.pExp1, pShared);
-		ASY_raw("pushl %%eax\n");
-		codeForExp(pExp->value.bin.pExp2, pShared);
-		ASY_raw("popl %%ecx\n");
 		ASY_raw("cmp %%eax, %%ecx\n");
 		ASY_raw("%s %s\n", command, labelTrue);
 		ASY_raw("movl $0, %%eax\n");
@@ -215,16 +211,22 @@ void generateNumbersExpBin(char *command, ndExpression *pExp, void *pShared) {
 
 void codeForExpBin(ndExpression *pExp, void *pShared) {
 	char *labelTrue, *labelMiddle, *labelFalse, *labelEnd;
+	codeForExp(pExp->value.bin.pExp1, pShared);
+	ASY_raw("pushl %%eax\n");
+	codeForExp(pExp->value.bin.pExp2, pShared);
+	ASY_raw("popl %%ecx\n");
+	if (isCharType(pExp->value.bin.pExp1->pType)) {
+		ASY_raw("movsbl %%cl, %%ecx\n");
+	}
+	if (isCharType(pExp->value.bin.pExp2->pType)) {
+		ASY_raw("movsbl %%al, %%eax\n");
+	}
 	switch(pExp->value.bin.expTag) {
 		case(EXPBIN_PLUS):
 			if (isFloatOperation(pExp->value.bin.pExp1, pExp->value.bin.pExp2)) {
 				// TODO: float treat
 			}
 			else {
-				codeForExp(pExp->value.bin.pExp1, pShared);
-				ASY_raw("pushl %%eax\n");
-				codeForExp(pExp->value.bin.pExp2, pShared);
-				ASY_raw("popl %%ecx\n");
 				ASY_raw("addl %%ecx, %%eax\n");
 			}
 			break;
@@ -233,11 +235,10 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				// TODO: float treat
 			}
 			else {
-				codeForExp(pExp->value.bin.pExp1, pShared);
-				ASY_raw("pushl %%eax\n");
-				codeForExp(pExp->value.bin.pExp2, pShared);
-				ASY_raw("movl %%eax, %%ecx\n");
-				ASY_raw("popl %%eax\n");
+				ASY_raw("movl %%eax, %%edx\n");
+				ASY_raw("movl %%ecx, %%eax\n");
+				ASY_raw("movl %%edx, %%ecx\n");
+
 				ASY_raw("movl $0,%%edx\n");
 				ASY_raw("divl %%ecx\n");
 			}
@@ -247,12 +248,8 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				// TODO: float treat
 			}
 			else {
-				codeForExp(pExp->value.bin.pExp1, pShared);
-				ASY_raw("pushl %%eax\n");
-				codeForExp(pExp->value.bin.pExp2, pShared);
-				ASY_raw("movl %%eax, %%ecx\n");
-				ASY_raw("popl %%eax\n");
-				ASY_raw("subl %%ecx, %%eax\n");
+				ASY_raw("subl %%eax, %%ecx\n");
+				ASY_raw("movl %%ecx, %%eax\n");
 			}
 			break;
 		case(EXPBIN_ASTERISK):
@@ -260,20 +257,12 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 				// TODO: float treat
 			}
 			else {
-				codeForExp(pExp->value.bin.pExp1, pShared);
-				ASY_raw("pushl %%eax\n");
-				codeForExp(pExp->value.bin.pExp2, pShared);
-				ASY_raw("popl %%ecx\n");
 				ASY_raw("imull %%ecx, %%eax\n");
 			}
 			break;
 		case(EXPBIN_AND):
 			labelFalse = LBL_generate(LBL_next());
 			labelEnd = LBL_generate(LBL_next());
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("pushl %%eax\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("popl %%ecx\n");
 			ASY_raw("cmp $0, %%ecx\n");
 			ASY_raw("je %s\n", labelFalse);
 			ASY_raw("cmp $0, %%eax\n");
@@ -287,10 +276,6 @@ void codeForExpBin(ndExpression *pExp, void *pShared) {
 		case(EXPBIN_OR):
 			labelTrue = LBL_generate(LBL_next());
 			labelEnd = LBL_generate(LBL_next());
-			codeForExp(pExp->value.bin.pExp1, pShared);
-			ASY_raw("pushl %%eax\n");
-			codeForExp(pExp->value.bin.pExp2, pShared);
-			ASY_raw("popl %%ecx\n");
 			ASY_raw("cmp $0, %%ecx\n");
 			ASY_raw("jne %s\n", labelTrue);
 			ASY_raw("cmp $0, %%eax\n");
