@@ -1,4 +1,4 @@
-#include "ast_traversing.h"
+#include "ast_pre_traversing.h"
 #include "ast_code.h"
 #include "assembly_writer.h"
 #include "utils.h"
@@ -35,7 +35,7 @@ void afterEvent(char *evtName, void *pShared);
 int isCharType(tpType *pType);
 
 void COD_codeForTree(ndDeclarations *pDeclarations) {
-	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+	PRETRA_tpEvents *pEvents = NEW(PRETRA_tpEvents);
 
 	pEvents->onFunction = codeForFunction;
 	pEvents->onVariable = codeForVarDeclaration;
@@ -52,7 +52,7 @@ void COD_codeForTree(ndDeclarations *pDeclarations) {
 	tpState *pState = NEW(tpState);
 
 	ASY_raw(".data\n");
-	TRA_execute(pDeclarations, pEvents, (void*)pState);
+	PRETRA_execute(pDeclarations, pEvents, (void*)pState);
 	ASY_raw(".end\n\n");
 }
 

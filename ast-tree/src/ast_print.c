@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include "ast_print.h"
-#include "ast_traversing.h"
+#include "ast_pre_traversing.h"
 #include "list.h"
 
 void printDeclarations(ndDeclarations *pDecs             ,void *pShared);
@@ -33,7 +33,7 @@ void removeIdentShared(char *evtName, void *pShared);
 
 
 void printTree(ndDeclarations *pDeclarations) {
-	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+	PRETRA_tpEvents *pEvents = NEW(PRETRA_tpEvents);
   pEvents->onDeclarations = printDeclarations;
   pEvents->onDeclaration = printDeclaration;
   pEvents->onFunction = printFunction;
@@ -58,7 +58,7 @@ void printTree(ndDeclarations *pDeclarations) {
   pEvents->onNewLevel = addIdentShared;
   pEvents->onBackLevel = removeIdentShared;
 	char *ident = strDup("");
-	TRA_execute(pDeclarations, pEvents, (void*) &ident);
+	PRETRA_execute(pDeclarations, pEvents, (void*) &ident);
 }
 
 void printDeclarations(ndDeclarations *pDecs, void *pShared) {

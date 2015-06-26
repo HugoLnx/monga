@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "utils.h"
 #include "ast_ids.h"
-#include "ast_traversing.h"
+#include "ast_pre_traversing.h"
 #include "stack.h"
 #include "y.tab.h"
 
@@ -30,7 +30,7 @@ struct stState {
 };
 
 IDS_tpReport *IDS_checkVariablesScopes(ndDeclarations *pDeclarations) {
-	TRA_tpEvents *pEvents = NEW(TRA_tpEvents);
+	PRETRA_tpEvents *pEvents = NEW(PRETRA_tpEvents);
   struct stState *pState = NEW(struct stState);
 	pState->pStackVariables = STK_create();
   pState->pReport = NEW(IDS_tpReport);
@@ -47,7 +47,7 @@ IDS_tpReport *IDS_checkVariablesScopes(ndDeclarations *pDeclarations) {
   pEvents->onNewLevel = pushNewScopeVariablesIfBlock; 
   pEvents->onBackLevel = popScopeVariablesIfBlock; 
 
-  TRA_execute(pDeclarations, pEvents, (void*) pState);
+  PRETRA_execute(pDeclarations, pEvents, (void*) pState);
   if (pState->pReport->tag == IDS_RUNNING) {
     pState->pReport->tag = IDS_ALL_REFERENCED;
   }

@@ -74,8 +74,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "list.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_traversing.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_pre_traversing.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_pre_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_post_traversing.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_post_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "ast_ids.h") + " " + BUILD)
@@ -98,7 +98,7 @@ def compile():
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_traversing", "ast_post_traversing", "ast_ids", "ast_types", "label_generator", "assembly_writer", "ast_code", "error_reporter"])
+  compile_main(["main", "list", "stack", "utils", "ast_tree", "ast_pre_traversing", "ast_post_traversing", "ast_ids", "ast_types", "label_generator", "assembly_writer", "ast_code", "error_reporter"])
   return
 
 def critical_sys(cmd):

@@ -75,8 +75,8 @@ def compile():
   os.system("cp " + os.path.join(SRC, "list.c") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.h") + " " + BUILD)
   os.system("cp " + os.path.join(SRC, "utils.c") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_traversing.h") + " " + BUILD)
-  os.system("cp " + os.path.join(SRC, "ast_traversing.c") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_pre_traversing.h") + " " + BUILD)
+  os.system("cp " + os.path.join(SRC, "ast_pre_traversing.c") + " " + BUILD)
   os.system("cp " + os.path.join(AST_SRC, "main.c") + " " + BUILD)
   os.system("cp " + os.path.join(AST_SRC, "main.h") + " " + BUILD)
   os.system("cp " + os.path.join(AST_SRC, "ast_print.h") + " " + BUILD)
@@ -87,7 +87,7 @@ def compile():
   critical_sys("yacc -d -i -v -o 'y.tab.c' " + os.path.join(BUILD, "monga.yacc"))
   os.chdir(current_dir)
   
-  compile_main(["main", "list", "utils", "ast_tree", "ast_traversing", "ast_print"])
+  compile_main(["main", "list", "utils", "ast_tree", "ast_pre_traversing", "ast_print"])
   return
 
 def compile_main(artefacts):
