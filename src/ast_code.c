@@ -326,7 +326,7 @@ void codeForWhile(ndWhile *pWhile, void *pShared) {
 }
 
 void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
-	int qntParams = 0;
+	int paramsStackSize = 0;
 	LIS_tpList *pList;
 
 	if(pCall->pExpList != NULL) {
@@ -335,18 +335,12 @@ void codeForFunctionCall(ndFunctionCall *pCall, void *pShared) {
 		while(LIS_goNext(pList)) {
 			ndExpression *pStat = (ndExpression*) LIS_getCurrentValue(pList);
 			codeForExp(pStat, pShared);
-			// TODO não testei
-			if (isCharExpression(pStat)) {
-				ASY_raw("pushb %%al\n");
-			}
-			else {
-				ASY_raw("pushl %%eax\n");
-			}
-			qntParams++;
+			ASY_raw("pushl %%eax\n");
+			paramsStackSize += 4;
 		}
 	}
 
-	ASY_functionCall(pCall->functionName, qntParams);
+	ASY_functionCall(pCall->functionName, paramsStackSize);
 }
 
 void codeForStatement(ndStatement *pStat, void *pShared) {

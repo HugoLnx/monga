@@ -27,9 +27,9 @@ void ASY_functionBeginning() {
 	ASY_raw("movl %%esp, %%ebp\n");
 }
 
-void ASY_functionCall(char *funcName, int qntParams) {
+void ASY_functionCall(char *funcName, int paramsStackSize) {
 	ASY_raw("call %s\n", funcName);
-	ASY_raw("addl $%d, %%esp\n", qntParams*4);
+	ASY_raw("addl $%d, %%esp\n", paramsStackSize);
 }
 
 void ASY_functionEnding() {
@@ -40,5 +40,5 @@ void ASY_functionEnding() {
 
 void ASY_malloc(char *param) {
 	ASY_raw("pushl %s\n", param);
-	ASY_functionCall("malloc", 1);
+	ASY_functionCall("malloc", 4);
 }
