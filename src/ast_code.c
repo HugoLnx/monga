@@ -63,7 +63,7 @@ int isIntExpression(ndExpression *pExp){
 }
 
 void codeForExp(ndExpression *pExp, void *pShared) {
-	char *label;
+	char *label, *label2;
 	ndNew *pNew;
 	switch(pExp->expTag) {
 		case(EXPND_VAR):
@@ -112,8 +112,16 @@ void codeForExp(ndExpression *pExp, void *pShared) {
 			ASY_raw("imull $-1, %%eax\n");
 			break;
 		case(EXPND_EXCLAMATION): 
+			label = LBL_generate(LBL_next());
+			label2 = LBL_generate(LBL_next());
 			codeForExp((ndExpression*) pExp->value.pNode, pShared);
-			ASY_raw("notl %%eax\n");
+			ASY_raw("cmpl $0, %%eax\n");
+			ASY_raw("je %s\n", label);
+			ASY_raw("movl $0, %%eax\n");
+			ASY_raw("jmp %s\n", label2);
+			ASY_label(label);
+			ASY_raw("movl $1, %%eax\n", label);
+			ASY_label(label2);
 			break;
 		case(EXPND_BIN): 
 			codeForExpBin(pExp, pShared);

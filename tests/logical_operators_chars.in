@@ -14,6 +14,22 @@ void orOperations() {
 	} else {
 		printf("! c > a\n");
 	}
+
+	if (!(a == a || b == b)) {
+		printf("!(a == a || b == b)\n");
+	} else {
+		printf("a == a || b == b\n");
+	}
+	if (!(a != a || b == b)) {
+		printf("!(a != a || b == b)\n");
+	} else {
+		printf("a != a || b == b\n");
+	}
+	if (!(a != a || b != b)) {
+		printf("!(a != a || b != b)\n");
+	} else {
+		printf("a != a || b != b\n");
+	}
 }
 
 void andOperations() {
@@ -39,6 +55,16 @@ void andOperations() {
 		printf("c > b && a <= c\n");
 	} else {
 		printf("! c > b && a <= c\n");
+	}
+	if (!(a == a && b == b)) {
+		printf("!(a == a && b == b)\n");
+	} else {
+		printf("a == a && b == b\n");
+	}
+	if (!(a != a && b == b)) {
+		printf("!(a != a && b == b)\n");
+	} else {
+		printf("a != a && b == b\n");
 	}
 }
 
