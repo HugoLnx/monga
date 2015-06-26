@@ -269,7 +269,12 @@ void codeForParameters(ndParameters *pParams, void *pShared) {
 
 void codeForVarDeclaration(ndVariable *pVar, void *pShared) {
 	if(pVar->isGlobal) {
-		ASY_globalVar(pVar->name, "int", "0");
+		if (isCharType(pVar->pType)) {
+			ASY_globalVar(pVar->name, "byte", "0");
+		}
+		else {
+			ASY_globalVar(pVar->name, "int", "0");
+		}
 	} else {
 		pVar->stackPadding = STATE(pShared)->lastVarPadding;
 		if (isCharType(pVar->pType)) {
