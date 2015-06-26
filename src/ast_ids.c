@@ -16,6 +16,7 @@ void pushVariable(ndVariable *pVar, void *pShared);
 void checkVarName(ndVar *pVar, void *pShared);
 void pushNewScopeVariablesIfBlock(char *evtName, void *pShared);
 void popScopeVariablesIfBlock(char *evtName, void *pShared);
+
 void pushFunctionDeclaration(ndFunction *pFunc, void *pShared);
 void checkFunctionAlreadyExist(ndFunction *pFunc, void *pShared);
 void referenceFunctionBackToDeclaration(ndFunctionCall *pCall, void *pShared);
