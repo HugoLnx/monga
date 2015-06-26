@@ -52,8 +52,8 @@ TYP_tpReport *TYP_checkMatchingTypes(ndDeclarations *pDeclarations) {
   return pReport;
 }
 
-/* ATTRIBUTION CHECK
- * TODO: doc
+/* 
+ * ATTRIBUTION CHECK
  */
 
 void checkAttribution(ndAttribution *pAttr, void *pShared) {
@@ -99,8 +99,8 @@ enum enTokenGroup tokenGroup(int tk) {
 
 
 
-/* EXPRESSION TYPING
- * TODO: doc
+/* 
+ * EXPRESSION TYPING
  */
 
 void setExpressionTypeAndVerify(ndExpression *pExp, void *pShared) {
@@ -224,8 +224,8 @@ void setTypeFromFunctionCall(ndFunctionCall *pCall, tpType *pType) {
 
 
 
-/* ARRAY VAR TYPING
- * TODO: doc
+/* 
+ * ARRAY VAR TYPING
  */
 
 void setArrayVarTypeAndCheckInxExpression(ndVar *pVar, void *pShared) {
@@ -276,8 +276,8 @@ int isValidInxType(tpType *pType) {
 
 
 
-/* NEW ARRAY TYPING
- * TODO: doc
+/* 
+ * NEW ARRAY TYPING
  */
 
 void checkNewInx(ndNew *pNew, void *pShared) {
@@ -293,8 +293,8 @@ void checkNewInx(ndNew *pNew, void *pShared) {
 
 
 
-/* CHECK PARAMS FUNCTION
- * TODO: doc
+/* 
+ * CHECK PARAMS FUNCTION
  */
 
 void checkParamsFunctionCall(ndFunctionCall *pCall, void *pShared) {

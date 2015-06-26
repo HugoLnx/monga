@@ -436,17 +436,6 @@ int isFloatOperation(ndExpression *pExp1, ndExpression *pExp2){
 	return isFloatExpression(pExp1) || isFloatExpression(pExp2);
 }
 
-int isCharExpression(ndExpression *pExp) {
-	ndVar *ndVariable;
-	if (pExp->expTag == EXPND_VAR){
-		ndVariable = (ndVar *) pExp->value.pNode;
-		return ndVariable->varTag == EXP_CHAR;
-	}
-	else if (pExp->expTag == EXPND_MINUS)
-		return isCharExpression((ndExpression*) pExp->value.pNode);
-	return pExp->expTag == EXP_CHAR;
-}
-
 int isCharType(tpType *pType) {
 	return pType->token == TK_CHAR && pType->depth == 0;
 }
